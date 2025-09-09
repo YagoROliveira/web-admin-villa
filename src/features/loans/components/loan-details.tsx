@@ -9,8 +9,9 @@ import { ThemeSwitch } from '@/components/theme-switch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CheckCircle, Clock, XCircle, Truck, Package, Edit, FileText } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, Truck, Package, Edit, FileText, TrendingUp } from 'lucide-react';
 import { LoanStatusChangeDialog } from './loan-status-change-dialog';
+import { LoanViabilityDialog } from './loan-viability-dialog';
 
 // Tipo para os dados detalhados do empréstimo
 interface LoanDetailsResponse {
@@ -84,6 +85,7 @@ export function LoanDetails() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isViabilityDialogOpen, setIsViabilityDialogOpen] = useState(false);
 
   // Função para lidar com a alteração de status
   const handleStatusChange = (data: { status: string; reason: string }) => {
@@ -231,6 +233,13 @@ export function LoanDetails() {
             </p>
           </div>
           <div className='flex gap-2'>
+            <Button
+              variant='outline'
+              className='space-x-1'
+              onClick={() => setIsViabilityDialogOpen(true)}
+            >
+              <span>Análise de Viabilidade</span> <TrendingUp size={18} />
+            </Button>
             <Button
               variant='outline'
               className='space-x-1'
@@ -473,6 +482,23 @@ export function LoanDetails() {
         onOpenChange={setIsStatusDialogOpen}
         onSubmit={handleStatusChange}
       />
+
+      {/* Modal de Análise de Viabilidade */}
+      {loanData && (
+        <LoanViabilityDialog
+          open={isViabilityDialogOpen}
+          onOpenChange={setIsViabilityDialogOpen}
+          loanData={{
+            id: loanData.loanRequested.id,
+            amountRequested: loanData.loanRequested.amountRequested,
+            valueApproved: loanData.loanRequested.valueApproved,
+            installmentAmount: loanData.loanRequested.installmentAmount,
+            numberOfInstallments: loanData.loanRequested.numberOfInstallments,
+            createdAt: loanData.loanRequested.createdAt,
+            installments: loanData.loanRequested.installments
+          }}
+        />
+      )}
     </>
   );
 }
