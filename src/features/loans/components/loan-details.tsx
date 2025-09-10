@@ -147,14 +147,67 @@ export function LoanDetails() {
     setIsLoading(true);
     setError(null);
 
-    fetch(`https://localhost/wallet/v1/loan/get-data-to-analisys?requestId=${loanId}`)
+    console.log('Buscando dados do empréstimo:', loanId);
+
+    // Vamos tentar primeiro o endpoint que funcionou na listagem
+    fetch(`https://prod.villamarket.app:8443/wallet/v1/list-loans?document=05573338145`)
       .then(async (res) => {
-        if (!res.ok) throw new Error('Erro ao buscar dados do empréstimo');
+        console.log('Response status:', res.status);
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Erro ${res.status}: ${res.statusText} - ${errorText}`);
+        }
+
         const data = await res.json();
-        setLoanData(data);
+        console.log('Data received:', data);
+
+        // Encontrar o empréstimo específico pelo ID
+        const loanDetail = data.find((loan: any) => loan.id === loanId);
+
+        if (!loanDetail) {
+          throw new Error('Empréstimo não encontrado');
+        }
+
+        // Adaptar os dados para o formato esperado
+        const adaptedData = {
+          loanRequested: {
+            id: loanDetail.id,
+            userName: loanDetail.userName,
+            phone: loanDetail.phone || '',
+            amountRequested: loanDetail.amountRequested,
+            document: loanDetail.document || '',
+            paymentMethod: loanDetail.paymentMethod || '',
+            email: loanDetail.email || '',
+            cidade: loanDetail.cidade || '',
+            estado: loanDetail.estado || '',
+            cep: loanDetail.cep || '',
+            endereco: loanDetail.endereco || '',
+            approvalStatus: loanDetail.approvalStatus,
+            analysisNotes: loanDetail.analysisNotes || '',
+            step: loanDetail.step || '',
+            valueApproved: loanDetail.valueApproved || loanDetail.amountRequested,
+            installmentAmount: loanDetail.installmentAmount || '0',
+            numberOfInstallments: loanDetail.numberOfInstallments || '1',
+            dueDate: loanDetail.dueDate,
+            bank: loanDetail.bank || '',
+            bank_agency: loanDetail.bank_agency || '',
+            bank_account: loanDetail.bank_account || '',
+            pix_key: loanDetail.pix_key || '',
+            createdAt: loanDetail.createdAt,
+            updatedAt: loanDetail.updatedAt,
+            hireloan: loanDetail.hireloan,
+            loanDocuments: loanDetail.loanDocuments || [],
+            installments: loanDetail.installments || [],
+          },
+          orders: loanDetail.orders || []
+        };
+
+        setLoanData(adaptedData);
         setIsLoading(false);
       })
       .catch((err) => {
+        console.error('Fetch error:', err);
         setError(err.message || 'Erro desconhecido');
         setIsLoading(false);
       });
