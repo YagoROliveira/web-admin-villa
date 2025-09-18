@@ -38,6 +38,7 @@ type DataTableProps = {
   data: User[]
   search: Record<string, unknown>
   navigate: NavigateFn
+  isLoading?: boolean
 }
 
 export function UsersTable({ data, search, navigate }: DataTableProps) {
@@ -63,8 +64,8 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
     pagination: { defaultPage: 1, defaultPageSize: 10 },
     globalFilter: { enabled: false },
     columnFilters: [
-      // username per-column text filter
-      { columnId: 'username', searchKey: 'username', type: 'string' },
+      // email per-column text filter
+      { columnId: 'firstName', searchKey: 'firstName', type: 'string' },
       { columnId: 'status', searchKey: 'status', type: 'array' },
       { columnId: 'role', searchKey: 'role', type: 'array' },
     ],
@@ -103,16 +104,15 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
       <DataTableToolbar
         table={table}
         searchPlaceholder='Filter users...'
-        searchKey='username'
+        searchKey='firstName'
         filters={[
           {
             columnId: 'status',
             title: 'Status',
             options: [
-              { label: 'Active', value: 'active' },
-              { label: 'Inactive', value: 'inactive' },
-              { label: 'Invited', value: 'invited' },
-              { label: 'Suspended', value: 'suspended' },
+              { label: 'Active', value: 'ACTIVE' },
+              { label: 'Inactive', value: 'INACTIVE' },
+              { label: 'Suspended', value: 'SUSPENDED' },
             ],
           },
           {
@@ -140,9 +140,9 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Loan } from '../data/schema';
+import { buildApiUrl, API_CONFIG } from '@/config/api';
 
 interface LoansProviderProps {
   children: ReactNode;
@@ -22,7 +23,8 @@ export function LoansProvider({ children }: LoansProviderProps) {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    fetch('https://prod.villamarket.app:8443/wallet/v1/list-loans?document=05573338145')
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.LOANS.LIST_ALL);
+    fetch(url)
       .then(async (res) => {
         if (!res.ok) throw new Error('Erro ao buscar empréstimos');
         const apiData = await res.json();

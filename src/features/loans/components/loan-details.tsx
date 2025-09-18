@@ -9,9 +9,13 @@ import { ThemeSwitch } from '@/components/theme-switch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { buildApiUrl, API_CONFIG } from '@/config/api';
 import { CheckCircle, Clock, XCircle, Truck, Package, Edit, FileText, TrendingUp } from 'lucide-react';
 import { LoanStatusChangeDialog } from './loan-status-change-dialog';
 import { LoanViabilityDialog } from './loan-viability-dialog';
+import { LoanApprovalDialog } from './loan-approval-dialog';
+import { LoanRejectionDialog } from './loan-rejection-dialog';
+import { LoanStatusIndicator } from './loan-status-indicator';
 
 // Tipo para os dados detalhados do empréstimo
 interface LoanDetailsResponse {
@@ -105,7 +109,7 @@ export function LoanDetails() {
       'aprovado': { label: 'Aprovado', color: 'bg-green-100 text-green-800', icon: CheckCircle },
       'recusado': { label: 'Recusado', color: 'bg-red-100 text-red-800', icon: XCircle },
     };
-    return statusMap[status.toLowerCase()] || { label: status, color: 'bg-gray-100 text-gray-800', icon: Clock };
+    return statusMap[status?.toLowerCase() || ''] || { label: status || 'Status não informado', color: 'bg-gray-100 text-gray-800', icon: Clock };
   };
 
   // Função para formatar status de pagamento
@@ -150,10 +154,9 @@ export function LoanDetails() {
     console.log('Buscando dados do empréstimo:', loanId);
 
     // Vamos tentar primeiro o endpoint que funcionou na listagem
-    fetch(`https://prod.villamarket.app:8443/wallet/v1/list-loans?document=05573338145`)
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.LOANS.GET_ANALYSIS_DATA, { requestId: loanId });
+    fetch(url)
       .then(async (res) => {
-        console.log('Response status:', res.status);
-
         if (!res.ok) {
           const errorText = await res.text();
           throw new Error(`Erro ${res.status}: ${res.statusText} - ${errorText}`);
@@ -162,23 +165,35 @@ export function LoanDetails() {
         const data = await res.json();
         console.log('Data received:', data);
 
-        // Encontrar o empréstimo específico pelo ID
-        const loanDetail = data.find((loan: any) => loan.id === loanId);
+        // A API pode retornar um array ou um objeto direto
+        let loanDetail;
+
+        if (Array.isArray(data)) {
+          // Se for array, procurar pelo ID
+          loanDetail = data.find((loan: any) => loan.id === loanId);
+        } else if (data && typeof data === 'object') {
+          // Se for objeto direto, usar os dados como estão
+          loanDetail = data;
+        } else {
+          throw new Error('Formato de dados inválido');
+        }
 
         if (!loanDetail) {
           throw new Error('Empréstimo não encontrado');
         }
 
+        console.log('Loan detail:', loanDetail);
+
         // Adaptar os dados para o formato esperado
         const adaptedData = {
           loanRequested: {
-            id: loanDetail.id,
+            id: loanDetail.id || loanId,
             userName: loanDetail.userName,
             phone: loanDetail.phone || '',
+            email: loanDetail.email || '',
             amountRequested: loanDetail.amountRequested,
             document: loanDetail.document || '',
             paymentMethod: loanDetail.paymentMethod || '',
-            email: loanDetail.email || '',
             cidade: loanDetail.cidade || '',
             estado: loanDetail.estado || '',
             cep: loanDetail.cep || '',
@@ -203,7 +218,9 @@ export function LoanDetails() {
           orders: loanDetail.orders || []
         };
 
-        setLoanData(adaptedData);
+        console.log('Adapted data:', adaptedData);
+
+        setLoanData(loanDetail);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -282,10 +299,10 @@ export function LoanDetails() {
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>Detalhes do Empréstimo</h2>
             <p className='text-muted-foreground'>
-              Solicitação de {loanData.loanRequested.userName.toUpperCase()}
+              Solicitação de {loanData.loanRequested.userName?.toUpperCase() || 'Nome não informado'}
             </p>
           </div>
-          <div className='flex gap-2'>
+          <div className='flex flex-wrap gap-2'>
             <Button
               variant='outline'
               className='space-x-1'
@@ -300,7 +317,37 @@ export function LoanDetails() {
             >
               <span>Solicitar Dados</span> <FileText size={18} />
             </Button>
+
+            {/* Botões de Aprovação/Recusa - só aparecem se o status permitir */}
+            {loanData.loanRequested.approvalStatus?.toLowerCase() === 'pending' && (
+              <>
+                <LoanApprovalDialog
+                  loanId={loanData.loanRequested.id}
+                  amountRequested={loanData.loanRequested.amountRequested}
+                  userName={loanData.loanRequested.userName || 'Nome não informado'}
+                  userId={loanData.loanRequested.userId}
+                >
+                  <Button className='space-x-1 bg-green-600 hover:bg-green-700'>
+                    <CheckCircle size={18} />
+                    <span>Aprovar</span>
+                  </Button>
+                </LoanApprovalDialog>
+
+                <LoanRejectionDialog
+                  loanId={loanData.loanRequested.id}
+                  amountRequested={loanData.loanRequested.amountRequested}
+                  userName={loanData.loanRequested.userName || 'Nome não informado'}
+                >
+                  <Button variant='destructive' className='space-x-1'>
+                    <XCircle size={18} />
+                    <span>Rejeitar</span>
+                  </Button>
+                </LoanRejectionDialog>
+              </>
+            )}
+
             <Button
+              variant='outline'
               className='space-x-1'
               onClick={() => setIsStatusDialogOpen(true)}
             >
@@ -309,19 +356,27 @@ export function LoanDetails() {
           </div>
         </div>
 
+        {/* Indicador de Status do Empréstimo */}
+        <LoanStatusIndicator
+          status={loanData.loanRequested.approvalStatus}
+          step={loanData.loanRequested.step}
+          analysisNotes={loanData.loanRequested.analysisNotes}
+          className="mb-6"
+        />
+
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {/* Dados do Solicitante */}
           <div className='bg-card rounded-lg border p-6'>
             <h3 className='text-lg font-semibold mb-4'>Dados do Solicitante</h3>
             <div className='space-y-2'>
-              <p><strong>Nome:</strong> {loanData.loanRequested.userName.toUpperCase()}</p>
-              <p><strong>Email:</strong> {loanData.loanRequested.email}</p>
-              <p><strong>Telefone:</strong> {loanData.loanRequested.phone}</p>
-              <p><strong>Documento:</strong> {loanData.loanRequested.document}</p>
-              <p><strong>Endereço:</strong> {loanData.loanRequested.endereco}</p>
-              <p><strong>Cidade:</strong> {loanData.loanRequested.cidade}</p>
-              <p><strong>Estado:</strong> {loanData.loanRequested.estado}</p>
-              <p><strong>CEP:</strong> {loanData.loanRequested.cep}</p>
+              <p><strong>Nome:</strong> {loanData.loanRequested.userName?.toUpperCase() || 'Nome não informado'}</p>
+              <p><strong>Email:</strong> {loanData.loanRequested.email || 'Email não informado'}</p>
+              <p><strong>Telefone:</strong> {loanData.loanRequested.phone || 'Telefone não informado'}</p>
+              <p><strong>Documento:</strong> {loanData.loanRequested.document || 'Documento não informado'}</p>
+              <p><strong>Endereço:</strong> {loanData.loanRequested.endereco || 'Endereço não informado'}</p>
+              <p><strong>Cidade:</strong> {loanData.loanRequested.cidade || 'Cidade não informada'}</p>
+              <p><strong>Estado:</strong> {loanData.loanRequested.estado || 'Estado não informado'}</p>
+              <p><strong>CEP:</strong> {loanData.loanRequested.cep || 'CEP não informado'}</p>
             </div>
           </div>
 
@@ -329,8 +384,8 @@ export function LoanDetails() {
           <div className='bg-card rounded-lg border p-6'>
             <h3 className='text-lg font-semibold mb-4'>Dados do Empréstimo</h3>
             <div className='space-y-2'>
-              <p><strong>Valor Solicitado:</strong> {Number(loanData.loanRequested.amountRequested).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              <p><strong>Valor Aprovado:</strong> {Number(loanData.loanRequested.valueApproved).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p><strong>Valor Solicitado:</strong> {Number(loanData.loanRequested.amountRequested || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p><strong>Valor Aprovado:</strong> {Number(loanData.loanRequested.valueApproved || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
               <div className='flex items-center gap-2'>
                 <strong>Status:</strong>
                 {(() => {
@@ -343,9 +398,9 @@ export function LoanDetails() {
                   );
                 })()}
               </div>
-              <p><strong>Parcelas:</strong> {loanData.loanRequested.numberOfInstallments}</p>
-              <p><strong>Valor da Parcela:</strong> {Number(loanData.loanRequested.installmentAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-              <p><strong>Método de Pagamento:</strong> {loanData.loanRequested.paymentMethod}</p>
+              <p><strong>Parcelas:</strong> {loanData.loanRequested.numberOfInstallments || 'Não definido'}</p>
+              <p><strong>Valor da Parcela:</strong> {Number(loanData.loanRequested.installmentAmount || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+              <p><strong>Método de Pagamento:</strong> {loanData.loanRequested.paymentMethod || 'Não informado'}</p>
             </div>
           </div>
 
@@ -353,10 +408,10 @@ export function LoanDetails() {
           <div className='bg-card rounded-lg border p-6'>
             <h3 className='text-lg font-semibold mb-4'>Dados Bancários</h3>
             <div className='space-y-2'>
-              <p><strong>Banco:</strong> {loanData.loanRequested.bank}</p>
-              <p><strong>Agência:</strong> {loanData.loanRequested.bank_agency}</p>
-              <p><strong>Conta:</strong> {loanData.loanRequested.bank_account}</p>
-              <p><strong>Chave PIX:</strong> {loanData.loanRequested.pix_key}</p>
+              <p><strong>Banco:</strong> {loanData.loanRequested.bank || 'Banco não informado'}</p>
+              <p><strong>Agência:</strong> {loanData.loanRequested.bank_agency || 'Agência não informada'}</p>
+              <p><strong>Conta:</strong> {loanData.loanRequested.bank_account || 'Conta não informada'}</p>
+              <p><strong>Chave PIX:</strong> {loanData.loanRequested.pix_key || 'Chave PIX não informada'}</p>
             </div>
           </div>
         </div>

@@ -2,17 +2,17 @@
 
 import { useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
-import { showSubmittedData } from '@/lib/show-submitted-data'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { type User } from '../data/schema'
+import { useDeleteUser } from '../hooks/use-users'
 
 type UserDeleteDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  currentRow: User
+  currentRow?: User | null
 }
 
 export function UsersDeleteDialog({
@@ -21,60 +21,75 @@ export function UsersDeleteDialog({
   currentRow,
 }: UserDeleteDialogProps) {
   const [value, setValue] = useState('')
+  const deleteUserMutation = useDeleteUser()
 
-  const handleDelete = () => {
-    if (value.trim() !== currentRow.username) return
+  const handleDelete = async () => {
+    if (!currentRow || value.trim() !== currentRow.email) return
 
-    onOpenChange(false)
-    showSubmittedData(currentRow, 'The following user has been deleted:')
+    try {
+      await deleteUserMutation.mutateAsync(currentRow.id)
+      onOpenChange(false)
+      setValue('')
+    } catch (error) {
+      console.error('Erro ao deletar usuário:', error)
+    }
   }
+
+  const isLoading = deleteUserMutation.isPending
+  const userDisplayName = currentRow ? `${currentRow.firstName} ${currentRow.lastName}` : ''
 
   return (
     <ConfirmDialog
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(state) => {
+        if (!isLoading) {
+          onOpenChange(state)
+          setValue('')
+        }
+      }}
       handleConfirm={handleDelete}
-      disabled={value.trim() !== currentRow.username}
+      disabled={!currentRow || value.trim() !== currentRow.email || isLoading}
       title={
         <span className='text-destructive'>
           <AlertTriangle
             className='stroke-destructive me-1 inline-block'
             size={18}
           />{' '}
-          Delete User
+          Deletar Usuário
         </span>
       }
       desc={
         <div className='space-y-4'>
           <p className='mb-2'>
-            Are you sure you want to delete{' '}
-            <span className='font-bold'>{currentRow.username}</span>?
+            Tem certeza que deseja deletar{' '}
+            <span className='font-bold'>{userDisplayName}</span>?
             <br />
-            This action will permanently remove the user with the role of{' '}
+            Esta ação removerá permanentemente o usuário com o papel de{' '}
             <span className='font-bold'>
-              {currentRow.role.toUpperCase()}
+              {currentRow?.role}
             </span>{' '}
-            from the system. This cannot be undone.
+            do sistema. Esta ação não pode ser desfeita.
           </p>
 
           <Label className='my-2'>
-            Username:
+            Email (digite para confirmar):
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder='Enter username to confirm deletion.'
+              placeholder='Digite o email para confirmar a exclusão'
+              disabled={isLoading}
             />
           </Label>
 
           <Alert variant='destructive'>
-            <AlertTitle>Warning!</AlertTitle>
+            <AlertTitle>Atenção!</AlertTitle>
             <AlertDescription>
-              Please be careful, this operation can not be rolled back.
+              Tenha cuidado, esta operação não pode ser desfeita.
             </AlertDescription>
           </Alert>
         </div>
       }
-      confirmText='Delete'
+      confirmText={isLoading ? 'Deletando...' : 'Deletar'}
       destructive
     />
   )

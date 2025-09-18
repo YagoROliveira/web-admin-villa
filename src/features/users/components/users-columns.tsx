@@ -37,12 +37,12 @@ export const usersColumns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'username',
+    accessorKey: 'firstName',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Username' />
+      <DataTableColumnHeader column={column} title='First Name' />
     ),
     cell: ({ row }) => (
-      <LongText className='max-w-36 ps-3'>{row.getValue('username')}</LongText>
+      <LongText className='max-w-36 ps-3'>{row.getValue('firstName')}</LongText>
     ),
     meta: {
       className: cn(
@@ -50,7 +50,15 @@ export const usersColumns: ColumnDef<User>[] = [
         'sticky start-6 @4xl/content:table-cell @4xl/content:drop-shadow-none'
       ),
     },
-    enableHiding: false,
+  },
+  {
+    accessorKey: 'lastName',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Last Name' />
+    ),
+    cell: ({ row }) => (
+      <LongText className='max-w-36'>{row.getValue('lastName')}</LongText>
+    ),
   },
   {
     id: 'fullName',
