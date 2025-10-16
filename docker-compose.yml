@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  villa-admin:
+    container_name: villa-admin
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: villa-admin:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"  # Mapeia porta 8080 do host para porta 80 do container
+    environment:
+      - NODE_ENV=production
+    networks:
+      - villa-network
+    labels:
+      - "com.villa.description=Villa Market Admin Panel"
+      - "com.villa.version=2.1.0"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  villa-network:
+    driver: bridge
