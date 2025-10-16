@@ -15,7 +15,7 @@ export function FeesPage() {
   // Force refetch when component mounts
   useEffect(() => {
     refetch()
-  }, [])
+  }, [refetch])
 
   // Force refetch when dialog closes (taxa criada)
   useEffect(() => {

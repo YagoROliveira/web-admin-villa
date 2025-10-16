@@ -1,7 +1,4 @@
-/// <reference types="react" />
-/// <reference types="react-dom" />
-
-import * as React from 'react'
+import type * as React from 'react'
 
 declare global {
   namespace JSX {
@@ -9,23 +6,29 @@ declare global {
       [elemName: string]: any
     }
 
-    interface Element extends React.ReactElement<any, any> { }
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    interface Element extends React.ReactElement<any, any> {}
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface ElementClass extends React.Component<any> {
       render(): React.ReactNode
     }
 
     interface ElementAttributesProperty {
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
       props: {}
     }
 
     interface ElementChildrenAttribute {
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
       children: {}
     }
 
-    interface IntrinsicAttributes extends React.Attributes { }
-    interface IntrinsicClassAttributes<T> extends React.ClassAttributes<T> { }
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    interface IntrinsicAttributes extends React.Attributes {}
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    interface IntrinsicClassAttributes<T> extends React.ClassAttributes<T> {}
   }
 }
 
-export { }
+export {}

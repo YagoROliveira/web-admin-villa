@@ -184,7 +184,7 @@ export function LoanViabilityDialog({
     if (open && loanData) {
       fetchInflationData()
     }
-  }, [open, loanData])
+  }, [open, loanData, fetchInflationData])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {

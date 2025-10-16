@@ -147,7 +147,7 @@ export function useCurrentUser() {
   const { auth } = useAuthStore()
 
   return useQuery<UserResponse>({
-    queryKey: ['current-user'],
+    queryKey: ['current-user', auth.accessToken],
     queryFn: async () => {
       const token = auth.accessToken
 
@@ -185,7 +185,7 @@ export function useValidateToken() {
   const { auth } = useAuthStore()
 
   return useQuery<{ valid: boolean }>({
-    queryKey: ['validate-token'],
+    queryKey: ['validate-token', auth.accessToken],
     queryFn: async () => {
       const token = auth.accessToken
 

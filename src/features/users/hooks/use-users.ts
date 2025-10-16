@@ -60,7 +60,7 @@ export function useUsers(page = 1, pageSize = 10, search = '') {
   })
 
   return useQuery<UsersListResponse>({
-    queryKey: ['users', page, pageSize, search],
+    queryKey: ['users', page, pageSize, search, auth.accessToken],
     queryFn: async () => {
       // Se não estiver autenticado, usar dados mock
       if (!auth.isAuthenticated()) {
@@ -131,7 +131,7 @@ export function useUser(userId: string) {
   const { auth } = useAuthStore()
 
   return useQuery<User>({
-    queryKey: ['user', userId],
+    queryKey: ['user', userId, auth.accessToken],
     queryFn: async () => {
       const response = await fetch(buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.GET}/${userId}`), {
         headers: getAuthHeaders(auth.accessToken),
