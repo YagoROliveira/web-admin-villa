@@ -28,6 +28,7 @@ import { Route as AuthenticatedStoriesIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedLoansIndexRouteImport } from './routes/_authenticated/loans/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedFeesIndexRouteImport } from './routes/_authenticated/fees/index'
 import { Route as AuthenticatedEmprestimosIndexRouteImport } from './routes/_authenticated/emprestimos/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
@@ -139,6 +140,11 @@ const AuthenticatedHelpCenterIndexRoute =
     path: '/help-center/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFeesIndexRoute = AuthenticatedFeesIndexRouteImport.update({
+  id: '/fees/',
+  path: '/fees/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEmprestimosIndexRoute =
   AuthenticatedEmprestimosIndexRouteImport.update({
     id: '/emprestimos/',
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/emprestimos': typeof AuthenticatedEmprestimosIndexRoute
+  '/fees': typeof AuthenticatedFeesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/loans': typeof AuthenticatedLoansIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/emprestimos': typeof AuthenticatedEmprestimosIndexRoute
+  '/fees': typeof AuthenticatedFeesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/loans': typeof AuthenticatedLoansIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/emprestimos/': typeof AuthenticatedEmprestimosIndexRoute
+  '/_authenticated/fees/': typeof AuthenticatedFeesIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/loans/': typeof AuthenticatedLoansIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/chats'
     | '/emprestimos'
+    | '/fees'
     | '/help-center'
     | '/loans'
     | '/settings/'
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/chats'
     | '/emprestimos'
+    | '/fees'
     | '/help-center'
     | '/loans'
     | '/settings'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
     | '/_authenticated/emprestimos/'
+    | '/_authenticated/fees/'
     | '/_authenticated/help-center/'
     | '/_authenticated/loans/'
     | '/_authenticated/settings/'
@@ -554,6 +566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/fees/': {
+      id: '/_authenticated/fees/'
+      path: '/fees'
+      fullPath: '/fees'
+      preLoaderRoute: typeof AuthenticatedFeesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/emprestimos/': {
       id: '/_authenticated/emprestimos/'
       path: '/emprestimos'
@@ -673,6 +692,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedEmprestimosIndexRoute: typeof AuthenticatedEmprestimosIndexRoute
+  AuthenticatedFeesIndexRoute: typeof AuthenticatedFeesIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedLoansIndexRoute: typeof AuthenticatedLoansIndexRoute
   AuthenticatedStoriesIndexRoute: typeof AuthenticatedStoriesIndexRoute
@@ -691,6 +711,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedEmprestimosIndexRoute: AuthenticatedEmprestimosIndexRoute,
+  AuthenticatedFeesIndexRoute: AuthenticatedFeesIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedLoansIndexRoute: AuthenticatedLoansIndexRoute,
   AuthenticatedStoriesIndexRoute: AuthenticatedStoriesIndexRoute,

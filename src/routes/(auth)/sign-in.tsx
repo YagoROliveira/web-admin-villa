@@ -1,12 +1,23 @@
 import { z } from 'zod'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { SignIn } from '@/features/auth/sign-in'
+import { useAuthStore } from '@/stores/auth-store'
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
 })
 
 export const Route = createFileRoute('/(auth)/sign-in')({
+  beforeLoad: async () => {
+    const { auth } = useAuthStore.getState()
+
+    // Se já está autenticado, redirecionar para a página principal
+    if (auth.accessToken) {
+      throw redirect({
+        to: '/',
+      })
+    }
+  },
   component: SignIn,
   validateSearch: searchSchema,
 })

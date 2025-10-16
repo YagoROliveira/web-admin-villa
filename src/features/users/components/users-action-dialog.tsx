@@ -35,9 +35,7 @@ const formSchema = z
     phoneNumber: z.string().optional(),
     email: z.string().email('Please enter a valid email address.'),
     password: z.string().transform((pwd) => pwd.trim()),
-    role: z.enum(['ADMIN', 'USER', 'MANAGER', 'CASHIER'], {
-      required_error: 'Role is required.',
-    }),
+    role: z.enum(['ADMIN', 'USER', 'MANAGER', 'CASHIER'] as const),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     isEdit: z.boolean(),
   })

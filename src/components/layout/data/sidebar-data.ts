@@ -22,7 +22,8 @@ import {
   Command,
   GalleryVerticalEnd,
   Landmark,
-  BookOpen
+  BookOpen,
+  Calculator,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -62,6 +63,11 @@ export const sidebarData: SidebarData = {
           title: 'Tasks',
           url: '/tasks',
           icon: ListTodo,
+        },
+        {
+          title: 'Taxas',
+          url: '/fees',
+          icon: Calculator,
         },
         {
           title: 'Emprestimos',

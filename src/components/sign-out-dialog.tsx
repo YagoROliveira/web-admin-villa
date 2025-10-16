@@ -16,11 +16,9 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
     logoutMutation.mutate(undefined, {
       onSuccess: () => {
         onOpenChange(false)
-        // Preserve current location for redirect after sign-in
-        const currentPath = location.href
+        // Redirect to sign-in page
         navigate({
           to: '/sign-in',
-          search: { redirect: currentPath },
           replace: true,
         })
       },

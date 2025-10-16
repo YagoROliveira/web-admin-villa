@@ -1,7 +1,9 @@
 // Configuração da API
 export const API_CONFIG = {
   // Base URL da API
-  BASE_URL: 'https://localhost',
+  // Em desenvolvimento, usa proxy do Vite (vazio) para evitar CORS
+  // Em produção, usar a URL completa: 'https://pro.villamarket.app'
+  BASE_URL: import.meta.env.DEV ? '' : 'http://localhost:9001',
 
   // Endpoints específicos
   ENDPOINTS: {
@@ -42,6 +44,18 @@ export const API_CONFIG = {
     TRANSACTIONS: {
       LIST: '/wallet/transactions',
       LOGS: '/wallet/logs',
+    },
+
+    // Taxas/Fees
+    FEES: {
+      LIST: '/wallet/v1/fees',
+      CREATE: '/wallet/v1/fees',
+      GET: '/wallet/v1/fees',
+      UPDATE: '/wallet/v1/fees',
+      DELETE: '/wallet/v1/fees',
+      CALCULATE: '/wallet/v1/fees/calculate',
+      GET_USER_FEES: '/wallet/v1/fees/user',
+      GET_BRAND_FEES: '/wallet/v1/fees/brand',
     },
   },
 }

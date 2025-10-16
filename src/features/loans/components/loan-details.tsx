@@ -325,7 +325,7 @@ export function LoanDetails() {
                   loanId={loanData.loanRequested.id}
                   amountRequested={loanData.loanRequested.amountRequested}
                   userName={loanData.loanRequested.userName || 'Nome não informado'}
-                  userId={loanData.loanRequested.userId}
+                  userId={loanData.loanRequested.id}
                 >
                   <Button className='space-x-1 bg-green-600 hover:bg-green-700'>
                     <CheckCircle size={18} />

@@ -88,8 +88,8 @@ export function StoryForm({ story, onSave, onCancel, isLoading = false }: StoryF
     try {
       await onSave({
         ...data,
-        startAt: data.startAt?.toISOString() || '',
-        endAt: data.endAt?.toISOString() || '',
+        startAt: data.startAt || undefined,
+        endAt: data.endAt || undefined,
         imageFiles: imageFiles.length > 0 ? imageFiles : undefined
       })
     } catch (error) {

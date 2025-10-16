@@ -123,9 +123,6 @@ export function useUsers(page = 1, pageSize = 10, search = '') {
       }
       return failureCount < 3
     },
-    onError: (error: any) => {
-      console.error('Erro no useUsers:', error)
-    }
   })
 }
 
