@@ -22,7 +22,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/wallet': {
-        target: 'https://pro.villamarket.app',
+        target: 'https://prod.villamarket.app',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path,

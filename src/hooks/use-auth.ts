@@ -41,7 +41,13 @@ export function useLogin() {
 
   return useMutation<LoginResponse, Error, LoginRequest>({
     mutationFn: async (credentials: LoginRequest) => {
-      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGIN), {
+      const url = buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGIN)
+      console.log('🔐 Login Request:', {
+        url,
+        credentials: { ...credentials, password: '***' },
+      })
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,12 +55,34 @@ export function useLogin() {
         body: JSON.stringify(credentials),
       })
 
+      console.log('📡 Login Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+      })
+
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erro ${response.status}: ${errorText}`)
+        let errorMessage = `Erro ${response.status}: ${response.statusText}`
+        try {
+          const errorData = await response.json()
+          console.error('❌ Error Data:', errorData)
+          errorMessage = errorData.message || errorData.error || errorMessage
+        } catch {
+          const errorText = await response.text()
+          console.error('❌ Error Text:', errorText)
+          errorMessage = errorText || errorMessage
+        }
+        throw new Error(errorMessage)
       }
 
-      return response.json()
+      const data = await response.json()
+      console.log('✅ Login Success:', {
+        user: data.user,
+        hasAccessToken: !!data.accessToken,
+        hasRefreshToken: !!data.refreshToken,
+      })
+
+      return data
     },
     onSuccess: (data: LoginResponse) => {
       // Adaptar os dados do usuário para o formato esperado pelo store
