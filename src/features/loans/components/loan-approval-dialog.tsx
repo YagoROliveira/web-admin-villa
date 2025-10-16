@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { CheckCircle, Loader2 } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,6 +14,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -23,9 +26,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { CheckCircle, Loader2 } from 'lucide-react'
 import { useApproveLoan } from '../hooks/use-loan-mutations'
 
 // Schema de validação para aprovação
@@ -38,9 +38,7 @@ const approvalSchema = z.object({
     .number()
     .min(0, 'Taxa de juros deve ser maior ou igual a 0')
     .max(100, 'Taxa de juros deve ser menor que 100%'),
-  valueApproved: z
-    .number()
-    .min(0.01, 'Valor aprovado deve ser maior que zero'),
+  valueApproved: z.number().min(0.01, 'Valor aprovado deve ser maior que zero'),
 })
 
 type ApprovalFormData = z.infer<typeof approvalSchema>
@@ -58,7 +56,7 @@ export function LoanApprovalDialog({
   amountRequested,
   userName,
   children,
-  userId
+  userId,
 }: LoanApprovalDialogProps) {
   const [open, setOpen] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -96,7 +94,11 @@ export function LoanApprovalDialog({
   }
 
   // Calcular valor da parcela estimado
-  const calculateInstallmentAmount = (value: number, installments: number, rate: number) => {
+  const calculateInstallmentAmount = (
+    value: number,
+    installments: number,
+    rate: number
+  ) => {
     if (installments <= 0) return 0
     const monthlyRate = rate / 100
     if (monthlyRate === 0) return value / installments
@@ -114,44 +116,52 @@ export function LoanApprovalDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        {children}
-      </AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
 
-      <AlertDialogContent className="max-w-2xl">
+      <AlertDialogContent className='max-w-2xl'>
         {!showConfirmation ? (
           <>
             <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <AlertDialogTitle className='flex items-center gap-2'>
+                <CheckCircle className='h-5 w-5 text-green-600' />
                 Aprovar Empréstimo
               </AlertDialogTitle>
               <AlertDialogDescription>
-                Configure os parâmetros de aprovação para <strong>{userName}</strong>
+                Configure os parâmetros de aprovação para{' '}
+                <strong>{userName}</strong>
                 <br />
-                <span className="text-sm text-muted-foreground">
-                  Valor solicitado: {Number(amountRequested).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                <span className='text-muted-foreground text-sm'>
+                  Valor solicitado:{' '}
+                  {Number(amountRequested).toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  })}
                 </span>
               </AlertDialogDescription>
             </AlertDialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className='space-y-6'
+              >
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name="valueApproved"
+                    name='valueApproved'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Valor Aprovado</FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            step="0.01"
-                            min="0.01"
-                            placeholder="0.00"
+                            type='number'
+                            step='0.01'
+                            min='0.01'
+                            placeholder='0.00'
                             {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
                           />
                         </FormControl>
                         <FormDescription>
@@ -164,18 +174,20 @@ export function LoanApprovalDialog({
 
                   <FormField
                     control={form.control}
-                    name="maxInstallments"
+                    name='maxInstallments'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Número de Parcelas</FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            min="1"
-                            max="60"
-                            placeholder="12"
+                            type='number'
+                            min='1'
+                            max='60'
+                            placeholder='12'
                             {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
                           />
                         </FormControl>
                         <FormDescription>
@@ -189,19 +201,21 @@ export function LoanApprovalDialog({
 
                 <FormField
                   control={form.control}
-                  name="interestRate"
+                  name='interestRate'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Taxa de Juros Mensal (%)</FormLabel>
                       <FormControl>
                         <Input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          max="100"
-                          placeholder="2.5"
+                          type='number'
+                          step='0.1'
+                          min='0'
+                          max='100'
+                          placeholder='2.5'
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormDescription>
@@ -213,39 +227,50 @@ export function LoanApprovalDialog({
                 />
 
                 {/* Informações de resumo */}
-                {watchedValues.valueApproved > 0 && watchedValues.maxInstallments > 0 && (
-                  <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg border">
-                    <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                      Resumo da Aprovação
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Valor aprovado:</span>
-                        <Badge variant="secondary">
-                          {Number(watchedValues.valueApproved).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        </Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Parcelas:</span>
-                        <Badge variant="secondary">{watchedValues.maxInstallments}x</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Taxa mensal:</span>
-                        <Badge variant="secondary">{watchedValues.interestRate}%</Badge>
-                      </div>
-                      <div className="flex justify-between font-semibold border-t pt-2">
-                        <span>Valor estimado da parcela:</span>
-                        <Badge>
-                          {estimatedInstallment.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        </Badge>
+                {watchedValues.valueApproved > 0 &&
+                  watchedValues.maxInstallments > 0 && (
+                    <div className='rounded-lg border bg-blue-50 p-4 dark:bg-blue-950'>
+                      <h4 className='mb-2 font-semibold text-blue-900 dark:text-blue-100'>
+                        Resumo da Aprovação
+                      </h4>
+                      <div className='space-y-2 text-sm'>
+                        <div className='flex justify-between'>
+                          <span>Valor aprovado:</span>
+                          <Badge variant='secondary'>
+                            {Number(watchedValues.valueApproved).toLocaleString(
+                              'pt-BR',
+                              { style: 'currency', currency: 'BRL' }
+                            )}
+                          </Badge>
+                        </div>
+                        <div className='flex justify-between'>
+                          <span>Parcelas:</span>
+                          <Badge variant='secondary'>
+                            {watchedValues.maxInstallments}x
+                          </Badge>
+                        </div>
+                        <div className='flex justify-between'>
+                          <span>Taxa mensal:</span>
+                          <Badge variant='secondary'>
+                            {watchedValues.interestRate}%
+                          </Badge>
+                        </div>
+                        <div className='flex justify-between border-t pt-2 font-semibold'>
+                          <span>Valor estimado da parcela:</span>
+                          <Badge>
+                            {estimatedInstallment.toLocaleString('pt-BR', {
+                              style: 'currency',
+                              currency: 'BRL',
+                            })}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <Button type="submit" disabled={!form.formState.isValid}>
+                  <Button type='submit' disabled={!form.formState.isValid}>
                     Continuar
                   </Button>
                 </AlertDialogFooter>
@@ -255,55 +280,63 @@ export function LoanApprovalDialog({
         ) : (
           <>
             <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2 text-green-600">
-                <CheckCircle className="h-5 w-5" />
+              <AlertDialogTitle className='flex items-center gap-2 text-green-600'>
+                <CheckCircle className='h-5 w-5' />
                 Confirmar Aprovação
               </AlertDialogTitle>
               <AlertDialogDescription>
-                Tem certeza que deseja aprovar este empréstimo com os seguintes parâmetros?
+                Tem certeza que deseja aprovar este empréstimo com os seguintes
+                parâmetros?
               </AlertDialogDescription>
             </AlertDialogHeader>
 
-            <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg border">
-              <h4 className="font-semibold text-green-900 dark:text-green-100 mb-3">
+            <div className='rounded-lg border bg-green-50 p-4 dark:bg-green-950'>
+              <h4 className='mb-3 font-semibold text-green-900 dark:text-green-100'>
                 Detalhes da Aprovação
               </h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
+              <div className='space-y-2 text-sm'>
+                <div className='flex justify-between'>
                   <span>Cliente:</span>
                   <strong>{userName}</strong>
                 </div>
-                <div className="flex justify-between">
+                <div className='flex justify-between'>
                   <span>Valor aprovado:</span>
                   <strong>
-                    {Number(formData?.valueApproved || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    {Number(formData?.valueApproved || 0).toLocaleString(
+                      'pt-BR',
+                      { style: 'currency', currency: 'BRL' }
+                    )}
                   </strong>
                 </div>
-                <div className="flex justify-between">
+                <div className='flex justify-between'>
                   <span>Parcelas máximas:</span>
                   <strong>{formData?.maxInstallments}x</strong>
                 </div>
-                <div className="flex justify-between">
+                <div className='flex justify-between'>
                   <span>Taxa de juros:</span>
                   <strong>{formData?.interestRate}% a.m.</strong>
                 </div>
-                <div className="flex justify-between font-semibold text-base border-t pt-2">
+                <div className='flex justify-between border-t pt-2 text-base font-semibold'>
                   <span>Parcela estimada:</span>
                   <strong>
                     {calculateInstallmentAmount(
                       formData?.valueApproved || 0,
                       formData?.maxInstallments || 1,
                       formData?.interestRate || 0
-                    ).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    ).toLocaleString('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    })}
                   </strong>
                 </div>
               </div>
             </div>
 
-            <div className="bg-yellow-50 dark:bg-yellow-950 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                <strong>Atenção:</strong> Esta ação não pode ser desfeita. O empréstimo será aprovado
-                imediatamente e o cliente será notificado.
+            <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950'>
+              <p className='text-sm text-yellow-800 dark:text-yellow-200'>
+                <strong>Atenção:</strong> Esta ação não pode ser desfeita. O
+                empréstimo será aprovado imediatamente e o cliente será
+                notificado.
               </p>
             </div>
 
@@ -317,11 +350,11 @@ export function LoanApprovalDialog({
               <AlertDialogAction
                 onClick={handleConfirmApproval}
                 disabled={approveLoanMutation.isPending}
-                className="bg-green-600 hover:bg-green-700"
+                className='bg-green-600 hover:bg-green-700'
               >
                 {approveLoanMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                     Aprovando...
                   </>
                 ) : (

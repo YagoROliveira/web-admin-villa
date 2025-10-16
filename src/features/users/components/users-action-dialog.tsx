@@ -1,7 +1,7 @@
 'use client'
 
-import { z } from 'zod'
 import { useEffect } from 'react'
+import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
@@ -181,12 +181,13 @@ export function UsersActionDialog({
     >
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader className='text-start'>
-          <DialogTitle>{isEdit ? 'Editar Usuário' : 'Adicionar Usuário'}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? 'Editar Usuário' : 'Adicionar Usuário'}
+          </DialogTitle>
           <DialogDescription>
             {isEdit
               ? 'Atualize as informações do usuário abaixo.'
-              : 'Preencha as informações para criar um novo usuário.'
-            }
+              : 'Preencha as informações para criar um novo usuário.'}
           </DialogDescription>
         </DialogHeader>
         <div className='h-[26.25rem] w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3'>
@@ -303,7 +304,9 @@ export function UsersActionDialog({
                     </FormLabel>
                     <FormControl>
                       <PasswordInput
-                        placeholder={isEdit ? 'Deixe vazio para manter' : 'Enter password'}
+                        placeholder={
+                          isEdit ? 'Deixe vazio para manter' : 'Enter password'
+                        }
                         className='col-span-4'
                         {...field}
                       />
@@ -345,11 +348,7 @@ export function UsersActionDialog({
           >
             Cancel
           </Button>
-          <Button
-            type='submit'
-            form='user-form'
-            disabled={isLoading}
-          >
+          <Button type='submit' form='user-form' disabled={isLoading}>
             {isLoading ? 'Saving...' : isEdit ? 'Update User' : 'Create User'}
           </Button>
         </DialogFooter>

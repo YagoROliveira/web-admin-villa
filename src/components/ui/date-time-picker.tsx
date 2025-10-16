@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { Calendar as CalendarIcon, Clock } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
@@ -8,7 +9,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
 
 type DateTimePickerProps = {
   selected: Date | undefined
@@ -21,7 +21,7 @@ export function DateTimePicker({
   selected,
   onSelect,
   placeholder = 'Selecione data e hora',
-  className
+  className,
 }: DateTimePickerProps) {
   const handleDateSelect = (date: Date | undefined) => {
     if (date && selected) {
@@ -72,16 +72,12 @@ export function DateTimePicker({
             className
           )}
         >
-          {selected ? (
-            formatDateTime(selected)
-          ) : (
-            <span>{placeholder}</span>
-          )}
+          {selected ? formatDateTime(selected) : <span>{placeholder}</span>}
           <CalendarIcon className='ms-auto h-4 w-4 opacity-50' />
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-auto p-0' align='start'>
-        <div className='p-3 space-y-3'>
+        <div className='space-y-3 p-3'>
           <Calendar
             mode='single'
             captionLayout='dropdown'
@@ -92,7 +88,7 @@ export function DateTimePicker({
           />
           <div className='border-t pt-3'>
             <div className='flex items-center gap-2'>
-              <Clock className='h-4 w-4 text-muted-foreground' />
+              <Clock className='text-muted-foreground h-4 w-4' />
               <label className='text-sm font-medium'>Hora:</label>
               <Input
                 type='time'

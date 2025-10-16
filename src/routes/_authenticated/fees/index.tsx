@@ -11,7 +11,13 @@ const feesSearchSchema = z.object({
     .optional()
     .catch([]),
   feeType: z
-    .array(z.union([z.literal('INSTALLMENT'), z.literal('PROCESSING'), z.literal('SERVICE')]))
+    .array(
+      z.union([
+        z.literal('INSTALLMENT'),
+        z.literal('PROCESSING'),
+        z.literal('SERVICE'),
+      ])
+    )
     .optional()
     .catch([]),
   // Per-column text filter

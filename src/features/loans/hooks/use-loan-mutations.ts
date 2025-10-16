@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import { buildApiUrl, API_CONFIG } from '@/config/api'
+import { toast } from 'sonner'
 
 // Tipos para as operações de empréstimo
 interface ApprovalData {
@@ -45,7 +45,11 @@ interface RejectionResponse {
 export function useApproveLoan() {
   const queryClient = useQueryClient()
 
-  return useMutation<ApprovalResponse, Error, { loanRequestId: string; data: ApprovalData; userId: string }>({
+  return useMutation<
+    ApprovalResponse,
+    Error,
+    { loanRequestId: string; data: ApprovalData; userId: string }
+  >({
     mutationFn: async ({ loanRequestId, data, userId }) => {
       const url = buildApiUrl(API_CONFIG.ENDPOINTS.LOANS.APPROVE)
       const response = await fetch(url, {
@@ -72,12 +76,12 @@ export function useApproveLoan() {
 
       // Invalidar e refetch dos dados do empréstimo
       queryClient.invalidateQueries({
-        queryKey: ['loan-details', variables.loanRequestId]
+        queryKey: ['loan-details', variables.loanRequestId],
       })
 
       // Invalidar lista de empréstimos se existir
       queryClient.invalidateQueries({
-        queryKey: ['loans']
+        queryKey: ['loans'],
       })
 
       // Recarregar a página para atualizar os dados
@@ -94,7 +98,11 @@ export function useApproveLoan() {
 export function useRejectLoan() {
   const queryClient = useQueryClient()
 
-  return useMutation<RejectionResponse, Error, { loanRequestId: string; data: RejectionData }>({
+  return useMutation<
+    RejectionResponse,
+    Error,
+    { loanRequestId: string; data: RejectionData }
+  >({
     mutationFn: async ({ loanRequestId, data }) => {
       const url = buildApiUrl(API_CONFIG.ENDPOINTS.LOANS.REJECT)
       const response = await fetch(url, {
@@ -121,12 +129,12 @@ export function useRejectLoan() {
 
       // Invalidar e refetch dos dados do empréstimo
       queryClient.invalidateQueries({
-        queryKey: ['loan-details', variables.loanRequestId]
+        queryKey: ['loan-details', variables.loanRequestId],
       })
 
       // Invalidar lista de empréstimos se existir
       queryClient.invalidateQueries({
-        queryKey: ['loans']
+        queryKey: ['loans'],
       })
 
       // Recarregar a página para atualizar os dados
@@ -142,12 +150,16 @@ export function useRejectLoan() {
 // Hook para buscar dados do empréstimo (para usar no React Query)
 export function useLoanDetails(loanId: string) {
   return async () => {
-    const url = buildApiUrl(API_CONFIG.ENDPOINTS.LOANS.GET_ANALYSIS_DATA, { requestId: loanId })
+    const url = buildApiUrl(API_CONFIG.ENDPOINTS.LOANS.GET_ANALYSIS_DATA, {
+      requestId: loanId,
+    })
     const response = await fetch(url)
 
     if (!response.ok) {
       const errorText = await response.text()
-      throw new Error(`Erro ${response.status}: ${response.statusText} - ${errorText}`)
+      throw new Error(
+        `Erro ${response.status}: ${response.statusText} - ${errorText}`
+      )
     }
 
     const data = await response.json()

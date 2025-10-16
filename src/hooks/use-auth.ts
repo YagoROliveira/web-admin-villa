@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { buildApiUrl, getAuthHeaders, API_CONFIG } from '@/config/api'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
-import { buildApiUrl, getAuthHeaders, API_CONFIG } from '@/config/api'
 
 // Tipos para autenticação
 interface LoginRequest {
@@ -119,13 +119,16 @@ export function useLogout() {
       const token = auth.accessToken
 
       if (token) {
-        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGOUT), {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        })
+        const response = await fetch(
+          buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGOUT),
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        )
 
         if (!response.ok) {
           // Mesmo se der erro, vamos fazer logout local
@@ -157,7 +160,7 @@ export function useCurrentUser() {
 
       const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.ME), {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 
@@ -193,11 +196,14 @@ export function useValidateToken() {
         throw new Error('Token não encontrado')
       }
 
-      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.VALIDATE), {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
+      const response = await fetch(
+        buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.VALIDATE),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
 
       if (!response.ok) {
         throw new Error(`Token inválido`)
@@ -223,13 +229,16 @@ export function useRefreshToken() {
         throw new Error('Refresh token não encontrado')
       }
 
-      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.REFRESH), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken }),
-      })
+      const response = await fetch(
+        buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.REFRESH),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refreshToken }),
+        }
+      )
 
       if (!response.ok) {
         throw new Error(`Erro ${response.status}: ${response.statusText}`)

@@ -6,27 +6,21 @@ declare global {
       [elemName: string]: any
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface Element extends React.ReactElement<any, any> {}
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface ElementClass extends React.Component<any> {
       render(): React.ReactNode
     }
 
     interface ElementAttributesProperty {
-      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
       props: {}
     }
 
     interface ElementChildrenAttribute {
-      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
       children: {}
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface IntrinsicAttributes extends React.Attributes {}
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface IntrinsicClassAttributes<T> extends React.ClassAttributes<T> {}
   }
 }

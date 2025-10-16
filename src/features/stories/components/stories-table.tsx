@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -9,10 +10,16 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { useNavigate } from '@tanstack/react-router'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
 import { flexRender } from '@tanstack/react-table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
 import { storiesColumns } from './stories-columns'
 import { useStories } from './stories-provider'
 
@@ -49,14 +56,14 @@ export function StoriesTable() {
   })
 
   if (isLoading) {
-    return <div className="text-center py-10">Carregando stories...</div>
+    return <div className='py-10 text-center'>Carregando stories...</div>
   }
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       <DataTableToolbar
         table={table}
-        searchPlaceholder="Filtrar por nome..."
+        searchPlaceholder='Filtrar por nome...'
         filters={[
           {
             columnId: 'status',
@@ -80,7 +87,7 @@ export function StoriesTable() {
         ]}
       />
 
-      <div className="overflow-hidden rounded-md border">
+      <div className='overflow-hidden rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -90,9 +97,9 @@ export function StoriesTable() {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -104,20 +111,28 @@ export function StoriesTable() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => navigate({ to: `/stories/${row.original.id}` })}
+                  className='hover:bg-muted/50 cursor-pointer'
+                  onClick={() =>
+                    navigate({ to: `/stories/${row.original.id}` })
+                  }
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       onClick={(e) => {
                         // Evitar navegação quando clicar em ações
-                        if (cell.column.id === 'actions' || cell.column.id === 'select') {
+                        if (
+                          cell.column.id === 'actions' ||
+                          cell.column.id === 'select'
+                        ) {
                           e.stopPropagation()
                         }
                       }}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -126,7 +141,7 @@ export function StoriesTable() {
               <TableRow>
                 <TableCell
                   colSpan={storiesColumns.length}
-                  className="h-24 text-center"
+                  className='h-24 text-center'
                 >
                   Nenhum story encontrado.
                 </TableCell>

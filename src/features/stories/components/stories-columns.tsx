@@ -1,11 +1,11 @@
 import { type ColumnDef } from '@tanstack/react-table'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { statuses } from '../data/schema'
 import { type Story } from '../data/schema'
 import { StoriesActions } from './stories-actions'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export const storiesColumns: ColumnDef<Story>[] = [
   {
@@ -41,26 +41,21 @@ export const storiesColumns: ColumnDef<Story>[] = [
       <DataTableColumnHeader column={column} title='Nome' />
     ),
     cell: ({ row }) => {
-      const story = row.original;
+      const story = row.original
       return (
         <div className='flex items-center space-x-3'>
           <Avatar className='h-8 w-8'>
-            <AvatarImage
-              src={story.images?.[0]?.url}
-              alt={story.name}
-            />
+            <AvatarImage src={story.images?.[0]?.url} alt={story.name} />
             <AvatarFallback>
               {story.name.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <div className='font-medium'>{story.name}</div>
-            <div className='text-sm text-muted-foreground'>
-              ID: {story.id}
-            </div>
+            <div className='text-muted-foreground text-sm'>ID: {story.id}</div>
           </div>
         </div>
-      );
+      )
     },
   },
   {
@@ -73,7 +68,7 @@ export const storiesColumns: ColumnDef<Story>[] = [
         <div className='w-[100px]'>
           <Badge variant='outline'>{row.getValue('module')}</Badge>
         </div>
-      );
+      )
     },
     enableSorting: true,
     enableHiding: true,
@@ -86,39 +81,37 @@ export const storiesColumns: ColumnDef<Story>[] = [
     cell: ({ row }) => {
       const status = statuses.find(
         (status) => status.value === row.getValue('status')
-      );
+      )
 
       if (!status) {
-        return null;
+        return null
       }
 
       const getStatusColor = (value: string) => {
         switch (value) {
           case 'ACTIVE':
-            return 'bg-green-100 text-green-800';
+            return 'bg-green-100 text-green-800'
           case 'INACTIVE':
-            return 'bg-gray-100 text-gray-800';
+            return 'bg-gray-100 text-gray-800'
           case 'SCHEDULED':
-            return 'bg-blue-100 text-blue-800';
+            return 'bg-blue-100 text-blue-800'
           case 'PAUSED':
-            return 'bg-yellow-100 text-yellow-800';
+            return 'bg-yellow-100 text-yellow-800'
           case 'CONCLUDED':
-            return 'bg-purple-100 text-purple-800';
+            return 'bg-purple-100 text-purple-800'
           default:
-            return 'bg-gray-100 text-gray-800';
+            return 'bg-gray-100 text-gray-800'
         }
-      };
+      }
 
       return (
         <div className='flex w-[100px] items-center'>
-          <Badge className={getStatusColor(status.value)}>
-            {status.label}
-          </Badge>
+          <Badge className={getStatusColor(status.value)}>{status.label}</Badge>
         </div>
-      );
+      )
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
+      return value.includes(row.getValue(id))
     },
   },
   {
@@ -127,7 +120,7 @@ export const storiesColumns: ColumnDef<Story>[] = [
       <DataTableColumnHeader column={column} title='Início' />
     ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue('startAt'));
+      const date = new Date(row.getValue('startAt'))
       return (
         <div className='text-sm'>
           {date.toLocaleDateString('pt-BR', {
@@ -138,7 +131,7 @@ export const storiesColumns: ColumnDef<Story>[] = [
             minute: '2-digit',
           })}
         </div>
-      );
+      )
     },
   },
   {
@@ -147,7 +140,7 @@ export const storiesColumns: ColumnDef<Story>[] = [
       <DataTableColumnHeader column={column} title='Fim' />
     ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue('endAt'));
+      const date = new Date(row.getValue('endAt'))
       return (
         <div className='text-sm'>
           {date.toLocaleDateString('pt-BR', {
@@ -158,7 +151,7 @@ export const storiesColumns: ColumnDef<Story>[] = [
             minute: '2-digit',
           })}
         </div>
-      );
+      )
     },
   },
   {
@@ -167,7 +160,7 @@ export const storiesColumns: ColumnDef<Story>[] = [
       <DataTableColumnHeader column={column} title='Visualizações' />
     ),
     cell: ({ row }) => {
-      const viewed = row.getValue('viewed') as boolean;
+      const viewed = row.getValue('viewed') as boolean
       return (
         <div className='text-sm'>
           {viewed ? (
@@ -176,7 +169,7 @@ export const storiesColumns: ColumnDef<Story>[] = [
             <Badge variant='outline'>Não visualizado</Badge>
           )}
         </div>
-      );
+      )
     },
   },
   {
@@ -184,12 +177,12 @@ export const storiesColumns: ColumnDef<Story>[] = [
     header: '',
     cell: ({ row }) => {
       return (
-        <div className="flex justify-end">
+        <div className='flex justify-end'>
           <StoriesActions story={row.original} />
         </div>
-      );
+      )
     },
     enableSorting: false,
     enableHiding: false,
   },
-];
+]

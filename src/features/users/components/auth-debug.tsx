@@ -1,7 +1,7 @@
+import { buildApiUrl, API_CONFIG } from '@/config/api'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import { mockLoginResponse } from '../data/mock-data'
-import { buildApiUrl, API_CONFIG } from '@/config/api'
 
 export function AuthDebug() {
   const { auth } = useAuthStore()
@@ -13,12 +13,17 @@ export function AuthDebug() {
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
-          ...(auth.accessToken && { Authorization: `Bearer ${auth.accessToken}` })
-        }
+          ...(auth.accessToken && {
+            Authorization: `Bearer ${auth.accessToken}`,
+          }),
+        },
       })
 
       console.log('Response status:', response.status)
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+      console.log(
+        'Response headers:',
+        Object.fromEntries(response.headers.entries())
+      )
 
       if (response.ok) {
         const data = await response.json()
@@ -57,8 +62,8 @@ export function AuthDebug() {
         },
         body: JSON.stringify({
           email: 'admin@test.com',
-          password: 'password123'
-        })
+          password: 'password123',
+        }),
       })
 
       console.log('Login response status:', response.status)
@@ -86,36 +91,46 @@ export function AuthDebug() {
   }
 
   return (
-    <div className="p-4 border rounded-lg bg-muted/50">
-      <h3 className="font-semibold mb-2">Auth Debug</h3>
-      <div className="space-y-2 text-sm">
-        <p><strong>Autenticado (user + token):</strong> {auth.isAuthenticated() ? 'Sim' : 'Não'}</p>
-        <p><strong>Usuário:</strong> {auth.user?.name || 'Nenhum'} {auth.user && `(${auth.user.email})`}</p>
-        <p><strong>Token:</strong> {auth.accessToken ? 'Presente' : 'Ausente'}</p>
+    <div className='bg-muted/50 rounded-lg border p-4'>
+      <h3 className='mb-2 font-semibold'>Auth Debug</h3>
+      <div className='space-y-2 text-sm'>
+        <p>
+          <strong>Autenticado (user + token):</strong>{' '}
+          {auth.isAuthenticated() ? 'Sim' : 'Não'}
+        </p>
+        <p>
+          <strong>Usuário:</strong> {auth.user?.name || 'Nenhum'}{' '}
+          {auth.user && `(${auth.user.email})`}
+        </p>
+        <p>
+          <strong>Token:</strong> {auth.accessToken ? 'Presente' : 'Ausente'}
+        </p>
         {auth.accessToken && (
-          <p><strong>Token (primeiros 20 chars):</strong> {auth.accessToken.substring(0, 20)}...</p>
+          <p>
+            <strong>Token (primeiros 20 chars):</strong>{' '}
+            {auth.accessToken.substring(0, 20)}...
+          </p>
         )}
-        <div className="mt-2 p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded text-xs">
-          <strong>Status:</strong> {
-            auth.accessToken && !auth.user
-              ? '⚠️ Token existe mas usuário é null - Faça login mockado ou reset auth'
-              : auth.isAuthenticated()
-                ? '✅ Autenticado corretamente'
-                : '❌ Não autenticado'
-          }
+        <div className='mt-2 rounded bg-yellow-100 p-2 text-xs dark:bg-yellow-900/20'>
+          <strong>Status:</strong>{' '}
+          {auth.accessToken && !auth.user
+            ? '⚠️ Token existe mas usuário é null - Faça login mockado ou reset auth'
+            : auth.isAuthenticated()
+              ? '✅ Autenticado corretamente'
+              : '❌ Não autenticado'}
         </div>
       </div>
-      <div className="flex gap-2 mt-4">
-        <Button onClick={testConnection} variant="outline" size="sm">
+      <div className='mt-4 flex gap-2'>
+        <Button onClick={testConnection} variant='outline' size='sm'>
           Testar Conexão
         </Button>
-        <Button onClick={mockLogin} variant="outline" size="sm">
+        <Button onClick={mockLogin} variant='outline' size='sm'>
           Login Mockado
         </Button>
-        <Button onClick={loginTest} variant="outline" size="sm">
+        <Button onClick={loginTest} variant='outline' size='sm'>
           Login Real
         </Button>
-        <Button onClick={() => auth.reset()} variant="destructive" size="sm">
+        <Button onClick={() => auth.reset()} variant='destructive' size='sm'>
           Reset Auth
         </Button>
       </div>

@@ -1,13 +1,13 @@
+import { useState, useEffect } from 'react'
+import { format } from 'date-fns'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { ptBR } from 'date-fns/locale'
+import { ArrowLeft, Edit, Trash2, Eye } from 'lucide-react'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Edit, Trash2, Eye } from 'lucide-react'
-import { useState, useEffect } from 'react'
 import { type Story } from '@/features/stories/data/schema'
-import { toast } from 'sonner'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 
 export const Route = createFileRoute('/_authenticated/stories/$storyId/')({
   component: StoryDetailsPage,
@@ -41,13 +41,13 @@ function StoryDetailsPage() {
             {
               id: '1',
               url: 'https://via.placeholder.com/400x600/ff6b6b/ffffff?text=Story+1',
-              order: 1
+              order: 1,
             },
             {
               id: '2',
               url: 'https://via.placeholder.com/400x600/4ecdc4/ffffff?text=Story+2',
-              order: 2
-            }
+              order: 2,
+            },
           ],
         }
         setStory(mockStory)
@@ -99,81 +99,83 @@ function StoryDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6">
-        <div className="text-center">
-          Carregando story...
-        </div>
+      <div className='container mx-auto py-6'>
+        <div className='text-center'>Carregando story...</div>
       </div>
     )
   }
 
   if (!story) {
     return (
-      <div className="container mx-auto py-6">
-        <div className="text-center">
-          Story não encontrado
-        </div>
+      <div className='container mx-auto py-6'>
+        <div className='text-center'>Story não encontrado</div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <div className='container mx-auto py-6'>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={handleBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+      <div className='mb-6 flex items-center justify-between'>
+        <div className='flex items-center gap-4'>
+          <Button variant='ghost' size='sm' onClick={handleBack}>
+            <ArrowLeft className='mr-2 h-4 w-4' />
             Voltar
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{story.name}</h1>
-            <p className="text-muted-foreground">
-              Detalhes do story
-            </p>
+            <h1 className='text-3xl font-bold tracking-tight'>{story.name}</h1>
+            <p className='text-muted-foreground'>Detalhes do story</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleEdit}>
-            <Edit className="h-4 w-4 mr-2" />
+        <div className='flex items-center gap-2'>
+          <Button variant='outline' onClick={handleEdit}>
+            <Edit className='mr-2 h-4 w-4' />
             Editar
           </Button>
-          <Button variant="destructive" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4 mr-2" />
+          <Button variant='destructive' onClick={handleDelete}>
+            <Trash2 className='mr-2 h-4 w-4' />
             Excluir
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         {/* Informações Principais */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className='space-y-6 lg:col-span-2'>
           <Card>
             <CardHeader>
               <CardTitle>Informações Gerais</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className='space-y-4'>
+              <div className='grid grid-cols-2 gap-4'>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Nome</label>
-                  <p className="text-sm">{story.name}</p>
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    Nome
+                  </label>
+                  <p className='text-sm'>{story.name}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Status</label>
-                  <div className="mt-1">
-                    {getStatusBadge(story.status)}
-                  </div>
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    Status
+                  </label>
+                  <div className='mt-1'>{getStatusBadge(story.status)}</div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Módulo</label>
-                  <p className="text-sm">{story.module}</p>
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    Módulo
+                  </label>
+                  <p className='text-sm'>{story.module}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Visualizado</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Eye className="h-4 w-4" />
-                    <span className="text-sm">{story.viewed ? 'Sim' : 'Não'}</span>
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    Visualizado
+                  </label>
+                  <div className='mt-1 flex items-center gap-2'>
+                    <Eye className='h-4 w-4' />
+                    <span className='text-sm'>
+                      {story.viewed ? 'Sim' : 'Não'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -184,18 +186,26 @@ function StoryDetailsPage() {
             <CardHeader>
               <CardTitle>Período de Exibição</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className='space-y-4'>
+              <div className='grid grid-cols-2 gap-4'>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Data de Início</label>
-                  <p className="text-sm">
-                    {format(new Date(story.startAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    Data de Início
+                  </label>
+                  <p className='text-sm'>
+                    {format(new Date(story.startAt), 'dd/MM/yyyy HH:mm', {
+                      locale: ptBR,
+                    })}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Data de Fim</label>
-                  <p className="text-sm">
-                    {format(new Date(story.endAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    Data de Fim
+                  </label>
+                  <p className='text-sm'>
+                    {format(new Date(story.endAt), 'dd/MM/yyyy HH:mm', {
+                      locale: ptBR,
+                    })}
                   </p>
                 </div>
               </div>
@@ -206,24 +216,34 @@ function StoryDetailsPage() {
             <CardHeader>
               <CardTitle>Informações do Sistema</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className='space-y-4'>
+              <div className='grid grid-cols-2 gap-4'>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">ID</label>
-                  <p className="text-sm font-mono">{story.id}</p>
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    ID
+                  </label>
+                  <p className='font-mono text-sm'>{story.id}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Store ID</label>
-                  <p className="text-sm font-mono">{story.storeId}</p>
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    Store ID
+                  </label>
+                  <p className='font-mono text-sm'>{story.storeId}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">User ID</label>
-                  <p className="text-sm font-mono">{story.userId}</p>
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    User ID
+                  </label>
+                  <p className='font-mono text-sm'>{story.userId}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Criado em</label>
-                  <p className="text-sm">
-                    {format(new Date(story.createdAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                  <label className='text-muted-foreground text-sm font-medium'>
+                    Criado em
+                  </label>
+                  <p className='text-sm'>
+                    {format(new Date(story.createdAt), 'dd/MM/yyyy HH:mm', {
+                      locale: ptBR,
+                    })}
                   </p>
                 </div>
               </div>
@@ -232,24 +252,28 @@ function StoryDetailsPage() {
         </div>
 
         {/* Imagens */}
-        <div className="space-y-6">
+        <div className='space-y-6'>
           <Card>
             <CardHeader>
-              <CardTitle>Imagens do Story ({story.images?.length || 0})</CardTitle>
+              <CardTitle>
+                Imagens do Story ({story.images?.length || 0})
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {story.images && story.images.length > 0 ? (
-                <div className="space-y-4">
+                <div className='space-y-4'>
                   {story.images.map((image, index) => (
-                    <div key={image.id} className="space-y-2">
-                      <div className="text-sm font-medium">Imagem {index + 1}</div>
+                    <div key={image.id} className='space-y-2'>
+                      <div className='text-sm font-medium'>
+                        Imagem {index + 1}
+                      </div>
                       <img
                         src={image.url}
                         alt={`Story imagem ${index + 1}`}
-                        className="w-full h-48 object-cover rounded-lg border"
+                        className='h-48 w-full rounded-lg border object-cover'
                       />
                       {image.order && (
-                        <div className="text-xs text-muted-foreground">
+                        <div className='text-muted-foreground text-xs'>
                           Ordem: {image.order}
                         </div>
                       )}
@@ -257,7 +281,7 @@ function StoryDetailsPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className='text-muted-foreground py-8 text-center'>
                   Nenhuma imagem disponível
                 </div>
               )}

@@ -20,8 +20,10 @@ export const FEES_QUERY_KEYS = {
   list: (filters?: any) => [...FEES_QUERY_KEYS.lists(), filters] as const,
   details: () => [...FEES_QUERY_KEYS.all, 'detail'] as const,
   detail: (id: string) => [...FEES_QUERY_KEYS.details(), id] as const,
-  userFees: (userId: string) => [...FEES_QUERY_KEYS.all, 'user', userId] as const,
-  brandFees: (brandId: string) => [...FEES_QUERY_KEYS.all, 'brand', brandId] as const,
+  userFees: (userId: string) =>
+    [...FEES_QUERY_KEYS.all, 'user', userId] as const,
+  brandFees: (brandId: string) =>
+    [...FEES_QUERY_KEYS.all, 'brand', brandId] as const,
 }
 
 // Hook para listar todas as taxas
@@ -43,13 +45,17 @@ export const useFeesQuery = (filters?: {
     queryFn: async (): Promise<FeesListResponse> => {
       try {
         // Converter boolean para string para a URL
-        const urlFilters: Record<string, string | number> | undefined = filters ? {
-          ...(filters.type && { type: filters.type }),
-          ...(filters.scope && { scope: filters.scope }),
-          ...(filters.isActive !== undefined && { isActive: filters.isActive.toString() }),
-          ...(filters.page && { page: filters.page }),
-          ...(filters.limit && { limit: filters.limit }),
-        } : undefined
+        const urlFilters: Record<string, string | number> | undefined = filters
+          ? {
+              ...(filters.type && { type: filters.type }),
+              ...(filters.scope && { scope: filters.scope }),
+              ...(filters.isActive !== undefined && {
+                isActive: filters.isActive.toString(),
+              }),
+              ...(filters.page && { page: filters.page }),
+              ...(filters.limit && { limit: filters.limit }),
+            }
+          : undefined
 
         const url = buildApiUrl(API_CONFIG.ENDPOINTS.FEES.LIST, urlFilters)
         const response = await fetch(url, {
@@ -88,7 +94,7 @@ export const useFeesQuery = (filters?: {
               description: 'Taxa de processamento de transações',
               fee_type: 'PROCESSING',
               calculation_type: 'FIXED',
-              value: 15.00,
+              value: 15.0,
               min_installments: 2,
               max_installments: 12,
               applies_to: 'GENERAL',
@@ -176,7 +182,9 @@ export const useUserFeesQuery = (userId: string) => {
     queryKey: FEES_QUERY_KEYS.userFees(userId),
     queryFn: async (): Promise<Fee[]> => {
       try {
-        const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.FEES.GET_USER_FEES}/${userId}`)
+        const url = buildApiUrl(
+          `${API_CONFIG.ENDPOINTS.FEES.GET_USER_FEES}/${userId}`
+        )
         const response = await fetch(url, {
           headers: getAuthHeaders(auth.accessToken || undefined),
         })
@@ -203,7 +211,9 @@ export const useBrandFeesQuery = (brandId: string) => {
     queryKey: FEES_QUERY_KEYS.brandFees(brandId),
     queryFn: async (): Promise<Fee[]> => {
       try {
-        const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.FEES.GET_BRAND_FEES}/${brandId}`)
+        const url = buildApiUrl(
+          `${API_CONFIG.ENDPOINTS.FEES.GET_BRAND_FEES}/${brandId}`
+        )
         const response = await fetch(url, {
           headers: getAuthHeaders(auth.accessToken || undefined),
         })
@@ -227,13 +237,18 @@ export const useFeeCalculation = () => {
   const { auth } = useAuthStore()
 
   return useMutation({
-    mutationFn: async (data: CalculateFeesRequest): Promise<FeeCalculationResponse> => {
+    mutationFn: async (
+      data: CalculateFeesRequest
+    ): Promise<FeeCalculationResponse> => {
       try {
-        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.FEES.CALCULATE), {
-          method: 'POST',
-          headers: getAuthHeaders(auth.accessToken || undefined),
-          body: JSON.stringify(data),
-        })
+        const response = await fetch(
+          buildApiUrl(API_CONFIG.ENDPOINTS.FEES.CALCULATE),
+          {
+            method: 'POST',
+            headers: getAuthHeaders(auth.accessToken || undefined),
+            body: JSON.stringify(data),
+          }
+        )
 
         if (!response.ok) {
           throw new Error('Falha ao calcular taxa')
@@ -273,11 +288,14 @@ export const useCreateFee = () => {
   return useMutation({
     mutationFn: async (data: CreateFeeData): Promise<Fee> => {
       try {
-        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.FEES.CREATE), {
-          method: 'POST',
-          headers: getAuthHeaders(auth.accessToken || undefined),
-          body: JSON.stringify(data),
-        })
+        const response = await fetch(
+          buildApiUrl(API_CONFIG.ENDPOINTS.FEES.CREATE),
+          {
+            method: 'POST',
+            headers: getAuthHeaders(auth.accessToken || undefined),
+            body: JSON.stringify(data),
+          }
+        )
 
         if (!response.ok) {
           const errorData = await response.json()
@@ -312,13 +330,22 @@ export const useUpdateFee = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateFeeData }): Promise<Fee> => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string
+      data: UpdateFeeData
+    }): Promise<Fee> => {
       try {
-        const response = await fetch(buildApiUrl(`${API_CONFIG.ENDPOINTS.FEES.UPDATE}/${id}`), {
-          method: 'PUT',
-          headers: getAuthHeaders(auth.accessToken || undefined),
-          body: JSON.stringify(data),
-        })
+        const response = await fetch(
+          buildApiUrl(`${API_CONFIG.ENDPOINTS.FEES.UPDATE}/${id}`),
+          {
+            method: 'PUT',
+            headers: getAuthHeaders(auth.accessToken || undefined),
+            body: JSON.stringify(data),
+          }
+        )
 
         if (!response.ok) {
           const errorData = await response.json()
@@ -356,10 +383,13 @@ export const useDeleteFee = () => {
   return useMutation({
     mutationFn: async (id: string): Promise<void> => {
       try {
-        const response = await fetch(buildApiUrl(`${API_CONFIG.ENDPOINTS.FEES.DELETE}/${id}`), {
-          method: 'DELETE',
-          headers: getAuthHeaders(auth.accessToken || undefined),
-        })
+        const response = await fetch(
+          buildApiUrl(`${API_CONFIG.ENDPOINTS.FEES.DELETE}/${id}`),
+          {
+            method: 'DELETE',
+            headers: getAuthHeaders(auth.accessToken || undefined),
+          }
+        )
 
         if (!response.ok) {
           const errorData = await response.json()

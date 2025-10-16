@@ -129,11 +129,7 @@ export function LoanStatusChangeDialog({
         </Form>
 
         <DialogFooter className='gap-2 sm:gap-0'>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={handleCancel}
-          >
+          <Button type='button' variant='outline' onClick={handleCancel}>
             Cancelar
           </Button>
           <Button type='submit' form='status-change-form'>

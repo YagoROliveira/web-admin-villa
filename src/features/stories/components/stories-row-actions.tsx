@@ -1,4 +1,5 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import { Edit, Copy, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -7,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Edit, Copy, Trash2 } from 'lucide-react'
 
 interface StoriesRowActionsProps {
   onEdit: () => void
@@ -25,7 +25,7 @@ export function StoriesRowActions({
       <DropdownMenuTrigger asChild>
         <Button
           variant='ghost'
-          className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'
+          className='data-[state=open]:bg-muted flex h-8 w-8 p-0'
         >
           <DotsHorizontalIcon className='h-4 w-4' />
           <span className='sr-only'>Abrir menu</span>

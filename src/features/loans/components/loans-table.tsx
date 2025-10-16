@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { getRouteApi, useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react'
+import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import {
   type SortingState,
   type VisibilityState,
@@ -9,8 +9,8 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from '@tanstack/react-table';
-import { useTableUrlState } from '@/hooks/use-table-url-state';
+} from '@tanstack/react-table'
+import { useTableUrlState } from '@/hooks/use-table-url-state'
 import {
   Table,
   TableBody,
@@ -18,23 +18,22 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table';
-import { loansColumns as columns } from './loans-columns';
-import { Loan } from '../data/schema';
+} from '@/components/ui/table'
+import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { Loan } from '../data/schema'
+import { loansColumns as columns } from './loans-columns'
 
-
-const route = getRouteApi('/_authenticated/loans/');
+const route = getRouteApi('/_authenticated/loans/')
 
 type LoansTableProps = {
-  data: Loan[];
-};
+  data: Loan[]
+}
 
 export function LoansTable({ data }: LoansTableProps) {
-  const [rowSelection, setRowSelection] = useState({});
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const navigate = useNavigate({ from: '/loans' });
+  const [rowSelection, setRowSelection] = useState({})
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const navigate = useNavigate({ from: '/loans' })
 
   const {
     globalFilter,
@@ -49,10 +48,8 @@ export function LoansTable({ data }: LoansTableProps) {
     navigate: route.useNavigate(),
     pagination: { defaultPage: 1, defaultPageSize: 10 },
     globalFilter: { enabled: true, key: 'filter' },
-    columnFilters: [
-      { columnId: 'status', searchKey: 'status', type: 'array' },
-    ],
-  });
+    columnFilters: [{ columnId: 'status', searchKey: 'status', type: 'array' }],
+  })
 
   const table = useReactTable({
     data,
@@ -76,18 +73,18 @@ export function LoansTable({ data }: LoansTableProps) {
     onPaginationChange,
     onGlobalFilterChange,
     onColumnFiltersChange,
-  });
+  })
 
-  const pageCount = table.getPageCount();
+  const pageCount = table.getPageCount()
   useEffect(() => {
-    ensurePageInRange(pageCount);
-  }, [pageCount, ensurePageInRange]);
+    ensurePageInRange(pageCount)
+  }, [pageCount, ensurePageInRange])
 
   return (
-    <div className="space-y-4 max-sm:has-[div[role=toolbar]]:mb-16">
+    <div className='space-y-4 max-sm:has-[div[role=toolbar]]:mb-16'>
       <DataTableToolbar
         table={table}
-        searchPlaceholder="Filtrar por solicitante..."
+        searchPlaceholder='Filtrar por solicitante...'
         filters={[
           {
             columnId: 'status',
@@ -100,7 +97,7 @@ export function LoansTable({ data }: LoansTableProps) {
           },
         ]}
       />
-      <div className="overflow-hidden rounded-md border">
+      <div className='overflow-hidden rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -109,7 +106,10 @@ export function LoansTable({ data }: LoansTableProps) {
                   <TableHead key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -121,19 +121,30 @@ export function LoansTable({ data }: LoansTableProps) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => navigate({ to: '/loans/$loanId', params: { loanId: row.original.id } })}
+                  className='hover:bg-muted/50 cursor-pointer'
+                  onClick={() =>
+                    navigate({
+                      to: '/loans/$loanId',
+                      params: { loanId: row.original.id },
+                    })
+                  }
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
                   Nenhum resultado.
                 </TableCell>
               </TableRow>
@@ -144,5 +155,5 @@ export function LoansTable({ data }: LoansTableProps) {
       <DataTablePagination table={table} />
       {/* Adicione bulk actions se necessário */}
     </div>
-  );
+  )
 }

@@ -61,7 +61,10 @@ export const API_CONFIG = {
 }
 
 // Helper function para construir URLs completas
-export const buildApiUrl = (endpoint: string, params?: Record<string, string | number>) => {
+export const buildApiUrl = (
+  endpoint: string,
+  params?: Record<string, string | number>
+) => {
   let url = `${API_CONFIG.BASE_URL}${endpoint}`
 
   if (params) {

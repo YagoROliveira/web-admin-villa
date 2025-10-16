@@ -28,7 +28,10 @@ export function formatCurrency(value: number): string {
  * - In middle: [1, '...', 4, 5, 6, '...', 10]
  * - Near end: [1, '...', 7, 8, 9, 10]
  */
-export function getPageNumbers(currentPage: number, totalPages: number): (number | string)[] {
+export function getPageNumbers(
+  currentPage: number,
+  totalPages: number
+): (number | string)[] {
   const maxVisiblePages = 5 // Maximum number of page buttons to show
   const rangeWithDots: (number | string)[] = []
 

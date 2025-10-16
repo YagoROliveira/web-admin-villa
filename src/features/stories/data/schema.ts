@@ -12,11 +12,15 @@ export const storySchema = z.object({
   userId: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  images: z.array(z.object({
-    id: z.string(),
-    url: z.string(),
-    order: z.number().optional(),
-  })).optional(),
+  images: z
+    .array(
+      z.object({
+        id: z.string(),
+        url: z.string(),
+        order: z.number().optional(),
+      })
+    )
+    .optional(),
 })
 
 export type Story = z.infer<typeof storySchema>

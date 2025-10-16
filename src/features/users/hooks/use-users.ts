@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { buildApiUrl, getAuthHeaders, API_CONFIG } from '@/config/api'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
-import { buildApiUrl, getAuthHeaders, API_CONFIG } from '@/config/api'
 import { mockUsers } from '../data/mock-data'
 
 // Tipos para usuários
@@ -56,7 +56,7 @@ export function useUsers(page = 1, pageSize = 10, search = '') {
     user: auth.user,
     page,
     pageSize,
-    search
+    search,
   })
 
   return useQuery<UsersListResponse>({
@@ -70,7 +70,7 @@ export function useUsers(page = 1, pageSize = 10, search = '') {
 
       const params: Record<string, string> = {
         page: page.toString(),
-        pageSize: pageSize.toString()
+        pageSize: pageSize.toString(),
       }
       if (search) {
         params.search = search
@@ -104,7 +104,10 @@ export function useUsers(page = 1, pageSize = 10, search = '') {
         console.error('Erro no fetch:', fetchError)
 
         // Se o erro é de network, usar dados mockados
-        if (fetchError.message === 'Failed to fetch' || fetchError.name === 'TypeError') {
+        if (
+          fetchError.message === 'Failed to fetch' ||
+          fetchError.name === 'TypeError'
+        ) {
           console.warn('Servidor não disponível, usando dados mockados')
           toast.warning('Usando dados de exemplo - servidor não conectado')
           return mockUsers
@@ -133,9 +136,12 @@ export function useUser(userId: string) {
   return useQuery<User>({
     queryKey: ['user', userId, auth.accessToken],
     queryFn: async () => {
-      const response = await fetch(buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.GET}/${userId}`), {
-        headers: getAuthHeaders(auth.accessToken),
-      })
+      const response = await fetch(
+        buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.GET}/${userId}`),
+        {
+          headers: getAuthHeaders(auth.accessToken),
+        }
+      )
 
       if (!response.ok) {
         throw new Error(`Erro ${response.status}: ${response.statusText}`)
@@ -154,11 +160,14 @@ export function useCreateUser() {
 
   return useMutation<User, Error, CreateUserRequest>({
     mutationFn: async (userData: CreateUserRequest) => {
-      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.USERS.CREATE), {
-        method: 'POST',
-        headers: getAuthHeaders(auth.accessToken),
-        body: JSON.stringify(userData),
-      })
+      const response = await fetch(
+        buildApiUrl(API_CONFIG.ENDPOINTS.USERS.CREATE),
+        {
+          method: 'POST',
+          headers: getAuthHeaders(auth.accessToken),
+          body: JSON.stringify(userData),
+        }
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -169,7 +178,9 @@ export function useCreateUser() {
     },
     onSuccess: (data: User) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      toast.success(`Usuário ${data.firstName} ${data.lastName} criado com sucesso!`)
+      toast.success(
+        `Usuário ${data.firstName} ${data.lastName} criado com sucesso!`
+      )
     },
     onError: (error: Error) => {
       console.error('Erro ao criar usuário:', error)
@@ -184,12 +195,21 @@ export function useUpdateUser() {
   const queryClient = useQueryClient()
 
   return useMutation<User, Error, { id: string; data: UpdateUserRequest }>({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateUserRequest }) => {
-      const response = await fetch(buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}`), {
-        method: 'PUT',
-        headers: getAuthHeaders(auth.accessToken),
-        body: JSON.stringify(data),
-      })
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string
+      data: UpdateUserRequest
+    }) => {
+      const response = await fetch(
+        buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}`),
+        {
+          method: 'PUT',
+          headers: getAuthHeaders(auth.accessToken),
+          body: JSON.stringify(data),
+        }
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -198,10 +218,15 @@ export function useUpdateUser() {
 
       return response.json()
     },
-    onSuccess: (data: User, variables: { id: string; data: UpdateUserRequest }) => {
+    onSuccess: (
+      data: User,
+      variables: { id: string; data: UpdateUserRequest }
+    ) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       queryClient.invalidateQueries({ queryKey: ['user', variables.id] })
-      toast.success(`Usuário ${data.firstName} ${data.lastName} atualizado com sucesso!`)
+      toast.success(
+        `Usuário ${data.firstName} ${data.lastName} atualizado com sucesso!`
+      )
     },
     onError: (error: Error) => {
       console.error('Erro ao atualizar usuário:', error)
@@ -217,10 +242,13 @@ export function useDeleteUser() {
 
   return useMutation<void, Error, string>({
     mutationFn: async (userId: string) => {
-      const response = await fetch(buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.DELETE}/${userId}`), {
-        method: 'DELETE',
-        headers: getAuthHeaders(auth.accessToken),
-      })
+      const response = await fetch(
+        buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.DELETE}/${userId}`),
+        {
+          method: 'DELETE',
+          headers: getAuthHeaders(auth.accessToken),
+        }
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -248,13 +276,26 @@ export function useToggleUserStatus() {
   const { auth } = useAuthStore()
   const queryClient = useQueryClient()
 
-  return useMutation<User, Error, { id: string; status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' }>({
-    mutationFn: async ({ id, status }: { id: string; status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' }) => {
-      const response = await fetch(buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}/status`), {
-        method: 'PATCH',
-        headers: getAuthHeaders(auth.accessToken),
-        body: JSON.stringify({ status }),
-      })
+  return useMutation<
+    User,
+    Error,
+    { id: string; status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' }
+  >({
+    mutationFn: async ({
+      id,
+      status,
+    }: {
+      id: string
+      status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED'
+    }) => {
+      const response = await fetch(
+        buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}/status`),
+        {
+          method: 'PATCH',
+          headers: getAuthHeaders(auth.accessToken),
+          body: JSON.stringify({ status }),
+        }
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -263,12 +304,21 @@ export function useToggleUserStatus() {
 
       return response.json()
     },
-    onSuccess: (data: User, variables: { id: string; status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' }) => {
+    onSuccess: (
+      data: User,
+      variables: { id: string; status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' }
+    ) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       queryClient.invalidateQueries({ queryKey: ['user', variables.id] })
-      const statusText = variables.status === 'ACTIVE' ? 'ativado' :
-        variables.status === 'INACTIVE' ? 'desativado' : 'suspenso'
-      toast.success(`Usuário ${data.firstName} ${data.lastName} ${statusText} com sucesso!`)
+      const statusText =
+        variables.status === 'ACTIVE'
+          ? 'ativado'
+          : variables.status === 'INACTIVE'
+            ? 'desativado'
+            : 'suspenso'
+      toast.success(
+        `Usuário ${data.firstName} ${data.lastName} ${statusText} com sucesso!`
+      )
     },
     onError: (error: Error) => {
       console.error('Erro ao alterar status do usuário:', error)

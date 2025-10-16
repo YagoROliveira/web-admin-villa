@@ -5,6 +5,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { Loader2, LogIn } from 'lucide-react'
 import { IconFacebook, IconGithub } from '@/assets/brand-icons'
 import { cn } from '@/lib/utils'
+import { useLogin } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -16,7 +17,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
-import { useLogin } from '@/hooks/use-auth'
 
 const formSchema = z.object({
   email: z.email({
@@ -98,7 +98,11 @@ export function UserAuthForm({
           )}
         />
         <Button className='mt-2' disabled={loginMutation.isPending}>
-          {loginMutation.isPending ? <Loader2 className='animate-spin' /> : <LogIn />}
+          {loginMutation.isPending ? (
+            <Loader2 className='animate-spin' />
+          ) : (
+            <LogIn />
+          )}
           Sign in
         </Button>
 
@@ -114,10 +118,18 @@ export function UserAuthForm({
         </div>
 
         <div className='grid grid-cols-2 gap-2'>
-          <Button variant='outline' type='button' disabled={loginMutation.isPending}>
+          <Button
+            variant='outline'
+            type='button'
+            disabled={loginMutation.isPending}
+          >
             <IconGithub className='h-4 w-4' /> GitHub
           </Button>
-          <Button variant='outline' type='button' disabled={loginMutation.isPending}>
+          <Button
+            variant='outline'
+            type='button'
+            disabled={loginMutation.isPending}
+          >
             <IconFacebook className='h-4 w-4' /> Facebook
           </Button>
         </div>

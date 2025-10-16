@@ -36,7 +36,9 @@ export function UsersDeleteDialog({
   }
 
   const isLoading = deleteUserMutation.isPending
-  const userDisplayName = currentRow ? `${currentRow.firstName} ${currentRow.lastName}` : ''
+  const userDisplayName = currentRow
+    ? `${currentRow.firstName} ${currentRow.lastName}`
+    : ''
 
   return (
     <ConfirmDialog
@@ -65,10 +67,8 @@ export function UsersDeleteDialog({
             <span className='font-bold'>{userDisplayName}</span>?
             <br />
             Esta ação removerá permanentemente o usuário com o papel de{' '}
-            <span className='font-bold'>
-              {currentRow?.role}
-            </span>{' '}
-            do sistema. Esta ação não pode ser desfeita.
+            <span className='font-bold'>{currentRow?.role}</span> do sistema.
+            Esta ação não pode ser desfeita.
           </p>
 
           <Label className='my-2'>

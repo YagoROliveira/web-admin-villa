@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { StoriesRowActions } from './stories-row-actions'
 import { type Story } from '../data/schema'
+import { StoriesRowActions } from './stories-row-actions'
 
 interface StoriesActionsProps {
   story: Story
