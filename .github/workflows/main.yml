@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image CI - Villa Admin
 
 on:
   push:
@@ -18,14 +18,20 @@ jobs:
 
       - name: Set image tag
         id: vars
-        run: echo "TAG=$(date +%s)" >> $GITHUB_ENV
+        run: |
+          echo "TAG=$(date +%s)" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: |
           REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          docker build . -f Dockerfile -t ghcr.io/${REPO}/web-admin-villa:${{ env.TAG }}
+          docker build . -f Dockerfile -t ghcr.io/${REPO}/villa-admin:${{ env.TAG }}
+          docker tag ghcr.io/${REPO}/villa-admin:${{ env.TAG }} ghcr.io/${REPO}/villa-admin:latest
+          docker tag ghcr.io/${REPO}/villa-admin:${{ env.TAG }} ghcr.io/${REPO}/villa-admin:${{ env.SHORT_SHA }}
       
       - name: Push Docker image
         run: |
           REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          docker push ghcr.io/${REPO}/web-admin-villa:${{ env.TAG }}
+          docker push ghcr.io/${REPO}/villa-admin:${{ env.TAG }}
+          docker push ghcr.io/${REPO}/villa-admin:latest
+          docker push ghcr.io/${REPO}/villa-admin:${{ env.SHORT_SHA }}
