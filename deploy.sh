@@ -15,7 +15,8 @@ NC='\033[0m' # No Color
 IMAGE_NAME="villa-admin"
 IMAGE_TAG="latest"
 CONTAINER_NAME="villa-admin"
-PORT="8080"
+PORT="8000"
+DOMAIN="admin.villamarket.app"
 
 # Funções auxiliares
 print_success() {
@@ -41,7 +42,8 @@ start() {
     echo "🚀 Starting containers..."
     docker-compose up -d
     print_success "Containers started!"
-    echo "📱 Application available at: http://localhost:${PORT}"
+    echo "📱 Application available at: https://${DOMAIN}"
+    echo "💡 If using Traefik, access via domain. Local access: http://localhost:${PORT}"
 }
 
 stop() {

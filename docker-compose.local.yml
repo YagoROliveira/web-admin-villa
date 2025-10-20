@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  villa-admin:
+    container_name: villa-admin-local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: villa-admin:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # Mapeia porta 8000 do host para 8000 do container
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

@@ -19,21 +19,26 @@ COPY . .
 # Build da aplicação
 RUN pnpm build
 
-# Estágio 2: Servir a aplicação com Nginx
-FROM nginx:alpine
+# Estágio 2: Servir a aplicação com serve
+FROM node:20-alpine
 
-# Copiar arquivos buildados
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Instalar serve globalmente
+RUN npm install -g serve
 
-# Copiar configuração customizada do Nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Definir diretório de trabalho
+WORKDIR /app
 
-# Expor porta 80
-EXPOSE 80
+# Copiar arquivos buildados do estágio anterior
+COPY --from=builder /app/dist ./dist
+
+# Expor porta 8000
+EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+  CMD wget --quiet --tries=1 --spider http://localhost:8000/ || exit 1
 
-# Comando para iniciar o Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Comando para servir a aplicação na porta 8000
+# -s = single page application (todas as rotas retornam index.html)
+# -l = porta
+CMD ["serve", "-s", "dist", "-l", "8000"]

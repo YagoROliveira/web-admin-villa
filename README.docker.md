@@ -82,7 +82,7 @@ Adicione no `docker-compose.yml` conforme necessário:
 ```yaml
 environment:
   - NODE_ENV=production
-  - API_BASE_URL=https://pro.villamarket.app
+  - API_BASE_URL=https://prod.villamarket.app
   - VITE_APP_TITLE=Villa Market Admin
 ```
 

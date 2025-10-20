@@ -173,7 +173,7 @@ Adicione no Portainer ao criar a stack:
 ```yaml
 environment:
   - NODE_ENV=production
-  - VITE_API_BASE_URL=https://pro.villamarket.app
+  - VITE_API_BASE_URL=https://prod.villamarket.app
 ```
 
 ---
