@@ -1,0 +1,1 @@
+export { useClassifieds } from './use-classifieds';
