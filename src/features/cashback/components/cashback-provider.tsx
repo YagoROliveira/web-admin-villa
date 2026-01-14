@@ -67,16 +67,15 @@ export function CashbackProvider({ children }: CashbackProviderProps) {
    * Busca lista de cashbacks com filtros
    */
   const fetchCashbacks = useCallback(
-    async (newFilters?: CashbackFilters, newPagination?: PaginationParams) => {
+    async (newFilters?: CashbackFilters) => {
       setIsLoading(true)
       setError(null)
 
       try {
         const currentFilters = newFilters || filters
-        const currentPagination = newPagination || pagination
         const response = await CashbackService.list(
           currentFilters,
-          currentPagination,
+          pagination,
           token
         )
 
@@ -111,7 +110,7 @@ export function CashbackProvider({ children }: CashbackProviderProps) {
         setIsLoading(false)
       }
     },
-    [token]
+    [filters, pagination, token]
   )
 
   /**

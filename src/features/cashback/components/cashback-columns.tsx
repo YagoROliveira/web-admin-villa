@@ -15,6 +15,7 @@ import { Cashback } from '../types'
 import { CashbackStatusBadge, CashbackTypeBadge } from './cashback-badges'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { Link } from '@tanstack/react-router'
 
 export const cashbackColumns: ColumnDef<Cashback>[] = [
   {
@@ -53,11 +54,21 @@ export const cashbackColumns: ColumnDef<Cashback>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Usuário' />
     ),
-    cell: ({ row }) => (
-      <div className='font-mono text-xs text-muted-foreground'>
-        {row.getValue('userId')}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const userName = row.original.userName
+      const userId = row.getValue('userId') as string
+
+      return (
+        <div className='flex flex-col'>
+          {userName && (
+            <div className='font-medium text-sm'>{userName}</div>
+          )}
+          <div className='font-mono text-xs text-muted-foreground'>
+            ID: {userId}
+          </div>
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'cashbackType',
@@ -178,10 +189,15 @@ export const cashbackColumns: ColumnDef<Cashback>[] = [
               Copiar ID do Pedido
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Eye className='mr-2 h-4 w-4' />
-              Ver Detalhes
-            </DropdownMenuItem>
+            <Link
+              to='/cashback/$orderId'
+              params={{ orderId: cashback.orderId }}
+            >
+              <DropdownMenuItem>
+                <Eye className='mr-2 h-4 w-4' />
+                Ver Detalhes
+              </DropdownMenuItem>
+            </Link>
             {cashback.status === 'PENDING' && (
               <DropdownMenuItem>
                 <RotateCcw className='mr-2 h-4 w-4' />

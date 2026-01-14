@@ -4,6 +4,7 @@ import type {
   Cashback,
   CashbackAuditLog,
   CashbackFilters,
+  CashbackListResponse,
   CashbackStats,
   CreateCashbackRequest,
   PaginationParams,
@@ -106,6 +107,24 @@ export class CashbackService {
   }
 
   /**
+   * Busca um cashback por ID
+   */
+  static async getById(
+    cashbackId: number,
+    token?: string
+  ): Promise<ApiResponse<Cashback>> {
+    const response = await fetch(
+      `${BASE_URL}${API_CONFIG.ENDPOINTS.CASHBACK.PROCESS_BY_ID}/${cashbackId}`,
+      {
+        method: 'GET',
+        headers: getAuthHeaders(token),
+      }
+    )
+
+    return handleApiResponse<Cashback>(response)
+  }
+
+  /**
    * Lista cashbacks de um usuário
    */
   static async listByUser(
@@ -171,7 +190,7 @@ export class CashbackService {
     filters?: CashbackFilters,
     pagination?: PaginationParams,
     token?: string
-  ): Promise<ApiResponse<Cashback[]>> {
+  ): Promise<ApiResponse<CashbackListResponse>> {
     const params: Record<string, string> = {}
 
     // Filtros
@@ -199,7 +218,7 @@ export class CashbackService {
       headers: getAuthHeaders(token),
     })
 
-    return handleApiResponse<Cashback[]>(response)
+    return handleApiResponse<CashbackListResponse>(response)
   }
 
   /**

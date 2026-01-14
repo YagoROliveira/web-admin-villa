@@ -41,6 +41,8 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedLoansLoanIdRouteImport } from './routes/_authenticated/loans/$loanId'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedCashbackOrderIdRouteImport } from './routes/_authenticated/cashback/$orderId'
+import { Route as AuthenticatedCashbackCashbackIdRouteImport } from './routes/_authenticated/cashback/$cashbackId'
 import { Route as AuthenticatedStoriesStoryIdIndexRouteImport } from './routes/_authenticated/stories/$storyId/index'
 import { Route as AuthenticatedStoriesStoryIdEditRouteImport } from './routes/_authenticated/stories/$storyId/edit'
 
@@ -216,6 +218,18 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCashbackOrderIdRoute =
+  AuthenticatedCashbackOrderIdRouteImport.update({
+    id: '/cashback/$orderId',
+    path: '/cashback/$orderId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCashbackCashbackIdRoute =
+  AuthenticatedCashbackCashbackIdRouteImport.update({
+    id: '/cashback/$cashbackId',
+    path: '/cashback/$cashbackId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStoriesStoryIdIndexRoute =
   AuthenticatedStoriesStoryIdIndexRouteImport.update({
     id: '/stories/$storyId/',
@@ -242,6 +256,8 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/cashback/$cashbackId': typeof AuthenticatedCashbackCashbackIdRoute
+  '/cashback/$orderId': typeof AuthenticatedCashbackOrderIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/loans/$loanId': typeof AuthenticatedLoansLoanIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -276,6 +292,8 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/cashback/$cashbackId': typeof AuthenticatedCashbackCashbackIdRoute
+  '/cashback/$orderId': typeof AuthenticatedCashbackOrderIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/loans/$loanId': typeof AuthenticatedLoansLoanIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -313,6 +331,8 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/cashback/$cashbackId': typeof AuthenticatedCashbackCashbackIdRoute
+  '/_authenticated/cashback/$orderId': typeof AuthenticatedCashbackOrderIdRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/loans/$loanId': typeof AuthenticatedLoansLoanIdRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -350,6 +370,8 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/cashback/$cashbackId'
+    | '/cashback/$orderId'
     | '/errors/$error'
     | '/loans/$loanId'
     | '/settings/account'
@@ -384,6 +406,8 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/cashback/$cashbackId'
+    | '/cashback/$orderId'
     | '/errors/$error'
     | '/loans/$loanId'
     | '/settings/account'
@@ -420,6 +444,8 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/cashback/$cashbackId'
+    | '/_authenticated/cashback/$orderId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/loans/$loanId'
     | '/_authenticated/settings/account'
@@ -683,6 +709,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cashback/$orderId': {
+      id: '/_authenticated/cashback/$orderId'
+      path: '/cashback/$orderId'
+      fullPath: '/cashback/$orderId'
+      preLoaderRoute: typeof AuthenticatedCashbackOrderIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cashback/$cashbackId': {
+      id: '/_authenticated/cashback/$cashbackId'
+      path: '/cashback/$cashbackId'
+      fullPath: '/cashback/$cashbackId'
+      preLoaderRoute: typeof AuthenticatedCashbackCashbackIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/stories/$storyId/': {
       id: '/_authenticated/stories/$storyId/'
       path: '/stories/$storyId'
@@ -726,6 +766,8 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCashbackCashbackIdRoute: typeof AuthenticatedCashbackCashbackIdRoute
+  AuthenticatedCashbackOrderIdRoute: typeof AuthenticatedCashbackOrderIdRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedLoansLoanIdRoute: typeof AuthenticatedLoansLoanIdRoute
   AuthenticatedStoriesNewRoute: typeof AuthenticatedStoriesNewRoute
@@ -747,6 +789,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCashbackCashbackIdRoute: AuthenticatedCashbackCashbackIdRoute,
+  AuthenticatedCashbackOrderIdRoute: AuthenticatedCashbackOrderIdRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedLoansLoanIdRoute: AuthenticatedLoansLoanIdRoute,
   AuthenticatedStoriesNewRoute: AuthenticatedStoriesNewRoute,

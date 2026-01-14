@@ -31,6 +31,7 @@ export interface Cashback {
   id: number
   orderId: string
   userId: string
+  userName?: string
   cashbackType: CashbackType
   orderAmountCents: number
   orderAmountReais?: number
@@ -122,6 +123,13 @@ export interface CashbackStats {
   cancelled?: number
   totalAmountCents: number
   totalAmountReais: number
+}
+
+export interface CashbackListResponse {
+  cashbacks: Cashback[]
+  total: number
+  limit: number
+  offset: number
 }
 
 export interface CashbackFilters {

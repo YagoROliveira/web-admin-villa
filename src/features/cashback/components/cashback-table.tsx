@@ -39,12 +39,12 @@ export function CashbackTable({ data }: CashbackTableProps) {
 
   // Recarrega dados quando paginação mudar
   useEffect(() => {
-    fetchCashbacks(undefined, pagination)
+    fetchCashbacks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, pagination.limit])
 
   // Calcula o número de páginas baseado no total de itens do servidor
-  const pageCount = pagination.totalItems
+  const pageCount = pagination.totalItems && pagination.limit
     ? Math.ceil(pagination.totalItems / pagination.limit)
     : -1
 
