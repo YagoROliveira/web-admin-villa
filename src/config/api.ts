@@ -57,6 +57,24 @@ export const API_CONFIG = {
       GET_USER_FEES: '/wallet/v1/fees/user',
       GET_BRAND_FEES: '/wallet/v1/fees/brand',
     },
+
+    // Cashback
+    CASHBACK: {
+      PROCESS: '/cashback/process',
+      CREATE: '/cashback/create',
+      PROCESS_BY_ID: '/cashback',
+      LIST: '/cashback/all',
+      LIST_BY_USER: '/cashback/user',
+      GET_BY_ORDER: '/cashback/order',
+      AUDIT: '/cashback',
+      STATS: '/cashback/stats',
+      PROCESS_PENDING: '/cashback/process-pending',
+      RETRY_FAILED: '/cashback/retry-failed',
+      NOTIFY: '/cashback',
+      WORKER_RUN: '/cashback/worker/run',
+      WORKER_RUN_DATE_RANGE: '/cashback/worker/run-date-range',
+      WORKER_STATS: '/cashback/worker/stats',
+    },
   },
 }
 

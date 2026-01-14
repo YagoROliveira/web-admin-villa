@@ -32,6 +32,7 @@ import { Route as AuthenticatedFeesIndexRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEmprestimosIndexRouteImport } from './routes/_authenticated/emprestimos/index'
 import { Route as AuthenticatedClassifiedsIndexRouteImport } from './routes/_authenticated/classifieds/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
+import { Route as AuthenticatedCashbackIndexRouteImport } from './routes/_authenticated/cashback/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as AuthenticatedStoriesNewRouteImport } from './routes/_authenticated/stories/new'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
@@ -163,6 +164,12 @@ const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   path: '/chats/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCashbackIndexRoute =
+  AuthenticatedCashbackIndexRouteImport.update({
+    id: '/cashback/',
+    path: '/cashback/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   id: '/apps/',
   path: '/apps/',
@@ -243,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/stories/new': typeof AuthenticatedStoriesNewRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/cashback': typeof AuthenticatedCashbackIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/classifieds': typeof AuthenticatedClassifiedsIndexRoute
   '/emprestimos': typeof AuthenticatedEmprestimosIndexRoute
@@ -276,6 +284,7 @@ export interface FileRoutesByTo {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/stories/new': typeof AuthenticatedStoriesNewRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/cashback': typeof AuthenticatedCashbackIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/classifieds': typeof AuthenticatedClassifiedsIndexRoute
   '/emprestimos': typeof AuthenticatedEmprestimosIndexRoute
@@ -312,6 +321,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/stories/new': typeof AuthenticatedStoriesNewRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
+  '/_authenticated/cashback/': typeof AuthenticatedCashbackIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/classifieds/': typeof AuthenticatedClassifiedsIndexRoute
   '/_authenticated/emprestimos/': typeof AuthenticatedEmprestimosIndexRoute
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/stories/new'
     | '/apps'
+    | '/cashback'
     | '/chats'
     | '/classifieds'
     | '/emprestimos'
@@ -381,6 +392,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/stories/new'
     | '/apps'
+    | '/cashback'
     | '/chats'
     | '/classifieds'
     | '/emprestimos'
@@ -416,6 +428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/notifications'
     | '/_authenticated/stories/new'
     | '/_authenticated/apps/'
+    | '/_authenticated/cashback/'
     | '/_authenticated/chats/'
     | '/_authenticated/classifieds/'
     | '/_authenticated/emprestimos/'
@@ -607,6 +620,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cashback/': {
+      id: '/_authenticated/cashback/'
+      path: '/cashback'
+      fullPath: '/cashback'
+      preLoaderRoute: typeof AuthenticatedCashbackIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
       path: '/apps'
@@ -710,6 +730,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLoansLoanIdRoute: typeof AuthenticatedLoansLoanIdRoute
   AuthenticatedStoriesNewRoute: typeof AuthenticatedStoriesNewRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
+  AuthenticatedCashbackIndexRoute: typeof AuthenticatedCashbackIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedClassifiedsIndexRoute: typeof AuthenticatedClassifiedsIndexRoute
   AuthenticatedEmprestimosIndexRoute: typeof AuthenticatedEmprestimosIndexRoute
@@ -730,6 +751,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLoansLoanIdRoute: AuthenticatedLoansLoanIdRoute,
   AuthenticatedStoriesNewRoute: AuthenticatedStoriesNewRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
+  AuthenticatedCashbackIndexRoute: AuthenticatedCashbackIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedClassifiedsIndexRoute: AuthenticatedClassifiedsIndexRoute,
   AuthenticatedEmprestimosIndexRoute: AuthenticatedEmprestimosIndexRoute,
