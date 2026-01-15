@@ -10,6 +10,8 @@ import {
   Edit,
   FileText,
   TrendingUp,
+  Upload,
+  Wallet,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -32,6 +34,8 @@ import { LoanRejectionDialog } from './loan-rejection-dialog'
 import { LoanStatusChangeDialog } from './loan-status-change-dialog'
 import { LoanStatusIndicator } from './loan-status-indicator'
 import { LoanViabilityDialog } from './loan-viability-dialog'
+import { LoanPaymentProofDialog } from './loan-payment-proof-dialog'
+import { LoanDisbursementDialog } from './loan-disbursement-dialog'
 
 // Tipo para os dados detalhados do empréstimo
 interface LoanDetailsResponse {
@@ -48,6 +52,7 @@ interface LoanDetailsResponse {
     cep: string
     endereco: string
     approvalStatus: string
+    loanStatus: string
     analysisNotes: string
     step: string
     valueApproved: string
@@ -306,6 +311,7 @@ export function LoanDetails() {
             cep: loanDetail.cep || '',
             endereco: loanDetail.endereco || '',
             approvalStatus: loanDetail.approvalStatus,
+            loanStatus: loanDetail.loanStatus || loanDetail.approvalStatus,
             analysisNotes: loanDetail.analysisNotes || '',
             step: loanDetail.step || '',
             valueApproved:
@@ -435,35 +441,75 @@ export function LoanDetails() {
             {/* Botões de Aprovação/Recusa - só aparecem se o status permitir */}
             {loanData.loanRequested.approvalStatus?.toLowerCase() ===
               'pending' && (
-              <>
-                <LoanApprovalDialog
+                <>
+                  <LoanApprovalDialog
+                    loanId={loanData.loanRequested.id}
+                    amountRequested={loanData.loanRequested.amountRequested}
+                    userName={
+                      loanData.loanRequested.userName || 'Nome não informado'
+                    }
+                    userId={loanData.loanRequested.id}
+                  >
+                    <Button className='space-x-1 bg-green-600 hover:bg-green-700'>
+                      <CheckCircle size={18} />
+                      <span>Aprovar</span>
+                    </Button>
+                  </LoanApprovalDialog>
+
+                  <LoanRejectionDialog
+                    loanId={loanData.loanRequested.id}
+                    amountRequested={loanData.loanRequested.amountRequested}
+                    userName={
+                      loanData.loanRequested.userName || 'Nome não informado'
+                    }
+                  >
+                    <Button variant='destructive' className='space-x-1'>
+                      <XCircle size={18} />
+                      <span>Rejeitar</span>
+                    </Button>
+                  </LoanRejectionDialog>
+                </>
+              )}
+
+            {/* Botão de Desembolso - aparece para empréstimos aprovados que ainda não foram desembolsados */}
+            {loanData.loanRequested.approvalStatus?.toLowerCase() ===
+              'approved' && (
+                <LoanDisbursementDialog
                   loanId={loanData.loanRequested.id}
-                  amountRequested={loanData.loanRequested.amountRequested}
                   userName={
                     loanData.loanRequested.userName || 'Nome não informado'
                   }
-                  userId={loanData.loanRequested.id}
+                  valueApproved={loanData.loanRequested.valueApproved}
+                  onSuccess={() => window.location.reload()}
                 >
                   <Button className='space-x-1 bg-green-600 hover:bg-green-700'>
-                    <CheckCircle size={18} />
-                    <span>Aprovar</span>
+                    <Wallet size={18} />
+                    <span>Marcar como Desembolsado</span>
                   </Button>
-                </LoanApprovalDialog>
+                </LoanDisbursementDialog>
+              )}
 
-                <LoanRejectionDialog
+            {/* Botão de Upload de Comprovante - aparece para empréstimos desembolsados */}
+            {['disbursed', 'active', 'in_progress'].includes(
+              loanData.loanRequested.loanStatus?.toLowerCase()
+            ) && (
+                <LoanPaymentProofDialog
                   loanId={loanData.loanRequested.id}
-                  amountRequested={loanData.loanRequested.amountRequested}
                   userName={
                     loanData.loanRequested.userName || 'Nome não informado'
                   }
+                  amountPaid={loanData.loanRequested.valueApproved}
+                  onSuccess={() => window.location.reload()}
                 >
-                  <Button variant='destructive' className='space-x-1'>
-                    <XCircle size={18} />
-                    <span>Rejeitar</span>
+                  <Button
+                    variant='outline'
+                    className='space-x-1 border-blue-600 text-blue-600 hover:bg-blue-50'
+                  >
+                    <Upload size={18} />
+                    <span>Enviar Comprovante</span>
                   </Button>
-                </LoanRejectionDialog>
-              </>
-            )}
+                </LoanPaymentProofDialog>
+              )}
 
             <Button
               variant='outline'

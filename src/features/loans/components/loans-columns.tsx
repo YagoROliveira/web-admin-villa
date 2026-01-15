@@ -1,12 +1,31 @@
 import { ColumnDef } from '@tanstack/react-table'
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Loan } from '../data/schema'
 import { LoansRowActions } from './loans-row-actions'
 
 export const loansColumns: ColumnDef<Loan>[] = [
   {
     accessorKey: 'solicitante',
-    header: 'Solicitante',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className='hover:bg-muted'
+        >
+          Solicitante
+          {column.getIsSorted() === 'asc' ? (
+            <ArrowUp className='ml-2 h-4 w-4' />
+          ) : column.getIsSorted() === 'desc' ? (
+            <ArrowDown className='ml-2 h-4 w-4' />
+          ) : (
+            <ArrowUpDown className='ml-2 h-4 w-4' />
+          )}
+        </Button>
+      )
+    },
     cell: (info) => {
       const value = info.getValue() as string
       return value ? value.toUpperCase() : ''
@@ -14,7 +33,24 @@ export const loansColumns: ColumnDef<Loan>[] = [
   },
   {
     accessorKey: 'valor',
-    header: 'Valor',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className='hover:bg-muted'
+        >
+          Valor
+          {column.getIsSorted() === 'asc' ? (
+            <ArrowUp className='ml-2 h-4 w-4' />
+          ) : column.getIsSorted() === 'desc' ? (
+            <ArrowDown className='ml-2 h-4 w-4' />
+          ) : (
+            <ArrowUpDown className='ml-2 h-4 w-4' />
+          )}
+        </Button>
+      )
+    },
     cell: (info) => {
       const value = Number(info.getValue())
       return value.toLocaleString('pt-BR', {
@@ -26,7 +62,24 @@ export const loansColumns: ColumnDef<Loan>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className='hover:bg-muted'
+        >
+          Status
+          {column.getIsSorted() === 'asc' ? (
+            <ArrowUp className='ml-2 h-4 w-4' />
+          ) : column.getIsSorted() === 'desc' ? (
+            <ArrowDown className='ml-2 h-4 w-4' />
+          ) : (
+            <ArrowUpDown className='ml-2 h-4 w-4' />
+          )}
+        </Button>
+      )
+    },
     cell: (info) => {
       const value = info.getValue() as string
       let label = value
@@ -55,7 +108,24 @@ export const loansColumns: ColumnDef<Loan>[] = [
   },
   {
     accessorKey: 'dataSolicitacao',
-    header: 'Data da Solicitação',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          className='hover:bg-muted'
+        >
+          Data da Solicitação
+          {column.getIsSorted() === 'asc' ? (
+            <ArrowUp className='ml-2 h-4 w-4' />
+          ) : column.getIsSorted() === 'desc' ? (
+            <ArrowDown className='ml-2 h-4 w-4' />
+          ) : (
+            <ArrowUpDown className='ml-2 h-4 w-4' />
+          )}
+        </Button>
+      )
+    },
     cell: (info) => {
       const value = info.getValue() as string
       if (!value) return ''

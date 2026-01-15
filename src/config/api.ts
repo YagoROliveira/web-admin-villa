@@ -32,6 +32,8 @@ export const API_CONFIG = {
       GET_ANALYSIS_DATA: '/wallet/v1/loan/get-data-to-analisys',
       LIST: '/wallet/v1/loans',
       LIST_ALL: '/wallet/v1/list-loans-all', // Para loans-provider
+      UPLOAD_PAYMENT_PROOF: '/wallet/v1/loan/upload-payment-proof',
+      MARK_DISBURSED: '/wallet/v1/loan/mark-disbursed',
     },
 
     // Stories/Histórias
