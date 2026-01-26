@@ -25,6 +25,7 @@ import {
   BookOpen,
   Calculator,
   Gift,
+  Receipt,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -74,6 +75,11 @@ export const sidebarData: SidebarData = {
           title: 'Emprestimos',
           url: '/loans',
           icon: Landmark,
+        },
+        {
+          title: 'Contas a Pagar',
+          url: '/payable-accounts',
+          icon: Receipt,
         },
         {
           title: 'Cashback',

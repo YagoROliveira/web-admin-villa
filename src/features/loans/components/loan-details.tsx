@@ -36,6 +36,7 @@ import { LoanStatusIndicator } from './loan-status-indicator'
 import { LoanViabilityDialog } from './loan-viability-dialog'
 import { LoanPaymentProofDialog } from './loan-payment-proof-dialog'
 import { LoanDisbursementDialog } from './loan-disbursement-dialog'
+import { LoanNotificationDialog } from './loan-notification-dialog'
 
 // Tipo para os dados detalhados do empréstimo
 interface LoanDetailsResponse {
@@ -518,6 +519,39 @@ export function LoanDetails() {
             >
               <span>Alterar Status</span> <Edit size={18} />
             </Button>
+
+            {/* Botão de Notificação Manual */}
+            <LoanNotificationDialog
+              loanRequestId={loanData.loanRequested.id}
+              userName={loanData.loanRequested.userName || 'Usuário'}
+              overdueAmount={
+                loanData.loanRequested.installments
+                  ?.filter(
+                    (inst) =>
+                      inst.dueDate &&
+                      new Date(inst.dueDate) < new Date() &&
+                      !inst.paymentDate
+                  )
+                  .reduce((sum, inst) => sum + parseFloat(inst.amount || '0'), 0) || 0
+              }
+              overdueDays={
+                loanData.loanRequested.installments
+                  ?.filter(
+                    (inst) =>
+                      inst.dueDate &&
+                      new Date(inst.dueDate) < new Date() &&
+                      !inst.paymentDate
+                  )
+                  .map((inst) => {
+                    const dueDate = new Date(inst.dueDate)
+                    const today = new Date()
+                    const diffTime = Math.abs(today.getTime() - dueDate.getTime())
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                    return diffDays
+                  })
+                  .reduce((max, days) => Math.max(max, days), 0) || undefined
+              }
+            />
           </div>
         </div>
         {/* Indicador de Status do Empréstimo */}

@@ -3,7 +3,7 @@ export const API_CONFIG = {
   // Base URL da API
   // Em desenvolvimento, usa proxy do Vite (vazio) para evitar CORS
   // Em produção, usar a URL completa: 'https://prod.villamarket.app'
-  BASE_URL: 'https://prod.villamarket.app',
+  BASE_URL: 'http://localhost:9001',
 
   // Endpoints específicos
   ENDPOINTS: {
@@ -34,6 +34,7 @@ export const API_CONFIG = {
       LIST_ALL: '/wallet/v1/list-loans-all', // Para loans-provider
       UPLOAD_PAYMENT_PROOF: '/wallet/v1/loan/upload-payment-proof',
       MARK_DISBURSED: '/wallet/v1/loan/mark-disbursed',
+      SEND_NOTIFICATION: '/wallet/v1/loan/send-notification',
     },
 
     // Stories/Histórias
@@ -44,8 +45,8 @@ export const API_CONFIG = {
 
     // Transações/Logs
     TRANSACTIONS: {
-      LIST: '/wallet/transactions',
-      LOGS: '/wallet/logs',
+      LIST: '/wallet/v1/transactions',
+      LOGS: '/wallet/v1/logs',
     },
 
     // Taxas/Fees
@@ -76,6 +77,23 @@ export const API_CONFIG = {
       WORKER_RUN: '/cashback/worker/run',
       WORKER_RUN_DATE_RANGE: '/cashback/worker/run-date-range',
       WORKER_STATS: '/cashback/worker/stats',
+    },
+
+    // Contas a Pagar
+    PAYABLE_ACCOUNTS: {
+      DASHBOARD: '/admin/payable-accounts/dashboard',
+      LIST: '/admin/payable-accounts',
+      CREATE: '/admin/payable-accounts',
+      GET: '/admin/payable-accounts',
+      UPDATE: '/admin/payable-accounts',
+      APPROVE: '/admin/payable-accounts',
+      PAYMENT: '/admin/payable-accounts',
+      CANCEL: '/admin/payable-accounts',
+      AUTO_GENERATE: '/admin/payable-accounts/auto-generate',
+      BULK_APPROVE: '/admin/payable-accounts/bulk-approve',
+      BULK_PAYMENT: '/admin/payable-accounts/bulk-payment',
+      SUMMARY: '/admin/payable-accounts/summary',
+      OVERDUE: '/admin/payable-accounts/overdue',
     },
   },
 }

@@ -26,6 +26,7 @@ import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedStoriesIndexRouteImport } from './routes/_authenticated/stories/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedPayableAccountsIndexRouteImport } from './routes/_authenticated/payable-accounts/index'
 import { Route as AuthenticatedLoansIndexRouteImport } from './routes/_authenticated/loans/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedFeesIndexRouteImport } from './routes/_authenticated/fees/index'
@@ -132,6 +133,12 @@ const AuthenticatedSettingsIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedPayableAccountsIndexRoute =
+  AuthenticatedPayableAccountsIndexRouteImport.update({
+    id: '/payable-accounts/',
+    path: '/payable-accounts/',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedLoansIndexRoute = AuthenticatedLoansIndexRouteImport.update({
   id: '/loans/',
@@ -273,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/fees': typeof AuthenticatedFeesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/loans': typeof AuthenticatedLoansIndexRoute
+  '/payable-accounts': typeof AuthenticatedPayableAccountsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/stories': typeof AuthenticatedStoriesIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
@@ -309,6 +317,7 @@ export interface FileRoutesByTo {
   '/fees': typeof AuthenticatedFeesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/loans': typeof AuthenticatedLoansIndexRoute
+  '/payable-accounts': typeof AuthenticatedPayableAccountsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/stories': typeof AuthenticatedStoriesIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
@@ -348,6 +357,7 @@ export interface FileRoutesById {
   '/_authenticated/fees/': typeof AuthenticatedFeesIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/loans/': typeof AuthenticatedLoansIndexRoute
+  '/_authenticated/payable-accounts/': typeof AuthenticatedPayableAccountsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/stories/': typeof AuthenticatedStoriesIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
@@ -387,6 +397,7 @@ export interface FileRouteTypes {
     | '/fees'
     | '/help-center'
     | '/loans'
+    | '/payable-accounts'
     | '/settings/'
     | '/stories'
     | '/tasks'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/fees'
     | '/help-center'
     | '/loans'
+    | '/payable-accounts'
     | '/settings'
     | '/stories'
     | '/tasks'
@@ -461,6 +473,7 @@ export interface FileRouteTypes {
     | '/_authenticated/fees/'
     | '/_authenticated/help-center/'
     | '/_authenticated/loans/'
+    | '/_authenticated/payable-accounts/'
     | '/_authenticated/settings/'
     | '/_authenticated/stories/'
     | '/_authenticated/tasks/'
@@ -603,6 +616,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/'
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/payable-accounts/': {
+      id: '/_authenticated/payable-accounts/'
+      path: '/payable-accounts'
+      fullPath: '/payable-accounts'
+      preLoaderRoute: typeof AuthenticatedPayableAccountsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/loans/': {
       id: '/_authenticated/loans/'
@@ -779,6 +799,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFeesIndexRoute: typeof AuthenticatedFeesIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedLoansIndexRoute: typeof AuthenticatedLoansIndexRoute
+  AuthenticatedPayableAccountsIndexRoute: typeof AuthenticatedPayableAccountsIndexRoute
   AuthenticatedStoriesIndexRoute: typeof AuthenticatedStoriesIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
@@ -802,6 +823,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFeesIndexRoute: AuthenticatedFeesIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedLoansIndexRoute: AuthenticatedLoansIndexRoute,
+  AuthenticatedPayableAccountsIndexRoute:
+    AuthenticatedPayableAccountsIndexRoute,
   AuthenticatedStoriesIndexRoute: AuthenticatedStoriesIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
