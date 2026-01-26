@@ -70,16 +70,16 @@ export function LoanNotificationDialog({
 
   const generateDefaultMessage = (name: string, amount?: number, days?: number) => {
     const firstName = name.split(' ')[0]
-    
+
     if (amount && days) {
       const formattedAmount = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
       }).format(amount)
-      
+
       return `Olá ${firstName}! Identificamos que seu empréstimo está em atraso há ${days} ${days === 1 ? 'dia' : 'dias'}, no valor de ${formattedAmount}. Informamos que, ao atingir 30 dias de inadimplência, o débito poderá ser encaminhado para Serasa e SPC, além da incidência de juros diários. Para evitar encargos e restrições, entre em contato imediatamente pelo chat do aplicativo Villa Market e regularize sua situação.`
     }
-    
+
     return `Olá ${firstName}! Entre em contato conosco pelo chat do aplicativo Villa Market para tratar sobre seu empréstimo.`
   }
 

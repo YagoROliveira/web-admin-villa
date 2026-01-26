@@ -16,21 +16,21 @@ function LoansContent() {
 
   // Filtrar empréstimos por status e data
   const today = new Date().toISOString().split('T')[0]
-  
+
   const todayLoans = loans.filter((loan) => {
     const loanDate = loan.dataSolicitacao.split(' ')[0] // Pega apenas a data
     return loanDate === today
   })
 
-  const approvedLoans = loans.filter((loan) => 
+  const approvedLoans = loans.filter((loan) =>
     loan.status === 'Aprovado' || loan.status === 'APPROVED'
   )
 
-  const pendingLoans = loans.filter((loan) => 
+  const pendingLoans = loans.filter((loan) =>
     loan.status === 'Pendente' || loan.status === 'PENDING'
   )
 
-  const rejectedLoans = loans.filter((loan) => 
+  const rejectedLoans = loans.filter((loan) =>
     loan.status === 'Recusado' || loan.status === 'REJECTED' || loan.status === 'REFUSED'
   )
 

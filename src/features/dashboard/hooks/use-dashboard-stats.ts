@@ -41,17 +41,17 @@ export function useRecentCashbacks() {
     queryFn: async () => {
       const url = buildApiUrl(API_CONFIG.ENDPOINTS.CASHBACK.LIST)
       const response = await fetch(url)
-      
+
       if (!response.ok) {
         throw new Error('Erro ao buscar cashbacks recentes')
       }
-      
+
       const data = await response.json()
-      
+
       // Ordenar por data e pegar os 5 mais recentes
       if (Array.isArray(data)) {
         return data
-          .sort((a: any, b: any) => 
+          .sort((a: any, b: any) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           )
           .slice(0, 5)
@@ -64,7 +64,7 @@ export function useRecentCashbacks() {
             createdAt: item.createdAt,
           }))
       }
-      
+
       return []
     },
     staleTime: 2 * 60 * 1000, // 2 minutos
@@ -78,27 +78,27 @@ export function useCashbackByMonth() {
     queryFn: async () => {
       const url = buildApiUrl(API_CONFIG.ENDPOINTS.CASHBACK.LIST)
       const response = await fetch(url)
-      
+
       if (!response.ok) {
         throw new Error('Erro ao buscar dados de cashback por mês')
       }
-      
+
       const data = await response.json()
-      
+
       if (!Array.isArray(data)) {
         return []
       }
-      
+
       // Agrupar por mês
       const monthlyData: { [key: string]: number } = {}
       const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-      
+
       data.forEach((item: any) => {
         if (item.createdAt) {
           const date = new Date(item.createdAt)
           const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
           const amount = parseFloat(item.cashbackAmount || item.amount || 0)
-          
+
           if (monthlyData[monthKey]) {
             monthlyData[monthKey] += amount
           } else {
@@ -106,7 +106,7 @@ export function useCashbackByMonth() {
           }
         }
       })
-      
+
       // Converter para array e ordenar
       const result = Object.entries(monthlyData)
         .sort(([a], [b]) => a.localeCompare(b))
@@ -119,7 +119,7 @@ export function useCashbackByMonth() {
             total,
           }
         })
-      
+
       return result
     },
     staleTime: 5 * 60 * 1000, // 5 minutos
@@ -133,11 +133,11 @@ export function useCashbackStats() {
     queryFn: async () => {
       const url = buildApiUrl(API_CONFIG.ENDPOINTS.CASHBACK.STATS)
       const response = await fetch(url)
-      
+
       if (!response.ok) {
         throw new Error('Erro ao buscar estatísticas de cashback')
       }
-      
+
       return response.json()
     },
     staleTime: 5 * 60 * 1000, // 5 minutos
@@ -151,26 +151,26 @@ export function useLoanStats() {
     queryFn: async () => {
       const url = buildApiUrl(API_CONFIG.ENDPOINTS.LOANS.LIST_ALL)
       const response = await fetch(url)
-      
+
       if (!response.ok) {
         throw new Error('Erro ao buscar estatísticas de empréstimos')
       }
-      
+
       const loans = await response.json()
-      
+
       // Calcular estatísticas
       const totalRequested = loans.length
       const totalApproved = loans.filter(
         (loan: any) => loan.approvalStatus === 'APPROVED'
       ).length
-      
+
       // Calcular total a receber (soma dos valores aprovados)
       const totalToReceive = loans
         .filter((loan: any) => loan.approvalStatus === 'APPROVED')
         .reduce((sum: number, loan: any) => {
           return sum + parseFloat(loan.valueApproved || loan.amountRequested || 0)
         }, 0)
-      
+
       // Calcular parcelas atrasadas
       const overdueInstallments = loans.reduce((count: number, loan: any) => {
         if (loan.installments && Array.isArray(loan.installments)) {
@@ -183,7 +183,7 @@ export function useLoanStats() {
         }
         return count
       }, 0)
-      
+
       return {
         totalRequested,
         totalApproved,
@@ -202,7 +202,7 @@ export function useOrderStats() {
     queryFn: async () => {
       const url = buildApiUrl(API_CONFIG.ENDPOINTS.TRANSACTIONS.LIST)
       const response = await fetch(url)
-      
+
       if (!response.ok) {
         // Se não houver endpoint, retornar dados mockados
         return {
@@ -210,9 +210,9 @@ export function useOrderStats() {
           processed: 0,
         }
       }
-      
+
       const transactions = await response.json()
-      
+
       return {
         total: Array.isArray(transactions) ? transactions.length : 0,
         processed: Array.isArray(transactions)
