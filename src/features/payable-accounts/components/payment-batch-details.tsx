@@ -431,8 +431,8 @@ export function PaymentBatchDetails({
                   <div className='flex flex-col items-center'>
                     <div
                       className={`rounded-full p-2 ${index === 0
-                          ? 'bg-blue-100 dark:bg-blue-900'
-                          : 'bg-muted'
+                        ? 'bg-blue-100 dark:bg-blue-900'
+                        : 'bg-muted'
                         }`}
                     >
                       <Clock className='h-4 w-4' />

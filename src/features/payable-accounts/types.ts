@@ -316,7 +316,7 @@ export interface DashboardMetrics {
   approved_count: number
   paid_count: number
   overdue_count: number
-  
+
   // Summary amounts
   total_amount: number
   total_to_pay: number
@@ -324,13 +324,13 @@ export interface DashboardMetrics {
   approved_total: number
   paid_total: number
   overdue_total: number
-  
+
   // Upcoming payments
   next_7_days_count?: number
   next_7_days_total?: number
   next_30_days_count?: number
   next_30_days_total?: number
-  
+
   // Lists
   overdue_accounts?: PayableAccount[]
   upcoming_accounts?: PayableAccount[]
@@ -340,7 +340,7 @@ export interface DashboardMetrics {
     total_accounts: number
     total_amount: number
   }>
-  
+
   // Trend data
   monthly_trend?: Array<{
     month: string
