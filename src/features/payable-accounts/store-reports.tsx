@@ -65,7 +65,7 @@ export function StoreReports({ storeId, storeName, onBack }: StoreReportsProps) 
     error: errorReport,
     refetch: refetchReport,
   } = useQuery({
-    queryKey: ['store-payment-report', numericStoreId, period, startDate, endDate],
+    queryKey: ['store-payment-report', numericStoreId, filters],
     queryFn: () => storePaymentService.getStorePaymentReport(numericStoreId, filters),
     enabled: view === 'report',
     retry: false,
@@ -78,7 +78,7 @@ export function StoreReports({ storeId, storeName, onBack }: StoreReportsProps) 
     error: errorOrders,
     refetch: refetchOrders,
   } = useQuery({
-    queryKey: ['store-orders', numericStoreId, period, startDate, endDate],
+    queryKey: ['store-orders', numericStoreId, ordersFilters],
     queryFn: () => storePaymentService.getOrdersWithCosts(ordersFilters),
     enabled: view === 'orders',
     retry: false,

@@ -49,7 +49,7 @@ export function PayableAccounts() {
     error: errorDashboard,
     refetch: refetchDashboard,
   } = useQuery({
-    queryKey: ['consolidated-report', period, startDate, endDate],
+    queryKey: ['consolidated-report', filters],
     queryFn: () => storePaymentService.getAllStoresPaymentReport(filters),
     enabled: view === 'dashboard' && period !== undefined,
     retry: false,
@@ -62,7 +62,7 @@ export function PayableAccounts() {
     error: errorOrders,
     refetch: refetchOrders,
   } = useQuery({
-    queryKey: ['orders-with-costs', selectedStoreId, period, startDate, endDate],
+    queryKey: ['orders-with-costs', filters],
     queryFn: () => storePaymentService.getOrdersWithCosts(filters),
     enabled: view === 'orders',
     retry: false,
