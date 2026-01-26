@@ -189,7 +189,7 @@ export function PaymentBatchDetails({
           </CardHeader>
           <CardContent>
             <div className='text-lg font-semibold'>
-              {new Date(batch.created_at).toLocaleDateString('pt-BR')}
+              {batch.created_at ? new Date(batch.created_at).toLocaleDateString('pt-BR') : 'N/A'}
             </div>
           </CardContent>
         </Card>
@@ -385,8 +385,8 @@ export function PaymentBatchDetails({
                     <div>
                       <p className='font-medium'>{proof.file_name}</p>
                       <p className='text-xs text-muted-foreground'>
-                        {new Date(proof.uploaded_at).toLocaleString('pt-BR')} •{' '}
-                        {(proof.file_size / 1024).toFixed(2)} KB
+                        {proof.uploaded_at ? new Date(proof.uploaded_at).toLocaleString('pt-BR') : 'N/A'} •{' '}
+                        {proof.file_size ? (proof.file_size / 1024).toFixed(2) : '0.00'} KB
                       </p>
                     </div>
                   </div>
@@ -400,7 +400,7 @@ export function PaymentBatchDetails({
                       <Button
                         variant='ghost'
                         size='sm'
-                        onClick={() => deleteProofMutation.mutate(proof.id)}
+                        onClick={() => proof.id && deleteProofMutation.mutate(proof.id)}
                         disabled={deleteProofMutation.isPending}
                       >
                         <Trash2 className='h-4 w-4 text-destructive' />

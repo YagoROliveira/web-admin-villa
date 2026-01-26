@@ -221,7 +221,7 @@ export const storePaymentService = {
     console.log('[Store Payment] Orders response:', result)
 
     if (!result.success) {
-      throw new Error(result.message || 'Erro ao listar pedidos')
+      throw new Error('Erro ao listar pedidos')
     }
 
     return {

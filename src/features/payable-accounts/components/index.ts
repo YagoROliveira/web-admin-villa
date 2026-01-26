@@ -1,3 +1,6 @@
 export { StorePaymentDashboard } from './store-payment-dashboard'
 export { StoreOrdersList } from './store-orders-list'
 export { StoresList } from './stores-list'
+export { PayableAccountsDashboard } from './dashboard'
+export { PayableAccountsList } from './accounts-list'
+export { CreateAccountDialog } from './create-account-dialog'

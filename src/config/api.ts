@@ -3,7 +3,7 @@ export const API_CONFIG = {
   // Base URL da API
   // Em desenvolvimento, usa proxy do Vite (vazio) para evitar CORS
   // Em produção, usar a URL completa: 'https://prod.villamarket.app'
-  BASE_URL: 'http://localhost:9001',
+  BASE_URL: 'https://prod.villamarket.app',
 
   // Endpoints específicos
   ENDPOINTS: {

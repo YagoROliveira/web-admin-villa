@@ -174,6 +174,7 @@ export interface OrderWithCosts {
 
   // Valor Final
   net_amount?: number
+}
 
 export interface ConsolidatedReport {
   success: boolean
@@ -219,4 +220,139 @@ export interface TransferResponse {
   transfer_date: string
   message: string
   next_steps: string[]
+}
+
+// Re-export types from payment-batch
+export type { PaymentItem, PaymentItemType } from './types/payment-batch'
+
+// Payable Accounts System Types
+export type PayableAccountStatus = 'pending' | 'approved' | 'paid' | 'overdue' | 'cancelled'
+
+export interface PayableAccount {
+  id: number
+  store_id: number
+  store_name?: string
+  invoice_number?: string
+  description: string
+  reference_month: string // YYYY-MM
+  gross_amount: number
+  discounts: number
+  fees: number
+  net_amount: number
+  issue_date: string
+  due_date: string
+  payment_date?: string
+  status: PayableAccountStatus
+  payment_method?: string
+  notes?: string
+  created_at?: string
+  updated_at?: string
+  created_by?: number
+  approved_by?: number
+  paid_by?: number
+}
+
+export interface CreatePayableAccountRequest {
+  store_id: number
+  invoice_number?: string
+  description: string
+  reference_month: string
+  gross_amount: number
+  discounts: number
+  fees: number
+  net_amount: number
+  issue_date: string
+  due_date: string
+  payment_method?: string
+  notes?: string
+}
+
+export interface PayableAccountFilters {
+  status?: PayableAccountStatus | PayableAccountStatus[]
+  store_id?: number
+  reference_month?: string
+  start_due_date?: string
+  end_due_date?: string
+  due_date_start?: string
+  due_date_end?: string
+  start_payment_date?: string
+  end_payment_date?: string
+  payment_method?: string
+  min_amount?: number
+  max_amount?: number
+  search?: string
+  limit?: number
+  offset?: number
+  include_summary?: boolean
+  sort_by?: string
+  sort_order?: 'asc' | 'desc'
+}
+
+export interface PayableAccountSummary {
+  total_accounts: number
+  pending_count: number
+  approved_count: number
+  paid_count: number
+  overdue_count: number
+  cancelled_count: number
+  total_gross_amount: number
+  total_discounts: number
+  total_fees: number
+  total_net_amount: number
+  total_amount: number
+  pending_amount: number
+  pending_total: number
+  approved_amount: number
+  approved_total: number
+  paid_amount: number
+  paid_total: number
+  overdue_amount: number
+}
+
+export interface DashboardMetrics {
+  // Summary counts
+  total_count: number
+  pending_count: number
+  approved_count: number
+  paid_count: number
+  overdue_count: number
+  
+  // Summary amounts
+  total_amount: number
+  total_to_pay: number
+  pending_total: number
+  approved_total: number
+  paid_total: number
+  overdue_total: number
+  
+  // Upcoming payments
+  next_7_days_count?: number
+  next_7_days_total?: number
+  next_30_days_count?: number
+  next_30_days_total?: number
+  
+  // Lists
+  overdue_accounts?: PayableAccount[]
+  upcoming_accounts?: PayableAccount[]
+  top_suppliers?: Array<{
+    store_id: number
+    store_name: string
+    total_accounts: number
+    total_amount: number
+  }>
+  
+  // Trend data
+  monthly_trend?: Array<{
+    month: string
+    total: number
+    paid: number
+    pending: number
+  }>
+}
+
+export interface ListResponse<T> {
+  success: boolean
+  data?: T[]
+  total?: number
+  message?: string
 }

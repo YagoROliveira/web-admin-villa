@@ -511,7 +511,7 @@ export function OrderDetails({ order, onBack }: OrderDetailsProps) {
                             <p className='font-medium'>#{order.dm_vehicle_id}</p>
                           </div>
                         )}
-                        {order.dm_tips > 0 && (
+                        {order.dm_tips && order.dm_tips > 0 && (
                           <div>
                             <p className='text-xs text-muted-foreground'>Gorjeta</p>
                             <p className='font-medium text-green-600'>{formatMoney(order.dm_tips)}</p>

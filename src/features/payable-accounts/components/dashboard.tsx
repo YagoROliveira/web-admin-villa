@@ -142,10 +142,10 @@ export function PayableAccountsDashboard({ data, isLoading }: DashboardProps) {
           </CardHeader>
           <CardContent>
             <div className='text-2xl font-bold'>
-              {formatCurrency(data.next_7_days_total)}
+              {formatCurrency(data.next_7_days_total || 0)}
             </div>
             <p className='text-xs text-muted-foreground'>
-              {data.next_7_days_count} {data.next_7_days_count === 1 ? 'conta' : 'contas'}
+              {data.next_7_days_count || 0} {(data.next_7_days_count || 0) === 1 ? 'conta' : 'contas'}
             </p>
           </CardContent>
         </Card>
@@ -157,10 +157,10 @@ export function PayableAccountsDashboard({ data, isLoading }: DashboardProps) {
           </CardHeader>
           <CardContent>
             <div className='text-2xl font-bold'>
-              {formatCurrency(data.next_30_days_total)}
+              {formatCurrency(data.next_30_days_total || 0)}
             </div>
             <p className='text-xs text-muted-foreground'>
-              {data.next_30_days_count} {data.next_30_days_count === 1 ? 'conta' : 'contas'}
+              {data.next_30_days_count || 0} {(data.next_30_days_count || 0) === 1 ? 'conta' : 'contas'}
             </p>
           </CardContent>
         </Card>

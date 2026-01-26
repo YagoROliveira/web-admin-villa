@@ -385,6 +385,7 @@ export function StoreReports({ storeId, storeName, onBack }: StoreReportsProps) 
           {paymentView === 'create' && (
             <CreatePaymentBatch
               storeId={storeId}
+              storeName={storeName || 'Loja'}
               onBack={() => setPaymentView('list')}
               onSuccess={(batchId) => {
                 setSelectedBatchId(batchId)

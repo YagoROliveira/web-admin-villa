@@ -26,7 +26,9 @@ export interface PaymentProof {
   id?: number
   file_name: string
   file_url: string
+  file_path?: string
   file_type: string
+  file_size?: number
   uploaded_at?: string
   uploaded_by?: string
 }
@@ -37,9 +39,12 @@ export interface PaymentProof {
 export interface PaymentTimelineEvent {
   id?: number
   status: PaymentBatchStatus
+  old_status?: string
+  new_status?: string
   description: string
   created_at: string
   created_by?: string
+  user_name?: string
   notes?: string
 }
 
