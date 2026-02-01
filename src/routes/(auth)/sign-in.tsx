@@ -12,7 +12,7 @@ export const Route = createFileRoute('/(auth)/sign-in')({
     const { auth } = useAuthStore.getState()
 
     // Se já está autenticado, redirecionar para a página principal
-    if (auth.accessToken) {
+    if (auth.isAuthenticated()) {
       throw redirect({
         to: '/',
       })
