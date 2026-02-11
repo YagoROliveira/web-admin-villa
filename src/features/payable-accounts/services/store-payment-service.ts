@@ -185,6 +185,61 @@ export const storePaymentService = {
   },
 
   /**
+   * Gerar relatório de pagamento em PDF
+   */
+  async generatePaymentReportPDF(
+    storeId: number,
+    filters: {
+      start_date: string
+      end_date: string
+    }
+  ): Promise<void> {
+    const url = `${BASE_URL}/${storeId}/payment-report/pdf`
+    console.log('[Store Payment] Generating PDF report from:', url, filters)
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        store_id: storeId,
+        period: 'custom',
+        start_date: filters.start_date,
+        end_date: filters.end_date,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('[Store Payment] PDF error:', response.status, response.statusText, errorText)
+      
+      let errorMessage = 'Erro ao gerar relatório PDF'
+      try {
+        const errorJson = JSON.parse(errorText)
+        errorMessage = errorJson.message || errorJson.error || errorMessage
+      } catch {
+        errorMessage = errorText || errorMessage
+      }
+
+      throw new Error(errorMessage)
+    }
+
+    // Download do PDF
+    const blob = await response.blob()
+    const downloadUrl = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = downloadUrl
+    a.download = `relatorio-pagamentos-${filters.start_date}-${filters.end_date}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(downloadUrl)
+    document.body.removeChild(a)
+    
+    console.log('[Store Payment] PDF downloaded successfully')
+  },
+
+  /**
    * Listar pedidos com custos detalhados de uma loja específica
    */
   async getOrdersWithCosts(filters: PaymentReportFilters): Promise<{

@@ -95,6 +95,11 @@ export const API_CONFIG = {
       SUMMARY: '/admin/payable-accounts/summary',
       OVERDUE: '/admin/payable-accounts/overdue',
     },
+
+    // Relatórios de Pagamento (PDF)
+    PAYMENT_REPORT: {
+      GENERATE_PDF: '/admin/stores',  // Base: /admin/stores/{store_id}/payment-report/pdf
+    },
   },
 }
 

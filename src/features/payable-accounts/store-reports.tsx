@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { LayoutDashboard, List, ArrowLeft, Wallet } from 'lucide-react'
+import { LayoutDashboard, List, ArrowLeft, Wallet, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -36,6 +36,7 @@ export function StoreReports({ storeId, storeName, onBack }: StoreReportsProps) 
   const [selectedOrder, setSelectedOrder] = useState<OrderWithCosts | null>(null)
   const [paymentView, setPaymentView] = useState<'list' | 'create' | 'details'>('list')
   const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
   // Garantir que storeId seja número
   const numericStoreId = typeof storeId === 'string' ? Number(storeId) : storeId
@@ -101,6 +102,26 @@ export function StoreReports({ storeId, storeName, onBack }: StoreReportsProps) 
       refetchReport()
     } else {
       refetchOrders()
+    }
+  }
+
+  const handleGeneratePDF = async () => {
+    if (!startDate || !endDate) {
+      alert('Por favor, selecione as datas de início e fim')
+      return
+    }
+
+    setIsGeneratingPDF(true)
+    try {
+      await storePaymentService.generatePaymentReportPDF(numericStoreId, {
+        start_date: startDate,
+        end_date: endDate,
+      })
+    } catch (error) {
+      console.error('[StoreReports] Erro ao gerar PDF:', error)
+      alert(error instanceof Error ? error.message : 'Erro ao gerar relatório PDF')
+    } finally {
+      setIsGeneratingPDF(false)
     }
   }
 
@@ -201,6 +222,17 @@ export function StoreReports({ storeId, storeName, onBack }: StoreReportsProps) 
 
             <div className='flex gap-2'>
               <Button onClick={handleGenerateReport}>Gerar</Button>
+              {period === 'custom' && startDate && endDate && (
+                <Button 
+                  onClick={handleGeneratePDF} 
+                  variant='outline'
+                  disabled={isGeneratingPDF}
+                  className='gap-2'
+                >
+                  <FileText className='h-4 w-4' />
+                  {isGeneratingPDF ? 'Gerando PDF...' : 'Gerar PDF'}
+                </Button>
+              )}
               <Button onClick={handleRefresh} variant='outline' size='icon'>
                 <LayoutDashboard className='h-4 w-4' />
               </Button>

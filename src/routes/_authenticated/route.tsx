@@ -43,7 +43,7 @@ export const Route = createFileRoute('/_authenticated')({
 
         const userData = await response.json()
         console.log('✅ Usuário carregado:', userData.email)
-        
+
         // Atualizar o user no store
         auth.setUser({
           id: userData.id?.toString() || '',
