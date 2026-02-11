@@ -223,8 +223,8 @@ export function StoreReports({ storeId, storeName, onBack }: StoreReportsProps) 
             <div className='flex gap-2'>
               <Button onClick={handleGenerateReport}>Gerar</Button>
               {period === 'custom' && startDate && endDate && (
-                <Button 
-                  onClick={handleGeneratePDF} 
+                <Button
+                  onClick={handleGeneratePDF}
                   variant='outline'
                   disabled={isGeneratingPDF}
                   className='gap-2'

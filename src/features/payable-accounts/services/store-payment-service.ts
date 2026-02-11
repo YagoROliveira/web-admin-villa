@@ -213,7 +213,7 @@ export const storePaymentService = {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('[Store Payment] PDF error:', response.status, response.statusText, errorText)
-      
+
       let errorMessage = 'Erro ao gerar relatório PDF'
       try {
         const errorJson = JSON.parse(errorText)
@@ -235,7 +235,7 @@ export const storePaymentService = {
     a.click()
     window.URL.revokeObjectURL(downloadUrl)
     document.body.removeChild(a)
-    
+
     console.log('[Store Payment] PDF downloaded successfully')
   },
 
