@@ -251,12 +251,12 @@ export const storePaymentService = {
       throw new Error('store_id é obrigatório')
     }
 
-    // Usar o endpoint correto: /admin/stores/:storeId/orders
-    const url = new URL(`${BASE_URL}/${filters.store_id}/orders`)
+    // Usar o endpoint correto: /admin/stores/orders-with-costs
+    const url = new URL(`${BASE_URL}/orders-with-costs`)
 
-    // Adicionar outros parâmetros (exceto store_id que já está na URL)
+    // Adicionar todos os parâmetros (incluindo store_id) como query params
     Object.entries(filters).forEach(([key, value]) => {
-      if (key !== 'store_id' && value !== undefined && value !== null) {
+      if (value !== undefined && value !== null) {
         url.searchParams.append(key, String(value))
       }
     })
@@ -272,7 +272,7 @@ export const storePaymentService = {
       throw new Error(`Erro ao listar pedidos: ${response.status} - ${errorText}`)
     }
 
-    const result: ListResponse<OrderWithCosts> = await response.json()
+    const result: any = await response.json()
     console.log('[Store Payment] Orders response:', result)
 
     if (!result.success) {
@@ -280,8 +280,8 @@ export const storePaymentService = {
     }
 
     return {
-      orders: result.data || [],
-      count: result.count || 0,
+      orders: result.orders || [],
+      count: result.total_orders || 0,
     }
   },
 
