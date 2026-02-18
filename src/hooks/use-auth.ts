@@ -175,7 +175,6 @@ export function useCurrentUser() {
     retry: (failureCount: number, error: any) => {
       // Não tentar novamente se for erro 401 (não autorizado)
       if (error?.message?.includes('401')) {
-        auth.reset()
         return false
       }
       return failureCount < 3

@@ -169,7 +169,12 @@ export function PaymentBatchDetails({
           </CardHeader>
           <CardContent>
             <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>
-              {formatMoney(batch.total_amount)}
+              {formatMoney(
+                batch.items?.reduce((sum, item) => {
+                  const amount = typeof item.amount === 'string' ? parseFloat(item.amount) : (item.amount || 0)
+                  return sum + amount
+                }, 0) ?? batch.total_amount
+              )}
             </div>
           </CardContent>
         </Card>
@@ -320,23 +325,37 @@ export function PaymentBatchDetails({
                   </TableCell>
                 </TableRow>
               ) : (
-                batch.items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <Badge variant='outline'>{item.type}</Badge>
-                    </TableCell>
-                    <TableCell className='font-mono text-sm'>
-                      {item.reference_id || '-'}
-                    </TableCell>
-                    <TableCell>{item.description}</TableCell>
-                    <TableCell className='text-right font-semibold'>
-                      {formatMoney(item.amount)}
-                    </TableCell>
-                    <TableCell className='text-sm text-muted-foreground'>
-                      {item.notes || '-'}
-                    </TableCell>
-                  </TableRow>
-                ))
+                batch.items.map((item) => {
+                  const numAmount = typeof item.amount === 'string' ? parseFloat(item.amount) : (item.amount || 0)
+                  const isDiscount = item.type === 'discount' || numAmount < 0
+                  const displayAmount = Math.abs(numAmount)
+                  const typeLabels: Record<string, string> = {
+                    order: 'Pedido',
+                    adjustment: 'Ajuste',
+                    bonus: 'Bônus',
+                    discount: 'Desconto',
+                    other: 'Outro',
+                  }
+                  return (
+                    <TableRow key={item.id} className={isDiscount ? 'bg-red-50/50 dark:bg-red-950/20' : ''}>
+                      <TableCell>
+                        <Badge variant={isDiscount ? 'destructive' : 'outline'}>
+                          {typeLabels[item.type] || item.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className='font-mono text-sm'>
+                        {item.reference_id || '-'}
+                      </TableCell>
+                      <TableCell>{item.description}</TableCell>
+                      <TableCell className={`text-right font-semibold ${isDiscount ? 'text-red-600 dark:text-red-400' : ''}`}>
+                        {isDiscount ? `- ${formatMoney(displayAmount)}` : formatMoney(displayAmount)}
+                      </TableCell>
+                      <TableCell className='text-sm text-muted-foreground'>
+                        {item.notes || '-'}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
               )}
             </TableBody>
           </Table>

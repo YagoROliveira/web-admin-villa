@@ -3,6 +3,7 @@ import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
 
 const ACCESS_TOKEN = 'accessToken'
 const REFRESH_TOKEN = 'refreshToken'
+const USER_DATA = 'userData'
 
 interface AuthUser {
   id: string
@@ -28,35 +29,65 @@ interface AuthState {
   }
 }
 
+function loadCookieValue(key: string): string {
+  const raw = getCookie(key)
+  if (!raw) return ''
+  // Handle legacy double-JSON-stringified values
+  try {
+    const parsed = JSON.parse(raw)
+    if (typeof parsed === 'string') return parsed
+    return raw
+  } catch {
+    return raw
+  }
+}
+
+function loadUser(): AuthUser | null {
+  const raw = getCookie(USER_DATA)
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed === 'object' && parsed.id) return parsed
+    return null
+  } catch {
+    return null
+  }
+}
+
 export const useAuthStore = create<AuthState>()((set, get) => {
-  const cookieAccessToken = getCookie(ACCESS_TOKEN)
-  const cookieRefreshToken = getCookie(REFRESH_TOKEN)
-  const initAccessToken = cookieAccessToken ? JSON.parse(cookieAccessToken) : ''
-  const initRefreshToken = cookieRefreshToken
-    ? JSON.parse(cookieRefreshToken)
-    : ''
+  const initAccessToken = loadCookieValue(ACCESS_TOKEN)
+  const initRefreshToken = loadCookieValue(REFRESH_TOKEN)
+  const initUser = loadUser()
 
   return {
     auth: {
-      user: null,
+      user: initUser,
       setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
+        set((state) => {
+          if (user) {
+            setCookie(USER_DATA, JSON.stringify(user))
+          } else {
+            removeCookie(USER_DATA)
+          }
+          return { ...state, auth: { ...state.auth, user } }
+        }),
       accessToken: initAccessToken,
       setAccessToken: (accessToken) =>
         set((state) => {
-          setCookie(ACCESS_TOKEN, JSON.stringify(accessToken))
+          setCookie(ACCESS_TOKEN, accessToken)
           return { ...state, auth: { ...state.auth, accessToken } }
         }),
       refreshToken: initRefreshToken,
       setRefreshToken: (refreshToken) =>
         set((state) => {
-          setCookie(REFRESH_TOKEN, JSON.stringify(refreshToken))
+          setCookie(REFRESH_TOKEN, refreshToken)
           return { ...state, auth: { ...state.auth, refreshToken } }
         }),
       reset: () =>
         set((state) => {
           removeCookie(ACCESS_TOKEN)
           removeCookie(REFRESH_TOKEN)
+          removeCookie(USER_DATA)
           return {
             ...state,
             auth: {
@@ -68,8 +99,8 @@ export const useAuthStore = create<AuthState>()((set, get) => {
           }
         }),
       isAuthenticated: () => {
-        const { user, accessToken } = get().auth
-        return !!(user && accessToken)
+        const { accessToken } = get().auth
+        return !!accessToken
       },
     },
   }

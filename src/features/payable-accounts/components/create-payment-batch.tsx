@@ -71,6 +71,12 @@ export function CreatePaymentBatch({
         end_date: endDate,
       })
 
+      // Taxa padrão de processamento de cartão de crédito (2.5%)
+      const CARD_FEE_RATE = 0.025
+
+      let totalPlatformFee = 0
+      let totalCardFee = 0
+
       const orderItems: Omit<PaymentItem, 'id' | 'created_at'>[] = ordersData.orders.map(
         (order) => {
           // Parse todos os valores
@@ -88,6 +94,29 @@ export function CreatePaymentBatch({
 
           const totalDiscounts = couponDiscount + storeDiscount + flashAdminDiscount + flashStoreDiscount
           const finalAmount = orderAmount - totalDiscounts
+
+          // Calcular taxa da plataforma (comissão) por transação
+          // Usa o valor do backend se disponível, senão calcula pela taxa da loja
+          const commissionRate = order.store_commission_rate || 0
+          const platformFee = order.platform_commission_amount != null
+            ? (typeof order.platform_commission_amount === 'string' ? parseFloat(order.platform_commission_amount as any) : order.platform_commission_amount)
+            : parseFloat((finalAmount * (commissionRate / 100)).toFixed(2))
+
+          // Calcular taxa do cartão de crédito por transação
+          const isCardPayment = order.payment_method?.toLowerCase().includes('card') ||
+            order.payment_method?.toLowerCase().includes('cartao') ||
+            order.payment_method?.toLowerCase().includes('cartão') ||
+            order.payment_method?.toLowerCase().includes('credit') ||
+            order.payment_method?.toLowerCase().includes('credito') ||
+            order.payment_method?.toLowerCase().includes('crédito') ||
+            order.payment_method?.toLowerCase().includes('digital_payment')
+
+          const cardFee = order.card_fee_amount != null
+            ? (typeof order.card_fee_amount === 'string' ? parseFloat(order.card_fee_amount as any) : order.card_fee_amount)
+            : (isCardPayment ? parseFloat((finalAmount * CARD_FEE_RATE).toFixed(2)) : 0)
+
+          totalPlatformFee += platformFee
+          totalCardFee += cardFee
 
           // Montar descrição com cupom se houver
           let description = `Pedido #${order.id || order.order_id}`
@@ -122,6 +151,10 @@ export function CreatePaymentBatch({
                 additional_charge: additionalCharge,
                 extra_packaging_amount: extraPackaging,
                 total_discounts: totalDiscounts,
+                platform_commission: platformFee,
+                card_fee: cardFee,
+                commission_rate: commissionRate,
+                is_card_payment: isCardPayment,
                 final_amount: finalAmount,
               }
             }),
@@ -129,7 +162,37 @@ export function CreatePaymentBatch({
         }
       )
 
-      setItems(orderItems)
+      // Adicionar linha de desconto automático para taxa da plataforma
+      const feeItems: Omit<PaymentItem, 'id' | 'created_at'>[] = []
+
+      if (totalPlatformFee > 0) {
+        feeItems.push({
+          type: 'discount' as PaymentItemType,
+          reference_id: 'COMISSAO',
+          description: `Comissão da Plataforma`,
+          amount: parseFloat(totalPlatformFee.toFixed(2)),
+          notes: `Comissão sobre ${ordersData.orders.length} pedido(s) do período`,
+        })
+      }
+
+      // Adicionar linha de desconto automático para taxa do cartão
+      if (totalCardFee > 0) {
+        const cardOrders = ordersData.orders.filter((o) => {
+          const pm = o.payment_method?.toLowerCase() || ''
+          return pm.includes('card') || pm.includes('cartao') || pm.includes('cartão') ||
+            pm.includes('credit') || pm.includes('credito') || pm.includes('crédito') ||
+            pm.includes('digital_payment')
+        })
+        feeItems.push({
+          type: 'discount' as PaymentItemType,
+          reference_id: 'TAXA_CARTAO',
+          description: `Taxa Processamento Cartão (2.5%)`,
+          amount: parseFloat(totalCardFee.toFixed(2)),
+          notes: `Taxa de ${cardOrders.length} pedido(s) pago(s) com cartão`,
+        })
+      }
+
+      setItems([...orderItems, ...feeItems])
     } catch (error) {
       console.error('Erro ao carregar pedidos:', error)
     } finally {
@@ -220,7 +283,12 @@ export function CreatePaymentBatch({
     setItems(newItems)
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + (item.amount || 0), 0)
+  const totalAmount = items.reduce((sum, item) => {
+    if (item.type === 'discount') {
+      return sum - Math.abs(item.amount || 0)
+    }
+    return sum + (item.amount || 0)
+  }, 0)
 
   const handleSave = () => {
     if (!startDate || !endDate || items.length === 0) {
@@ -236,12 +304,20 @@ export function CreatePaymentBatch({
       total_amount: totalAmount,
     })
 
+    // Converter items de desconto para valores negativos antes de enviar ao backend
+    const itemsToSend = items.map((item) => {
+      if (item.type === 'discount') {
+        return { ...item, amount: -Math.abs(item.amount) }
+      }
+      return item
+    })
+
     createMutation.mutate({
       store_id: storeId,
       period_type: period,
       start_date: startDate,
       end_date: endDate,
-      items,
+      items: itemsToSend,
       notes,
     })
   }
@@ -492,6 +568,29 @@ export function CreatePaymentBatch({
                                             </div>
                                           )}
 
+                                          {/* Taxas da plataforma e cartão */}
+                                          {(metadata.breakdown.platform_commission > 0 || metadata.breakdown.card_fee > 0) && (
+                                            <div className='border-t pt-2 mt-2 space-y-1'>
+                                              <div className='font-semibold text-xs text-muted-foreground mb-1'>Taxas:</div>
+                                              {metadata.breakdown.platform_commission > 0 && (
+                                                <div className='flex justify-between text-orange-600 dark:text-orange-400'>
+                                                  <span>• Comissão ({metadata.breakdown.commission_rate}%):</span>
+                                                  <span>-{formatMoney(metadata.breakdown.platform_commission)}</span>
+                                                </div>
+                                              )}
+                                              {metadata.breakdown.card_fee > 0 && (
+                                                <div className='flex justify-between text-orange-600 dark:text-orange-400'>
+                                                  <span>• Taxa Cartão (2.5%):</span>
+                                                  <span>-{formatMoney(metadata.breakdown.card_fee)}</span>
+                                                </div>
+                                              )}
+                                              <div className='flex justify-between font-semibold text-orange-600 dark:text-orange-400 pt-1 border-t'>
+                                                <span>Total Taxas:</span>
+                                                <span>-{formatMoney((metadata.breakdown.platform_commission || 0) + (metadata.breakdown.card_fee || 0))}</span>
+                                              </div>
+                                            </div>
+                                          )}
+
                                           <div className='flex justify-between border-t-2 pt-2 mt-2 font-bold text-green-600 dark:text-green-400 text-base'>
                                             <span>Valor a Receber:</span>
                                             <span>{formatMoney(metadata.breakdown.final_amount)}</span>
@@ -501,6 +600,9 @@ export function CreatePaymentBatch({
                                             <div>Cliente: {metadata.customer_name}</div>
                                             <div>Status: {metadata.order_status}</div>
                                             <div>Pagamento: {metadata.payment_method} ({metadata.payment_status})</div>
+                                            {metadata.breakdown.is_card_payment && (
+                                              <div className='text-orange-600 dark:text-orange-400 font-medium'>💳 Pagamento com cartão</div>
+                                            )}
                                           </div>
                                         </div>
                                       </div>
@@ -516,8 +618,8 @@ export function CreatePaymentBatch({
                         })()}
 
                         <div className='relative w-[140px]'>
-                          <span className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none'>
-                            R$
+                          <span className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${item.type === 'discount' ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}>
+                            {item.type === 'discount' ? '- R$' : 'R$'}
                           </span>
                           <Input
                             type='text'
@@ -529,7 +631,7 @@ export function CreatePaymentBatch({
                               const value = e.target.value.replace(/[^\d,]/g, '').replace(',', '.')
                               handleUpdateItem(index, 'amount', parseFloat(value) || 0)
                             }}
-                            className='text-right pl-10 font-semibold'
+                            className={`text-right pl-10 font-semibold ${item.type === 'discount' ? 'text-red-600 dark:text-red-400' : ''}`}
                             disabled={item.type === 'order'}
                             placeholder='0,00'
                           />

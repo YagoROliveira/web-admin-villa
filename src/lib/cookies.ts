@@ -3,7 +3,7 @@
  * Replaces js-cookie dependency for better consistency
  */
 
-const DEFAULT_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
+const DEFAULT_MAX_AGE = 60 * 60 * 24 * 30 // 30 days
 
 /**
  * Get a cookie value by name
@@ -15,7 +15,13 @@ export function getCookie(name: string): string | undefined {
   const parts = value.split(`; ${name}=`)
   if (parts.length === 2) {
     const cookieValue = parts.pop()?.split(';').shift()
-    return cookieValue
+    if (cookieValue) {
+      try {
+        return decodeURIComponent(cookieValue)
+      } catch {
+        return cookieValue
+      }
+    }
   }
   return undefined
 }
@@ -30,7 +36,8 @@ export function setCookie(
 ): void {
   if (typeof document === 'undefined') return
 
-  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}`
+  const encodedValue = encodeURIComponent(value)
+  document.cookie = `${name}=${encodedValue}; path=/; max-age=${maxAge}; SameSite=Lax`
 }
 
 /**
