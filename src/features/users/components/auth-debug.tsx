@@ -1,92 +1,47 @@
-import { buildApiUrl, API_CONFIG } from '@/config/api'
+import villamarketApi from '@/lib/villamarket-api'
+import { VM_API } from '@/config/api'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
-import { mockLoginResponse } from '../data/mock-data'
+import { DEFAULT_ROLE_PERMISSIONS } from '@/types/auth'
+import type { UserRole } from '@/types/auth'
 
 export function AuthDebug() {
   const { auth } = useAuthStore()
 
   const testConnection = async () => {
     try {
-      console.log('Testando conexão...')
-      const url = buildApiUrl(API_CONFIG.ENDPOINTS.USERS.LIST)
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(auth.accessToken && {
-            Authorization: `Bearer ${auth.accessToken}`,
-          }),
-        },
+      console.log('Testando conexão com NestJS API...')
+      const { data, status } = await villamarketApi.get(VM_API.ENDPOINTS.USERS.LIST, {
+        params: { page: 1, limit: 5 },
       })
-
-      console.log('Response status:', response.status)
-      console.log(
-        'Response headers:',
-        Object.fromEntries(response.headers.entries())
-      )
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log('Success:', data)
-      } else {
-        const errorText = await response.text()
-        console.error('Error:', errorText)
-      }
-    } catch (error) {
-      console.error('Fetch error:', error)
+      console.log('Response status:', status)
+      console.log('Success:', data)
+    } catch (error: any) {
+      console.error('Fetch error:', error?.response?.status, error?.message)
     }
-  }
-
-  const mockLogin = () => {
-    console.log('Fazendo login mockado...')
-    // Simular login com dados mockados
-    auth.setAccessToken(mockLoginResponse.accessToken)
-    auth.setRefreshToken(mockLoginResponse.refreshToken)
-    auth.setUser({
-      id: mockLoginResponse.user.id.toString(),
-      email: mockLoginResponse.user.email,
-      name: `${mockLoginResponse.user.firstName} ${mockLoginResponse.user.lastName}`,
-      role: mockLoginResponse.user.role,
-    })
-    console.log('Login mockado realizado com sucesso')
   }
 
   const loginTest = async () => {
     try {
-      console.log('Testando login...')
-      const url = buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGIN)
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 'admin@test.com',
-          password: 'password123',
-        }),
+      console.log('Testando login na NestJS API...')
+      const { data } = await villamarketApi.post(VM_API.ENDPOINTS.AUTH.ADMIN_LOGIN, {
+        email: 'admin@test.com',
+        password: 'password123',
       })
+      console.log('Login success:', data)
 
-      console.log('Login response status:', response.status)
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log('Login success:', data)
-
-        // Salvar token
-        auth.setAccessToken(data.accessToken)
-        auth.setRefreshToken(data.refreshToken)
-        auth.setUser({
-          id: data.user.id.toString(),
-          email: data.user.email,
-          name: `${data.user.firstName} ${data.user.lastName}`,
-          role: data.user.role,
-        })
-      } else {
-        const errorText = await response.text()
-        console.error('Login error:', errorText)
-      }
-    } catch (error) {
-      console.error('Login fetch error:', error)
+      // Salvar token
+      auth.setAccessToken(data.accessToken)
+      auth.setRefreshToken(data.refreshToken)
+      auth.setUser({
+        id: data.user?.id?.toString() ?? '',
+        email: data.user?.email ?? '',
+        name: data.user?.name ?? '',
+        role: (data.user?.role || 'ADMIN') as UserRole,
+        permissions: DEFAULT_ROLE_PERMISSIONS[(data.user?.role || 'ADMIN') as UserRole] ?? [],
+      })
+    } catch (error: any) {
+      console.error('Login error:', error?.response?.status, error?.response?.data || error?.message)
     }
   }
 
@@ -123,9 +78,6 @@ export function AuthDebug() {
       <div className='mt-4 flex gap-2'>
         <Button onClick={testConnection} variant='outline' size='sm'>
           Testar Conexão
-        </Button>
-        <Button onClick={mockLogin} variant='outline' size='sm'>
-          Login Mockado
         </Button>
         <Button onClick={loginTest} variant='outline' size='sm'>
           Login Real

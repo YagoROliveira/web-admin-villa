@@ -5,8 +5,10 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { StoryForm, StoriesProvider } from '@/features/stories/components'
 import { type Story } from '@/features/stories/data/schema'
+import { requirePermission } from '@/lib/route-guards'
 
 export const Route = createFileRoute('/_authenticated/stories/$storyId/edit')({
+  beforeLoad: requirePermission('wallet.stories.manage'),
   component: EditStoryPage,
 })
 

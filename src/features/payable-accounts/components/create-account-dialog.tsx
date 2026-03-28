@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -132,28 +133,24 @@ export function CreateAccountDialog({
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='gross_amount'>Valor Bruto *</Label>
-              <Input
+              <CurrencyInput
                 id='gross_amount'
-                type='number'
-                step='0.01'
-                required
                 value={formData.gross_amount}
-                onChange={(e) =>
-                  setFormData({ ...formData, gross_amount: Number(e.target.value) })
+                onChange={(v) =>
+                  setFormData({ ...formData, gross_amount: v })
                 }
                 onBlur={calculateNetAmount}
+                required
               />
             </div>
 
             <div className='space-y-2'>
               <Label htmlFor='discounts'>Descontos</Label>
-              <Input
+              <CurrencyInput
                 id='discounts'
-                type='number'
-                step='0.01'
                 value={formData.discounts}
-                onChange={(e) =>
-                  setFormData({ ...formData, discounts: Number(e.target.value) })
+                onChange={(v) =>
+                  setFormData({ ...formData, discounts: v })
                 }
                 onBlur={calculateNetAmount}
               />
@@ -163,13 +160,11 @@ export function CreateAccountDialog({
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='fees'>Taxas</Label>
-              <Input
+              <CurrencyInput
                 id='fees'
-                type='number'
-                step='0.01'
                 value={formData.fees}
-                onChange={(e) =>
-                  setFormData({ ...formData, fees: Number(e.target.value) })
+                onChange={(v) =>
+                  setFormData({ ...formData, fees: v })
                 }
                 onBlur={calculateNetAmount}
               />
@@ -177,15 +172,13 @@ export function CreateAccountDialog({
 
             <div className='space-y-2'>
               <Label htmlFor='net_amount'>Valor Líquido *</Label>
-              <Input
+              <CurrencyInput
                 id='net_amount'
-                type='number'
-                step='0.01'
-                required
                 value={formData.net_amount}
-                onChange={(e) =>
-                  setFormData({ ...formData, net_amount: Number(e.target.value) })
+                onChange={(v) =>
+                  setFormData({ ...formData, net_amount: v })
                 }
+                required
               />
             </div>
           </div>

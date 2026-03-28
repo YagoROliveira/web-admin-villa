@@ -23,19 +23,15 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
-import { SelectDropdown } from '@/components/select-dropdown'
-import { roles } from '../data/data'
 import { type User } from '../data/schema'
-import { useCreateUser, useUpdateUser } from '../hooks/use-users'
+import { useUpdateUser } from '../hooks/use-users'
 
 const formSchema = z
   .object({
-    firstName: z.string().min(1, 'First Name is required.'),
-    lastName: z.string().min(1, 'Last Name is required.'),
-    phoneNumber: z.string().optional(),
-    email: z.string().email('Please enter a valid email address.'),
+    name: z.string().min(1, 'Nome é obrigatório.'),
+    phone: z.string().optional(),
+    email: z.string().email('Informe um email válido.'),
     password: z.string().transform((pwd) => pwd.trim()),
-    role: z.enum(['ADMIN', 'USER', 'MANAGER', 'CASHIER'] as const),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     isEdit: z.boolean(),
   })
@@ -45,7 +41,7 @@ const formSchema = z
       return data.password.length > 0
     },
     {
-      message: 'Password is required.',
+      message: 'Senha é obrigatória.',
       path: ['password'],
     }
   )
@@ -55,7 +51,7 @@ const formSchema = z
       return password.length >= 8
     },
     {
-      message: 'Password must be at least 8 characters long.',
+      message: 'A senha deve ter pelo menos 8 caracteres.',
       path: ['password'],
     }
   )
@@ -65,7 +61,7 @@ const formSchema = z
       return password === confirmPassword
     },
     {
-      message: 'Passwords do not match.',
+      message: 'As senhas não conferem.',
       path: ['confirmPassword'],
     }
   )
@@ -83,19 +79,16 @@ export function UsersActionDialog({
   currentRow,
 }: UsersActionDialogProps) {
   const isEdit = !!currentRow
-  const createUserMutation = useCreateUser()
   const updateUserMutation = useUpdateUser()
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
+      name: '',
+      phone: '',
       email: '',
       password: '',
       confirmPassword: '',
-      role: 'USER',
       isEdit,
     },
   })
@@ -105,24 +98,20 @@ export function UsersActionDialog({
   useEffect(() => {
     if (currentRow && isEdit) {
       form.reset({
-        firstName: currentRow.firstName,
-        lastName: currentRow.lastName,
-        phoneNumber: currentRow.phoneNumber || '',
-        email: currentRow.email,
+        name: currentRow.name,
+        phone: currentRow.phone || '',
+        email: currentRow.email ?? '',
         password: '',
         confirmPassword: '',
-        role: currentRow.role,
         isEdit: true,
       })
     } else {
       form.reset({
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
+        name: '',
+        phone: '',
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'USER',
         isEdit: false,
       })
     }
@@ -131,34 +120,19 @@ export function UsersActionDialog({
   const onSubmit = async (data: FormData) => {
     try {
       if (isEdit && currentRow) {
-        // Atualizar usuário
-        const updateData: any = {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phoneNumber: data.phoneNumber,
+        const updateData: Record<string, string> = {
+          name: data.name,
           email: data.email,
-          role: data.role,
         }
-
-        // Só incluir password se foi preenchido
-        if (data.password) {
-          updateData.password = data.password
-        }
+        if (data.phone) updateData.phone = data.phone
+        if (data.password) updateData.password = data.password
 
         await updateUserMutation.mutateAsync({
           id: currentRow.id,
           data: updateData,
         })
       } else {
-        // Criar novo usuário
-        await createUserMutation.mutateAsync({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phoneNumber: data.phoneNumber,
-          email: data.email,
-          password: data.password,
-          role: data.role,
-        })
+        console.warn('Criação de clientes não suportada no admin')
       }
 
       onOpenChange(false)
@@ -168,7 +142,7 @@ export function UsersActionDialog({
     }
   }
 
-  const isLoading = createUserMutation.isPending || updateUserMutation.isPending
+  const isLoading = updateUserMutation.isPending
 
   return (
     <Dialog
@@ -199,35 +173,15 @@ export function UsersActionDialog({
             >
               <FormField
                 control={form.control}
-                name='firstName'
+                name='name'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-end'>
-                      First Name
+                      Nome
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='John'
-                        className='col-span-4'
-                        autoComplete='off'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='lastName'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-end'>
-                      Last Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Doe'
+                        placeholder='João Silva'
                         className='col-span-4'
                         autoComplete='off'
                         {...field}
@@ -246,7 +200,7 @@ export function UsersActionDialog({
                     <FormControl>
                       <Input
                         type='email'
-                        placeholder='john.doe@gmail.com'
+                        placeholder='joao@example.com'
                         className='col-span-4'
                         {...field}
                       />
@@ -257,39 +211,19 @@ export function UsersActionDialog({
               />
               <FormField
                 control={form.control}
-                name='phoneNumber'
+                name='phone'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-end'>
-                      Phone Number
+                      Telefone
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='+123456789 (optional)'
+                        placeholder='+55 11 99999-0000 (opcional)'
                         className='col-span-4'
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='role'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-end'>Role</FormLabel>
-                    <SelectDropdown
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                      placeholder='Select a role'
-                      className='col-span-4'
-                      items={roles.map(({ label, value }) => ({
-                        label,
-                        value,
-                      }))}
-                    />
                     <FormMessage className='col-span-4 col-start-3' />
                   </FormItem>
                 )}
@@ -300,12 +234,12 @@ export function UsersActionDialog({
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-end'>
-                      Password {isEdit && '(vazio = manter atual)'}
+                      Senha {isEdit && '(vazio = manter)'}
                     </FormLabel>
                     <FormControl>
                       <PasswordInput
                         placeholder={
-                          isEdit ? 'Deixe vazio para manter' : 'Enter password'
+                          isEdit ? 'Deixe vazio para manter' : 'Digite a senha'
                         }
                         className='col-span-4'
                         {...field}
@@ -322,11 +256,11 @@ export function UsersActionDialog({
                   render={({ field }) => (
                     <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                       <FormLabel className='col-span-2 text-end'>
-                        Confirm Password
+                        Confirmar Senha
                       </FormLabel>
                       <FormControl>
                         <PasswordInput
-                          placeholder='Confirm password'
+                          placeholder='Confirme a senha'
                           className='col-span-4'
                           {...field}
                         />
@@ -346,10 +280,10 @@ export function UsersActionDialog({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button type='submit' form='user-form' disabled={isLoading}>
-            {isLoading ? 'Saving...' : isEdit ? 'Update User' : 'Create User'}
+            {isLoading ? 'Salvando...' : isEdit ? 'Atualizar' : 'Criar'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { useApproveLoan } from '../hooks/use-loan-mutations'
 
 // Schema de validação para aprovação
@@ -153,15 +154,10 @@ export function LoanApprovalDialog({
                       <FormItem>
                         <FormLabel>Valor Aprovado</FormLabel>
                         <FormControl>
-                          <Input
-                            type='number'
-                            step='0.01'
-                            min='0.01'
-                            placeholder='0.00'
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
+                          <CurrencyInput
+                            value={field.value ?? 0}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
                           />
                         </FormControl>
                         <FormDescription>

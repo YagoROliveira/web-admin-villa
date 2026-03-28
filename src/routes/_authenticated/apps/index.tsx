@@ -1,6 +1,7 @@
 import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { Apps } from '@/features/apps'
+import { requirePermission } from '@/lib/route-guards'
 
 const appsSearchSchema = z.object({
   type: z
@@ -12,6 +13,7 @@ const appsSearchSchema = z.object({
 })
 
 export const Route = createFileRoute('/_authenticated/apps/')({
+  beforeLoad: requirePermission('wallet.apps.view'),
   validateSearch: appsSearchSchema,
   component: Apps,
 })

@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { CurrencyInput } from '@/components/ui/currency-input'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -264,19 +265,26 @@ export function EditFeeDialog({ open, onOpenChange, fee }: EditFeeDialogProps) {
                   Valor{' '}
                   {formData.calculation_type === 'PERCENTAGE' ? '(%)' : '(R$)'}
                 </Label>
-                <Input
-                  id='value'
-                  type='number'
-                  step='0.01'
-                  placeholder={
-                    formData.calculation_type === 'PERCENTAGE' ? '2.5' : '15.00'
-                  }
-                  value={formData.value || ''}
-                  onChange={(e) =>
-                    updateField('value', parseFloat(e.target.value) || 0)
-                  }
-                  required
-                />
+                {formData.calculation_type === 'PERCENTAGE' ? (
+                  <Input
+                    id='value'
+                    type='number'
+                    step='0.01'
+                    placeholder='2.5'
+                    value={formData.value || ''}
+                    onChange={(e) =>
+                      updateField('value', parseFloat(e.target.value) || 0)
+                    }
+                    required
+                  />
+                ) : (
+                  <CurrencyInput
+                    id='value'
+                    value={formData.value || 0}
+                    onChange={(v) => updateField('value', v)}
+                    required
+                  />
+                )}
                 <p className='text-muted-foreground text-sm'>
                   {formData.calculation_type === 'PERCENTAGE'
                     ? 'Percentual a ser aplicado sobre o valor'

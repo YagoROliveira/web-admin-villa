@@ -2,8 +2,10 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StoriesProvider, StoriesTable } from '@/features/stories/components'
+import { requirePermission } from '@/lib/route-guards'
 
 export const Route = createFileRoute('/_authenticated/stories/')({
+  beforeLoad: requirePermission('wallet.stories.view'),
   component: StoriesPage,
 })
 

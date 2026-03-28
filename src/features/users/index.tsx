@@ -20,27 +20,20 @@ const route = getRouteApi('/_authenticated/users/')
 export function Users() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
   const [searchQuery] = useState('')
 
-  // Usar os dados da API
+  // Fetch all users — client-side pagination via TanStack Table
   const {
     data: usersData,
     isLoading,
     error,
     refetch,
     isFetching,
-  } = useUsers(currentPage, pageSize, searchQuery)
+  } = useUsers(1, 1000, searchQuery)
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
-
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size)
-    setCurrentPage(1) // Reset to first page when changing page size
-  }
+  // NestJS returns { items, total, page, limit, totalPages }
+  const users = usersData?.items ?? []
+  const totalUsers = usersData?.total ?? 0
 
   if (error) {
     return (
@@ -70,11 +63,11 @@ export function Users() {
       <Main>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>User List</h2>
+            <h2 className='text-2xl font-bold tracking-tight'>Clientes</h2>
             <p className='text-muted-foreground'>
-              Manage your users and their roles here.
-              {usersData?.pagination?.total &&
-                ` (${usersData.pagination.total} usuários)`}
+              Gerencie seus clientes e suas informações aqui.
+              {totalUsers > 0 &&
+                ` (${totalUsers} clientes)`}
             </p>
           </div>
           <div className='flex items-center space-x-2'>
@@ -95,7 +88,7 @@ export function Users() {
         <AuthDebug />
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
           <UsersTable
-            data={usersData?.users || []}
+            data={users}
             search={search}
             navigate={navigate}
             isLoading={isLoading}

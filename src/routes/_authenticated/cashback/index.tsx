@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { CashbackProvider } from '@/features/cashback/components/cashback-provider'
 import { CashbackPage } from '@/features/cashback/pages/cashback-page'
+import { requirePermission } from '@/lib/route-guards'
 
 export const cashbackSearchSchema = z.object({
   page: z.number().optional(),
@@ -12,6 +13,7 @@ export const cashbackSearchSchema = z.object({
 })
 
 export const Route = createFileRoute('/_authenticated/cashback/')({
+  beforeLoad: requirePermission('wallet.cashback.view'),
   validateSearch: (search) => cashbackSearchSchema.parse(search),
   component: CashbackRoute,
 })

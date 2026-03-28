@@ -1,6 +1,7 @@
 import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { FeesPage } from '@/features/fees'
+import { requirePermission } from '@/lib/route-guards'
 
 const feesSearchSchema = z.object({
   page: z.number().optional().catch(1),
@@ -25,6 +26,7 @@ const feesSearchSchema = z.object({
 })
 
 export const Route = createFileRoute('/_authenticated/fees/')({
+  beforeLoad: requirePermission('wallet.fees.view'),
   validateSearch: feesSearchSchema,
   component: FeesPage,
 })

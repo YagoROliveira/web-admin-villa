@@ -1,328 +1,143 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { buildApiUrl, getAuthHeaders, API_CONFIG } from '@/config/api'
 import { toast } from 'sonner'
-import { useAuthStore } from '@/stores/auth-store'
-import { mockUsers } from '../data/mock-data'
+import villamarketApi from '@/lib/villamarket-api'
+import { VM_API } from '@/config/api'
 
-// Tipos para usuários
+// ─── Tipos (NestJS /v1/users) ───
+
 export interface User {
   id: string
-  firstName: string
-  lastName: string
-  email: string
-  phoneNumber?: string
-  role: 'ADMIN' | 'USER' | 'MANAGER' | 'CASHIER'
-  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION'
-  balance?: number
-  accountNo?: string
+  name: string
+  email: string | null
+  phone: string | null
+  avatarUrl: string | null
+  role: string
+  isActive: boolean
+  isEmailVerified: boolean
+  isPhoneVerified: boolean
+  walletBalance: number
+  loyaltyPoints: number
+  referralCode: string | null
+  lastLoginAt: string | null
   createdAt: string
   updatedAt: string
+  _count: {
+    orders: number
+    addresses: number
+  }
 }
 
 export interface CreateUserRequest {
-  firstName: string
-  lastName: string
+  name: string
   email: string
-  phoneNumber?: string
-  role: 'ADMIN' | 'USER' | 'MANAGER' | 'CASHIER'
+  phone?: string
   password: string
 }
 
 export interface UpdateUserRequest {
-  firstName?: string
-  lastName?: string
+  name?: string
   email?: string
-  phoneNumber?: string
-  role?: 'ADMIN' | 'USER' | 'MANAGER' | 'CASHIER'
-  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION'
+  phone?: string
 }
 
-export interface UsersListResponse {
-  users: User[]
-  pagination: {
-    page: number
-    pageSize: number
-    total: number
-    totalPages: number
-  }
+export interface PaginatedResponse<T> {
+  items: T[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
 }
 
-// Hook para listar usuários
-export function useUsers(page = 1, pageSize = 10, search = '') {
-  const { auth } = useAuthStore()
+// ─── Hook: listar clientes ───
 
-  console.log('useUsers - auth state:', {
-    hasToken: !!auth.accessToken,
-    user: auth.user,
-    page,
-    pageSize,
-    search,
-  })
-
-  return useQuery<UsersListResponse>({
-    queryKey: ['users', page, pageSize, search, auth.accessToken],
+export function useUsers(page = 1, limit = 25, search = '') {
+  return useQuery<PaginatedResponse<User>>({
+    queryKey: ['users', page, limit, search],
     queryFn: async () => {
-      // Se não estiver autenticado, usar dados mock
-      if (!auth.isAuthenticated()) {
-        console.log('Não autenticado, usando dados mock')
-        return mockUsers
-      }
-
       const params: Record<string, string> = {
         page: page.toString(),
-        pageSize: pageSize.toString(),
+        limit: limit.toString(),
       }
-      if (search) {
-        params.search = search
-      }
+      if (search) params.search = search
 
-      const url = buildApiUrl(API_CONFIG.ENDPOINTS.USERS.LIST, params)
-      const headers = getAuthHeaders(auth.accessToken)
-
-      console.log('Fazendo fetch para:', url)
-      console.log('Headers:', headers)
-
-      try {
-        const response = await fetch(url, {
-          headers,
-          mode: 'cors', // Especificar modo CORS
-        })
-
-        console.log('Response status:', response.status)
-        console.log('Response ok:', response.ok)
-
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error('Erro da API:', errorText)
-          throw new Error(`Erro ${response.status}: ${errorText}`)
-        }
-
-        const data = await response.json()
-        console.log('Dados recebidos:', data)
-        return data
-      } catch (fetchError: any) {
-        console.error('Erro no fetch:', fetchError)
-
-        // Se o erro é de network, usar dados mockados
-        if (
-          fetchError.message === 'Failed to fetch' ||
-          fetchError.name === 'TypeError'
-        ) {
-          console.warn('Servidor não disponível, usando dados mockados')
-          toast.warning('Usando dados de exemplo - servidor não conectado')
-          return mockUsers
-        }
-
-        throw fetchError
-      }
+      const { data } = await villamarketApi.get(VM_API.ENDPOINTS.USERS.LIST, { params })
+      return data
     },
-    enabled: true, // Sempre habilitado, mas usa lógica interna para decidir entre API ou mock
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    retry: (failureCount: number, error: any) => {
-      console.log('Tentativa de retry:', failureCount, error)
-      // Não fazer retry se for erro de conexão
-      if (error?.message?.includes('conectar ao servidor')) {
-        return false
-      }
-      return failureCount < 3
-    },
+    staleTime: 30_000,
   })
 }
 
-// Hook para obter um usuário específico
+// ─── Hook: obter um cliente ───
+
 export function useUser(userId: string) {
-  const { auth } = useAuthStore()
-
   return useQuery<User>({
-    queryKey: ['user', userId, auth.accessToken],
+    queryKey: ['user', userId],
     queryFn: async () => {
-      const response = await fetch(
-        buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.GET}/${userId}`),
-        {
-          headers: getAuthHeaders(auth.accessToken),
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error(`Erro ${response.status}: ${response.statusText}`)
-      }
-
-      return response.json()
+      const { data } = await villamarketApi.get(VM_API.ENDPOINTS.USERS.GET(userId))
+      return data
     },
-    enabled: !!auth.accessToken && !!userId,
+    enabled: !!userId,
   })
 }
 
-// Hook para criar usuário
-export function useCreateUser() {
-  const { auth } = useAuthStore()
-  const queryClient = useQueryClient()
+// ─── Hook: atualizar cliente ───
 
-  return useMutation<User, Error, CreateUserRequest>({
-    mutationFn: async (userData: CreateUserRequest) => {
-      const response = await fetch(
-        buildApiUrl(API_CONFIG.ENDPOINTS.USERS.CREATE),
-        {
-          method: 'POST',
-          headers: getAuthHeaders(auth.accessToken),
-          body: JSON.stringify(userData),
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erro ${response.status}: ${errorText}`)
-      }
-
-      return response.json()
-    },
-    onSuccess: (data: User) => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-      toast.success(
-        `Usuário ${data.firstName} ${data.lastName} criado com sucesso!`
-      )
-    },
-    onError: (error: Error) => {
-      console.error('Erro ao criar usuário:', error)
-      toast.error(error.message || 'Erro ao criar usuário')
-    },
-  })
-}
-
-// Hook para atualizar usuário
 export function useUpdateUser() {
-  const { auth } = useAuthStore()
   const queryClient = useQueryClient()
 
   return useMutation<User, Error, { id: string; data: UpdateUserRequest }>({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: string
-      data: UpdateUserRequest
-    }) => {
-      const response = await fetch(
-        buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}`),
-        {
-          method: 'PUT',
-          headers: getAuthHeaders(auth.accessToken),
-          body: JSON.stringify(data),
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erro ${response.status}: ${errorText}`)
-      }
-
-      return response.json()
+    mutationFn: async ({ id, data: dto }) => {
+      const { data } = await villamarketApi.patch(VM_API.ENDPOINTS.USERS.UPDATE(id), dto)
+      return data
     },
-    onSuccess: (
-      data: User,
-      variables: { id: string; data: UpdateUserRequest }
-    ) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       queryClient.invalidateQueries({ queryKey: ['user', variables.id] })
-      toast.success(
-        `Usuário ${data.firstName} ${data.lastName} atualizado com sucesso!`
-      )
+      toast.success('Cliente atualizado com sucesso!')
     },
-    onError: (error: Error) => {
-      console.error('Erro ao atualizar usuário:', error)
-      toast.error(error.message || 'Erro ao atualizar usuário')
+    onError: (error) => {
+      toast.error(error.message || 'Erro ao atualizar cliente')
     },
   })
 }
 
-// Hook para deletar usuário
+// ─── Hook: deletar cliente ───
+
 export function useDeleteUser() {
-  const { auth } = useAuthStore()
   const queryClient = useQueryClient()
 
   return useMutation<void, Error, string>({
-    mutationFn: async (userId: string) => {
-      const response = await fetch(
-        buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.DELETE}/${userId}`),
-        {
-          method: 'DELETE',
-          headers: getAuthHeaders(auth.accessToken),
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erro ${response.status}: ${errorText}`)
-      }
-
-      // Se não retorna JSON, não precisa fazer parse
-      if (response.status !== 204) {
-        return response.json()
-      }
+    mutationFn: async (userId) => {
+      await villamarketApi.delete(VM_API.ENDPOINTS.USERS.DELETE(userId))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
-      toast.success('Usuário deletado com sucesso!')
+      toast.success('Cliente removido com sucesso!')
     },
-    onError: (error: Error) => {
-      console.error('Erro ao deletar usuário:', error)
-      toast.error(error.message || 'Erro ao deletar usuário')
+    onError: (error) => {
+      toast.error(error.message || 'Erro ao remover cliente')
     },
   })
 }
 
-// Hook para alternar status do usuário
+// ─── Hook: ativar/desativar cliente ───
+
 export function useToggleUserStatus() {
-  const { auth } = useAuthStore()
   const queryClient = useQueryClient()
 
-  return useMutation<
-    User,
-    Error,
-    { id: string; status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' }
-  >({
-    mutationFn: async ({
-      id,
-      status,
-    }: {
-      id: string
-      status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED'
-    }) => {
-      const response = await fetch(
-        buildApiUrl(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}/status`),
-        {
-          method: 'PATCH',
-          headers: getAuthHeaders(auth.accessToken),
-          body: JSON.stringify({ status }),
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erro ${response.status}: ${errorText}`)
-      }
-
-      return response.json()
+  return useMutation<User, Error, { id: string }>({
+    mutationFn: async ({ id }) => {
+      const { data } = await villamarketApi.patch(VM_API.ENDPOINTS.USERS.TOGGLE_ACTIVE(id))
+      return data
     },
-    onSuccess: (
-      data: User,
-      variables: { id: string; status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' }
-    ) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       queryClient.invalidateQueries({ queryKey: ['user', variables.id] })
-      const statusText =
-        variables.status === 'ACTIVE'
-          ? 'ativado'
-          : variables.status === 'INACTIVE'
-            ? 'desativado'
-            : 'suspenso'
-      toast.success(
-        `Usuário ${data.firstName} ${data.lastName} ${statusText} com sucesso!`
-      )
+      const statusText = data.isActive ? 'ativado' : 'desativado'
+      toast.success(`Cliente ${statusText} com sucesso!`)
     },
-    onError: (error: Error) => {
-      console.error('Erro ao alterar status do usuário:', error)
-      toast.error(error.message || 'Erro ao alterar status do usuário')
+    onError: (error) => {
+      toast.error(error.message || 'Erro ao alterar status do cliente')
     },
   })
 }

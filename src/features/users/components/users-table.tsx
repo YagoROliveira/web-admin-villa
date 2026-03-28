@@ -64,8 +64,8 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
     globalFilter: { enabled: false },
     columnFilters: [
       // email per-column text filter
-      { columnId: 'firstName', searchKey: 'firstName', type: 'string' },
-      { columnId: 'status', searchKey: 'status', type: 'array' },
+      { columnId: 'name', searchKey: 'name', type: 'string' },
+      { columnId: 'isActive', searchKey: 'isActive', type: 'array' },
       { columnId: 'role', searchKey: 'role', type: 'array' },
     ],
   })
@@ -102,16 +102,15 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
     <div className='space-y-4 max-sm:has-[div[role="toolbar"]]:mb-16'>
       <DataTableToolbar
         table={table}
-        searchPlaceholder='Filter users...'
-        searchKey='firstName'
+        searchPlaceholder='Filtrar usuários...'
+        searchKey='name'
         filters={[
           {
-            columnId: 'status',
+            columnId: 'isActive',
             title: 'Status',
             options: [
-              { label: 'Active', value: 'ACTIVE' },
-              { label: 'Inactive', value: 'INACTIVE' },
-              { label: 'Suspended', value: 'SUSPENDED' },
+              { label: 'Ativo', value: 'ACTIVE' },
+              { label: 'Inativo', value: 'INACTIVE' },
             ],
           },
           {
@@ -139,9 +138,9 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}

@@ -3,8 +3,10 @@ import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { StoryForm, StoriesProvider } from '@/features/stories/components'
+import { requirePermission } from '@/lib/route-guards'
 
 export const Route = createFileRoute('/_authenticated/stories/new')({
+  beforeLoad: requirePermission('wallet.stories.manage'),
   component: NewStoryPage,
 })
 

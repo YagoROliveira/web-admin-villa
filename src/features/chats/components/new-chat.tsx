@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Check, X } from 'lucide-react'
-import { showSubmittedData } from '@/lib/show-submitted-data'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,106 +17,112 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { type ChatUser } from '../data/chat-types'
+import { useCreateConversation } from '../hooks/use-chat-api'
 
-type User = Omit<ChatUser, 'messages'>
+interface SimpleUser {
+  id: string
+  name: string
+  email?: string
+  avatar?: string
+}
 
 type NewChatProps = {
-  users: User[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }
-export function NewChat({ users, onOpenChange, open }: NewChatProps) {
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([])
 
-  const handleSelectUser = (user: User) => {
-    if (!selectedUsers.find((u) => u.id === user.id)) {
-      setSelectedUsers([...selectedUsers, user])
-    } else {
-      handleRemoveUser(user.id)
+export function NewChat({ onOpenChange, open }: NewChatProps) {
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
+  const [idInput, setIdInput] = useState('')
+  const createConversation = useCreateConversation()
+
+  const handleAddId = () => {
+    const trimmed = idInput.trim()
+    if (trimmed && !selectedUserIds.includes(trimmed)) {
+      setSelectedUserIds([...selectedUserIds, trimmed])
+      setIdInput('')
     }
   }
 
   const handleRemoveUser = (userId: string) => {
-    setSelectedUsers(selectedUsers.filter((user) => user.id !== userId))
+    setSelectedUserIds(selectedUserIds.filter((id) => id !== userId))
   }
 
   useEffect(() => {
     if (!open) {
-      setSelectedUsers([])
+      setSelectedUserIds([])
+      setIdInput('')
     }
   }, [open])
+
+  const handleCreate = () => {
+    if (selectedUserIds.length === 0) return
+
+    createConversation.mutate(
+      {
+        type: selectedUserIds.length > 1 ? 'group' : 'direct',
+        participantIds: selectedUserIds,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Conversa criada com sucesso!')
+          onOpenChange(false)
+        },
+        onError: (err) => {
+          toast.error(err.message || 'Erro ao criar conversa')
+        },
+      },
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[600px]'>
         <DialogHeader>
-          <DialogTitle>New message</DialogTitle>
+          <DialogTitle>Nova conversa</DialogTitle>
         </DialogHeader>
         <div className='flex flex-col gap-4'>
           <div className='flex flex-wrap items-baseline-last gap-2'>
-            <span className='text-muted-foreground min-h-6 text-sm'>To:</span>
-            {selectedUsers.map((user) => (
-              <Badge key={user.id} variant='default'>
-                {user.fullName}
+            <span className='text-muted-foreground min-h-6 text-sm'>Para:</span>
+            {selectedUserIds.map((userId) => (
+              <Badge key={userId} variant='default'>
+                {userId}
                 <button
                   className='ring-offset-background focus:ring-ring ms-1 rounded-full outline-hidden focus:ring-2 focus:ring-offset-2'
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleRemoveUser(user.id)
-                    }
+                    if (e.key === 'Enter') handleRemoveUser(userId)
                   }}
-                  onClick={() => handleRemoveUser(user.id)}
+                  onClick={() => handleRemoveUser(userId)}
                 >
                   <X className='text-muted-foreground hover:text-foreground h-3 w-3' />
                 </button>
               </Badge>
             ))}
           </div>
-          <Command className='rounded-lg border'>
-            <CommandInput
-              placeholder='Search people...'
-              className='text-foreground'
+          <div className='flex gap-2'>
+            <input
+              type='text'
+              placeholder='ID do usuário ou email...'
+              className='border-input bg-background flex-1 rounded-md border px-3 py-2 text-sm'
+              value={idInput}
+              onChange={(e) => setIdInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleAddId()
+                }
+              }}
             />
-            <CommandList>
-              <CommandEmpty>No people found.</CommandEmpty>
-              <CommandGroup>
-                {users.map((user) => (
-                  <CommandItem
-                    key={user.id}
-                    onSelect={() => handleSelectUser(user)}
-                    className='hover:bg-accent hover:text-accent-foreground flex items-center justify-between gap-2'
-                  >
-                    <div className='flex items-center gap-2'>
-                      <img
-                        src={user.profile || '/placeholder.svg'}
-                        alt={user.fullName}
-                        className='h-8 w-8 rounded-full'
-                      />
-                      <div className='flex flex-col'>
-                        <span className='text-sm font-medium'>
-                          {user.fullName}
-                        </span>
-                        <span className='text-accent-foreground/70 text-xs'>
-                          {user.username}
-                        </span>
-                      </div>
-                    </div>
-
-                    {selectedUsers.find((u) => u.id === user.id) && (
-                      <Check className='h-4 w-4' />
-                    )}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
+            <Button type='button' variant='outline' onClick={handleAddId}>
+              Adicionar
+            </Button>
+          </div>
           <Button
-            variant={'default'}
-            onClick={() => showSubmittedData(selectedUsers)}
-            disabled={selectedUsers.length === 0}
+            variant='default'
+            onClick={handleCreate}
+            disabled={selectedUserIds.length === 0 || createConversation.isPending}
           >
-            Chat
+            {createConversation.isPending ? 'Criando...' : 'Iniciar conversa'}
           </Button>
         </div>
       </DialogContent>

@@ -21,13 +21,16 @@ import { Route as authSignIn2RouteImport } from './routes/(auth)/sign-in-2'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as AuthenticatedVendorRouteRouteImport } from './routes/_authenticated/vendor/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedStoriesIndexRouteImport } from './routes/_authenticated/stories/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedPayableAccountsIndexRouteImport } from './routes/_authenticated/payable-accounts/index'
 import { Route as AuthenticatedLoansIndexRouteImport } from './routes/_authenticated/loans/index'
+import { Route as AuthenticatedItemsIndexRouteImport } from './routes/_authenticated/items/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedFeesIndexRouteImport } from './routes/_authenticated/fees/index'
 import { Route as AuthenticatedEmprestimosIndexRouteImport } from './routes/_authenticated/emprestimos/index'
@@ -35,17 +38,41 @@ import { Route as AuthenticatedClassifiedsIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCashbackIndexRouteImport } from './routes/_authenticated/cashback/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
+import { Route as AuthenticatedUsersUserIdRouteImport } from './routes/_authenticated/users/$userId'
 import { Route as AuthenticatedStoriesNewRouteImport } from './routes/_authenticated/stories/new'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedLoansLoanIdRouteImport } from './routes/_authenticated/loans/$loanId'
+import { Route as AuthenticatedItemsNewRouteImport } from './routes/_authenticated/items/new'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedCashbackOrderIdRouteImport } from './routes/_authenticated/cashback/$orderId'
 import { Route as AuthenticatedCashbackCashbackIdRouteImport } from './routes/_authenticated/cashback/$cashbackId'
+import { Route as AuthenticatedVendorOrdersIndexRouteImport } from './routes/_authenticated/vendor/orders/index'
 import { Route as AuthenticatedStoriesStoryIdIndexRouteImport } from './routes/_authenticated/stories/$storyId/index'
+import { Route as AuthenticatedItemsItemIdIndexRouteImport } from './routes/_authenticated/items/$itemId/index'
+import { Route as AuthenticatedAdminZonesIndexRouteImport } from './routes/_authenticated/admin/zones/index'
+import { Route as AuthenticatedAdminStoresIndexRouteImport } from './routes/_authenticated/admin/stores/index'
+import { Route as AuthenticatedAdminOrdersIndexRouteImport } from './routes/_authenticated/admin/orders/index'
+import { Route as AuthenticatedAdminModulesIndexRouteImport } from './routes/_authenticated/admin/modules/index'
+import { Route as AuthenticatedAdminCustomersIndexRouteImport } from './routes/_authenticated/admin/customers/index'
+import { Route as AuthenticatedAdminCategoriesIndexRouteImport } from './routes/_authenticated/admin/categories/index'
+import { Route as AuthenticatedAdminAccessManagementIndexRouteImport } from './routes/_authenticated/admin/access-management/index'
 import { Route as AuthenticatedStoriesStoryIdEditRouteImport } from './routes/_authenticated/stories/$storyId/edit'
+import { Route as AuthenticatedItemsItemIdEditRouteImport } from './routes/_authenticated/items/$itemId/edit'
+import { Route as AuthenticatedAdminZonesNewRouteImport } from './routes/_authenticated/admin/zones/new'
+import { Route as AuthenticatedAdminStoresNewRouteImport } from './routes/_authenticated/admin/stores/new'
+import { Route as AuthenticatedAdminModulesNewRouteImport } from './routes/_authenticated/admin/modules/new'
+import { Route as AuthenticatedAdminCustomersUserIdRouteImport } from './routes/_authenticated/admin/customers/$userId'
+import { Route as AuthenticatedAdminCategoriesNewRouteImport } from './routes/_authenticated/admin/categories/new'
+import { Route as AuthenticatedAdminOrdersOrderIdIndexRouteImport } from './routes/_authenticated/admin/orders/$orderId/index'
+import { Route as AuthenticatedAdminZonesZoneIdModulesRouteImport } from './routes/_authenticated/admin/zones/$zoneId/modules'
+import { Route as AuthenticatedAdminZonesZoneIdEditRouteImport } from './routes/_authenticated/admin/zones/$zoneId/edit'
+import { Route as AuthenticatedAdminStoresStoreIdEditRouteImport } from './routes/_authenticated/admin/stores/$storeId/edit'
+import { Route as AuthenticatedAdminModulesModuleIdEditRouteImport } from './routes/_authenticated/admin/modules/$moduleId/edit'
+import { Route as AuthenticatedAdminCategoriesCategoryIdEditRouteImport } from './routes/_authenticated/admin/categories/$categoryId/edit'
+import { Route as AuthenticatedAdminAccessManagementUserIdEditRouteImport } from './routes/_authenticated/admin/access-management/$userId/edit'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -106,12 +133,23 @@ const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedVendorRouteRoute =
+  AuthenticatedVendorRouteRouteImport.update({
+    id: '/vendor',
+    path: '/vendor',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRouteRoute =
   AuthenticatedSettingsRouteRouteImport.update({
     id: '/settings',
     path: '/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
@@ -143,6 +181,11 @@ const AuthenticatedPayableAccountsIndexRoute =
 const AuthenticatedLoansIndexRoute = AuthenticatedLoansIndexRouteImport.update({
   id: '/loans/',
   path: '/loans/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedItemsIndexRoute = AuthenticatedItemsIndexRouteImport.update({
+  id: '/items/',
+  path: '/items/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHelpCenterIndexRoute =
@@ -184,6 +227,12 @@ const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   path: '/apps/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedUsersUserIdRoute =
+  AuthenticatedUsersUserIdRouteImport.update({
+    id: '/users/$userId',
+    path: '/users/$userId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStoriesNewRoute = AuthenticatedStoriesNewRouteImport.update({
   id: '/stories/new',
   path: '/stories/new',
@@ -219,6 +268,11 @@ const AuthenticatedLoansLoanIdRoute =
     path: '/loans/$loanId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedItemsNewRoute = AuthenticatedItemsNewRouteImport.update({
+  id: '/items/new',
+  path: '/items/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
@@ -237,11 +291,65 @@ const AuthenticatedCashbackCashbackIdRoute =
     path: '/cashback/$cashbackId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedVendorOrdersIndexRoute =
+  AuthenticatedVendorOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => AuthenticatedVendorRouteRoute,
+  } as any)
 const AuthenticatedStoriesStoryIdIndexRoute =
   AuthenticatedStoriesStoryIdIndexRouteImport.update({
     id: '/stories/$storyId/',
     path: '/stories/$storyId/',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedItemsItemIdIndexRoute =
+  AuthenticatedItemsItemIdIndexRouteImport.update({
+    id: '/items/$itemId/',
+    path: '/items/$itemId/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminZonesIndexRoute =
+  AuthenticatedAdminZonesIndexRouteImport.update({
+    id: '/zones/',
+    path: '/zones/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminStoresIndexRoute =
+  AuthenticatedAdminStoresIndexRouteImport.update({
+    id: '/stores/',
+    path: '/stores/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOrdersIndexRoute =
+  AuthenticatedAdminOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminModulesIndexRoute =
+  AuthenticatedAdminModulesIndexRouteImport.update({
+    id: '/modules/',
+    path: '/modules/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCustomersIndexRoute =
+  AuthenticatedAdminCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCategoriesIndexRoute =
+  AuthenticatedAdminCategoriesIndexRouteImport.update({
+    id: '/categories/',
+    path: '/categories/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAccessManagementIndexRoute =
+  AuthenticatedAdminAccessManagementIndexRouteImport.update({
+    id: '/access-management/',
+    path: '/access-management/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedStoriesStoryIdEditRoute =
   AuthenticatedStoriesStoryIdEditRouteImport.update({
@@ -249,9 +357,89 @@ const AuthenticatedStoriesStoryIdEditRoute =
     path: '/stories/$storyId/edit',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedItemsItemIdEditRoute =
+  AuthenticatedItemsItemIdEditRouteImport.update({
+    id: '/items/$itemId/edit',
+    path: '/items/$itemId/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminZonesNewRoute =
+  AuthenticatedAdminZonesNewRouteImport.update({
+    id: '/zones/new',
+    path: '/zones/new',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminStoresNewRoute =
+  AuthenticatedAdminStoresNewRouteImport.update({
+    id: '/stores/new',
+    path: '/stores/new',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminModulesNewRoute =
+  AuthenticatedAdminModulesNewRouteImport.update({
+    id: '/modules/new',
+    path: '/modules/new',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCustomersUserIdRoute =
+  AuthenticatedAdminCustomersUserIdRouteImport.update({
+    id: '/customers/$userId',
+    path: '/customers/$userId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCategoriesNewRoute =
+  AuthenticatedAdminCategoriesNewRouteImport.update({
+    id: '/categories/new',
+    path: '/categories/new',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOrdersOrderIdIndexRoute =
+  AuthenticatedAdminOrdersOrderIdIndexRouteImport.update({
+    id: '/orders/$orderId/',
+    path: '/orders/$orderId/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminZonesZoneIdModulesRoute =
+  AuthenticatedAdminZonesZoneIdModulesRouteImport.update({
+    id: '/zones/$zoneId/modules',
+    path: '/zones/$zoneId/modules',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminZonesZoneIdEditRoute =
+  AuthenticatedAdminZonesZoneIdEditRouteImport.update({
+    id: '/zones/$zoneId/edit',
+    path: '/zones/$zoneId/edit',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminStoresStoreIdEditRoute =
+  AuthenticatedAdminStoresStoreIdEditRouteImport.update({
+    id: '/stores/$storeId/edit',
+    path: '/stores/$storeId/edit',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminModulesModuleIdEditRoute =
+  AuthenticatedAdminModulesModuleIdEditRouteImport.update({
+    id: '/modules/$moduleId/edit',
+    path: '/modules/$moduleId/edit',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCategoriesCategoryIdEditRoute =
+  AuthenticatedAdminCategoriesCategoryIdEditRouteImport.update({
+    id: '/categories/$categoryId/edit',
+    path: '/categories/$categoryId/edit',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAccessManagementUserIdEditRoute =
+  AuthenticatedAdminAccessManagementUserIdEditRouteImport.update({
+    id: '/access-management/$userId/edit',
+    path: '/access-management/$userId/edit',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/vendor': typeof AuthenticatedVendorRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -266,12 +454,14 @@ export interface FileRoutesByFullPath {
   '/cashback/$cashbackId': typeof AuthenticatedCashbackCashbackIdRoute
   '/cashback/$orderId': typeof AuthenticatedCashbackOrderIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/items/new': typeof AuthenticatedItemsNewRoute
   '/loans/$loanId': typeof AuthenticatedLoansLoanIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/stories/new': typeof AuthenticatedStoriesNewRoute
+  '/users/$userId': typeof AuthenticatedUsersUserIdRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/cashback': typeof AuthenticatedCashbackIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
@@ -279,16 +469,41 @@ export interface FileRoutesByFullPath {
   '/emprestimos': typeof AuthenticatedEmprestimosIndexRoute
   '/fees': typeof AuthenticatedFeesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/items': typeof AuthenticatedItemsIndexRoute
   '/loans': typeof AuthenticatedLoansIndexRoute
   '/payable-accounts': typeof AuthenticatedPayableAccountsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/stories': typeof AuthenticatedStoriesIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/admin/categories/new': typeof AuthenticatedAdminCategoriesNewRoute
+  '/admin/customers/$userId': typeof AuthenticatedAdminCustomersUserIdRoute
+  '/admin/modules/new': typeof AuthenticatedAdminModulesNewRoute
+  '/admin/stores/new': typeof AuthenticatedAdminStoresNewRoute
+  '/admin/zones/new': typeof AuthenticatedAdminZonesNewRoute
+  '/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
   '/stories/$storyId/edit': typeof AuthenticatedStoriesStoryIdEditRoute
+  '/admin/access-management': typeof AuthenticatedAdminAccessManagementIndexRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesIndexRoute
+  '/admin/customers': typeof AuthenticatedAdminCustomersIndexRoute
+  '/admin/modules': typeof AuthenticatedAdminModulesIndexRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersIndexRoute
+  '/admin/stores': typeof AuthenticatedAdminStoresIndexRoute
+  '/admin/zones': typeof AuthenticatedAdminZonesIndexRoute
+  '/items/$itemId': typeof AuthenticatedItemsItemIdIndexRoute
   '/stories/$storyId': typeof AuthenticatedStoriesStoryIdIndexRoute
+  '/vendor/orders': typeof AuthenticatedVendorOrdersIndexRoute
+  '/admin/access-management/$userId/edit': typeof AuthenticatedAdminAccessManagementUserIdEditRoute
+  '/admin/categories/$categoryId/edit': typeof AuthenticatedAdminCategoriesCategoryIdEditRoute
+  '/admin/modules/$moduleId/edit': typeof AuthenticatedAdminModulesModuleIdEditRoute
+  '/admin/stores/$storeId/edit': typeof AuthenticatedAdminStoresStoreIdEditRoute
+  '/admin/zones/$zoneId/edit': typeof AuthenticatedAdminZonesZoneIdEditRoute
+  '/admin/zones/$zoneId/modules': typeof AuthenticatedAdminZonesZoneIdModulesRoute
+  '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdIndexRoute
 }
 export interface FileRoutesByTo {
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/vendor': typeof AuthenticatedVendorRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -303,12 +518,14 @@ export interface FileRoutesByTo {
   '/cashback/$cashbackId': typeof AuthenticatedCashbackCashbackIdRoute
   '/cashback/$orderId': typeof AuthenticatedCashbackOrderIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/items/new': typeof AuthenticatedItemsNewRoute
   '/loans/$loanId': typeof AuthenticatedLoansLoanIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/stories/new': typeof AuthenticatedStoriesNewRoute
+  '/users/$userId': typeof AuthenticatedUsersUserIdRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/cashback': typeof AuthenticatedCashbackIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
@@ -316,19 +533,44 @@ export interface FileRoutesByTo {
   '/emprestimos': typeof AuthenticatedEmprestimosIndexRoute
   '/fees': typeof AuthenticatedFeesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/items': typeof AuthenticatedItemsIndexRoute
   '/loans': typeof AuthenticatedLoansIndexRoute
   '/payable-accounts': typeof AuthenticatedPayableAccountsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/stories': typeof AuthenticatedStoriesIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/admin/categories/new': typeof AuthenticatedAdminCategoriesNewRoute
+  '/admin/customers/$userId': typeof AuthenticatedAdminCustomersUserIdRoute
+  '/admin/modules/new': typeof AuthenticatedAdminModulesNewRoute
+  '/admin/stores/new': typeof AuthenticatedAdminStoresNewRoute
+  '/admin/zones/new': typeof AuthenticatedAdminZonesNewRoute
+  '/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
   '/stories/$storyId/edit': typeof AuthenticatedStoriesStoryIdEditRoute
+  '/admin/access-management': typeof AuthenticatedAdminAccessManagementIndexRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesIndexRoute
+  '/admin/customers': typeof AuthenticatedAdminCustomersIndexRoute
+  '/admin/modules': typeof AuthenticatedAdminModulesIndexRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersIndexRoute
+  '/admin/stores': typeof AuthenticatedAdminStoresIndexRoute
+  '/admin/zones': typeof AuthenticatedAdminZonesIndexRoute
+  '/items/$itemId': typeof AuthenticatedItemsItemIdIndexRoute
   '/stories/$storyId': typeof AuthenticatedStoriesStoryIdIndexRoute
+  '/vendor/orders': typeof AuthenticatedVendorOrdersIndexRoute
+  '/admin/access-management/$userId/edit': typeof AuthenticatedAdminAccessManagementUserIdEditRoute
+  '/admin/categories/$categoryId/edit': typeof AuthenticatedAdminCategoriesCategoryIdEditRoute
+  '/admin/modules/$moduleId/edit': typeof AuthenticatedAdminModulesModuleIdEditRoute
+  '/admin/stores/$storeId/edit': typeof AuthenticatedAdminStoresStoreIdEditRoute
+  '/admin/zones/$zoneId/edit': typeof AuthenticatedAdminZonesZoneIdEditRoute
+  '/admin/zones/$zoneId/modules': typeof AuthenticatedAdminZonesZoneIdModulesRoute
+  '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/_authenticated/vendor': typeof AuthenticatedVendorRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/sign-in': typeof authSignInRoute
@@ -343,12 +585,14 @@ export interface FileRoutesById {
   '/_authenticated/cashback/$cashbackId': typeof AuthenticatedCashbackCashbackIdRoute
   '/_authenticated/cashback/$orderId': typeof AuthenticatedCashbackOrderIdRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/_authenticated/items/new': typeof AuthenticatedItemsNewRoute
   '/_authenticated/loans/$loanId': typeof AuthenticatedLoansLoanIdRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/stories/new': typeof AuthenticatedStoriesNewRoute
+  '/_authenticated/users/$userId': typeof AuthenticatedUsersUserIdRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/cashback/': typeof AuthenticatedCashbackIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
@@ -356,19 +600,44 @@ export interface FileRoutesById {
   '/_authenticated/emprestimos/': typeof AuthenticatedEmprestimosIndexRoute
   '/_authenticated/fees/': typeof AuthenticatedFeesIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/items/': typeof AuthenticatedItemsIndexRoute
   '/_authenticated/loans/': typeof AuthenticatedLoansIndexRoute
   '/_authenticated/payable-accounts/': typeof AuthenticatedPayableAccountsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/stories/': typeof AuthenticatedStoriesIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/admin/categories/new': typeof AuthenticatedAdminCategoriesNewRoute
+  '/_authenticated/admin/customers/$userId': typeof AuthenticatedAdminCustomersUserIdRoute
+  '/_authenticated/admin/modules/new': typeof AuthenticatedAdminModulesNewRoute
+  '/_authenticated/admin/stores/new': typeof AuthenticatedAdminStoresNewRoute
+  '/_authenticated/admin/zones/new': typeof AuthenticatedAdminZonesNewRoute
+  '/_authenticated/items/$itemId/edit': typeof AuthenticatedItemsItemIdEditRoute
   '/_authenticated/stories/$storyId/edit': typeof AuthenticatedStoriesStoryIdEditRoute
+  '/_authenticated/admin/access-management/': typeof AuthenticatedAdminAccessManagementIndexRoute
+  '/_authenticated/admin/categories/': typeof AuthenticatedAdminCategoriesIndexRoute
+  '/_authenticated/admin/customers/': typeof AuthenticatedAdminCustomersIndexRoute
+  '/_authenticated/admin/modules/': typeof AuthenticatedAdminModulesIndexRoute
+  '/_authenticated/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
+  '/_authenticated/admin/stores/': typeof AuthenticatedAdminStoresIndexRoute
+  '/_authenticated/admin/zones/': typeof AuthenticatedAdminZonesIndexRoute
+  '/_authenticated/items/$itemId/': typeof AuthenticatedItemsItemIdIndexRoute
   '/_authenticated/stories/$storyId/': typeof AuthenticatedStoriesStoryIdIndexRoute
+  '/_authenticated/vendor/orders/': typeof AuthenticatedVendorOrdersIndexRoute
+  '/_authenticated/admin/access-management/$userId/edit': typeof AuthenticatedAdminAccessManagementUserIdEditRoute
+  '/_authenticated/admin/categories/$categoryId/edit': typeof AuthenticatedAdminCategoriesCategoryIdEditRoute
+  '/_authenticated/admin/modules/$moduleId/edit': typeof AuthenticatedAdminModulesModuleIdEditRoute
+  '/_authenticated/admin/stores/$storeId/edit': typeof AuthenticatedAdminStoresStoreIdEditRoute
+  '/_authenticated/admin/zones/$zoneId/edit': typeof AuthenticatedAdminZonesZoneIdEditRoute
+  '/_authenticated/admin/zones/$zoneId/modules': typeof AuthenticatedAdminZonesZoneIdModulesRoute
+  '/_authenticated/admin/orders/$orderId/': typeof AuthenticatedAdminOrdersOrderIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/admin'
     | '/settings'
+    | '/vendor'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -383,12 +652,14 @@ export interface FileRouteTypes {
     | '/cashback/$cashbackId'
     | '/cashback/$orderId'
     | '/errors/$error'
+    | '/items/new'
     | '/loans/$loanId'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
     | '/stories/new'
+    | '/users/$userId'
     | '/apps'
     | '/cashback'
     | '/chats'
@@ -396,16 +667,41 @@ export interface FileRouteTypes {
     | '/emprestimos'
     | '/fees'
     | '/help-center'
+    | '/items'
     | '/loans'
     | '/payable-accounts'
     | '/settings/'
     | '/stories'
     | '/tasks'
     | '/users'
+    | '/admin/categories/new'
+    | '/admin/customers/$userId'
+    | '/admin/modules/new'
+    | '/admin/stores/new'
+    | '/admin/zones/new'
+    | '/items/$itemId/edit'
     | '/stories/$storyId/edit'
+    | '/admin/access-management'
+    | '/admin/categories'
+    | '/admin/customers'
+    | '/admin/modules'
+    | '/admin/orders'
+    | '/admin/stores'
+    | '/admin/zones'
+    | '/items/$itemId'
     | '/stories/$storyId'
+    | '/vendor/orders'
+    | '/admin/access-management/$userId/edit'
+    | '/admin/categories/$categoryId/edit'
+    | '/admin/modules/$moduleId/edit'
+    | '/admin/stores/$storeId/edit'
+    | '/admin/zones/$zoneId/edit'
+    | '/admin/zones/$zoneId/modules'
+    | '/admin/orders/$orderId'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/admin'
+    | '/vendor'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -420,12 +716,14 @@ export interface FileRouteTypes {
     | '/cashback/$cashbackId'
     | '/cashback/$orderId'
     | '/errors/$error'
+    | '/items/new'
     | '/loans/$loanId'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
     | '/stories/new'
+    | '/users/$userId'
     | '/apps'
     | '/cashback'
     | '/chats'
@@ -433,18 +731,43 @@ export interface FileRouteTypes {
     | '/emprestimos'
     | '/fees'
     | '/help-center'
+    | '/items'
     | '/loans'
     | '/payable-accounts'
     | '/settings'
     | '/stories'
     | '/tasks'
     | '/users'
+    | '/admin/categories/new'
+    | '/admin/customers/$userId'
+    | '/admin/modules/new'
+    | '/admin/stores/new'
+    | '/admin/zones/new'
+    | '/items/$itemId/edit'
     | '/stories/$storyId/edit'
+    | '/admin/access-management'
+    | '/admin/categories'
+    | '/admin/customers'
+    | '/admin/modules'
+    | '/admin/orders'
+    | '/admin/stores'
+    | '/admin/zones'
+    | '/items/$itemId'
     | '/stories/$storyId'
+    | '/vendor/orders'
+    | '/admin/access-management/$userId/edit'
+    | '/admin/categories/$categoryId/edit'
+    | '/admin/modules/$moduleId/edit'
+    | '/admin/stores/$storeId/edit'
+    | '/admin/zones/$zoneId/edit'
+    | '/admin/zones/$zoneId/modules'
+    | '/admin/orders/$orderId'
   id:
     | '__root__'
     | '/_authenticated'
+    | '/_authenticated/admin'
     | '/_authenticated/settings'
+    | '/_authenticated/vendor'
     | '/(auth)/forgot-password'
     | '/(auth)/otp'
     | '/(auth)/sign-in'
@@ -459,12 +782,14 @@ export interface FileRouteTypes {
     | '/_authenticated/cashback/$cashbackId'
     | '/_authenticated/cashback/$orderId'
     | '/_authenticated/errors/$error'
+    | '/_authenticated/items/new'
     | '/_authenticated/loans/$loanId'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/stories/new'
+    | '/_authenticated/users/$userId'
     | '/_authenticated/apps/'
     | '/_authenticated/cashback/'
     | '/_authenticated/chats/'
@@ -472,14 +797,37 @@ export interface FileRouteTypes {
     | '/_authenticated/emprestimos/'
     | '/_authenticated/fees/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/items/'
     | '/_authenticated/loans/'
     | '/_authenticated/payable-accounts/'
     | '/_authenticated/settings/'
     | '/_authenticated/stories/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
+    | '/_authenticated/admin/categories/new'
+    | '/_authenticated/admin/customers/$userId'
+    | '/_authenticated/admin/modules/new'
+    | '/_authenticated/admin/stores/new'
+    | '/_authenticated/admin/zones/new'
+    | '/_authenticated/items/$itemId/edit'
     | '/_authenticated/stories/$storyId/edit'
+    | '/_authenticated/admin/access-management/'
+    | '/_authenticated/admin/categories/'
+    | '/_authenticated/admin/customers/'
+    | '/_authenticated/admin/modules/'
+    | '/_authenticated/admin/orders/'
+    | '/_authenticated/admin/stores/'
+    | '/_authenticated/admin/zones/'
+    | '/_authenticated/items/$itemId/'
     | '/_authenticated/stories/$storyId/'
+    | '/_authenticated/vendor/orders/'
+    | '/_authenticated/admin/access-management/$userId/edit'
+    | '/_authenticated/admin/categories/$categoryId/edit'
+    | '/_authenticated/admin/modules/$moduleId/edit'
+    | '/_authenticated/admin/stores/$storeId/edit'
+    | '/_authenticated/admin/zones/$zoneId/edit'
+    | '/_authenticated/admin/zones/$zoneId/modules'
+    | '/_authenticated/admin/orders/$orderId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -582,11 +930,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/vendor': {
+      id: '/_authenticated/vendor'
+      path: '/vendor'
+      fullPath: '/vendor'
+      preLoaderRoute: typeof AuthenticatedVendorRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/users/': {
@@ -629,6 +991,13 @@ declare module '@tanstack/react-router' {
       path: '/loans'
       fullPath: '/loans'
       preLoaderRoute: typeof AuthenticatedLoansIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/items/': {
+      id: '/_authenticated/items/'
+      path: '/items'
+      fullPath: '/items'
+      preLoaderRoute: typeof AuthenticatedItemsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/help-center/': {
@@ -680,6 +1049,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/users/$userId': {
+      id: '/_authenticated/users/$userId'
+      path: '/users/$userId'
+      fullPath: '/users/$userId'
+      preLoaderRoute: typeof AuthenticatedUsersUserIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/stories/new': {
       id: '/_authenticated/stories/new'
       path: '/stories/new'
@@ -722,6 +1098,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLoansLoanIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/items/new': {
+      id: '/_authenticated/items/new'
+      path: '/items/new'
+      fullPath: '/items/new'
+      preLoaderRoute: typeof AuthenticatedItemsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
@@ -743,12 +1126,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCashbackCashbackIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/vendor/orders/': {
+      id: '/_authenticated/vendor/orders/'
+      path: '/orders'
+      fullPath: '/vendor/orders'
+      preLoaderRoute: typeof AuthenticatedVendorOrdersIndexRouteImport
+      parentRoute: typeof AuthenticatedVendorRouteRoute
+    }
     '/_authenticated/stories/$storyId/': {
       id: '/_authenticated/stories/$storyId/'
       path: '/stories/$storyId'
       fullPath: '/stories/$storyId'
       preLoaderRoute: typeof AuthenticatedStoriesStoryIdIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/items/$itemId/': {
+      id: '/_authenticated/items/$itemId/'
+      path: '/items/$itemId'
+      fullPath: '/items/$itemId'
+      preLoaderRoute: typeof AuthenticatedItemsItemIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/zones/': {
+      id: '/_authenticated/admin/zones/'
+      path: '/zones'
+      fullPath: '/admin/zones'
+      preLoaderRoute: typeof AuthenticatedAdminZonesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/stores/': {
+      id: '/_authenticated/admin/stores/'
+      path: '/stores'
+      fullPath: '/admin/stores'
+      preLoaderRoute: typeof AuthenticatedAdminStoresIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/orders/': {
+      id: '/_authenticated/admin/orders/'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/modules/': {
+      id: '/_authenticated/admin/modules/'
+      path: '/modules'
+      fullPath: '/admin/modules'
+      preLoaderRoute: typeof AuthenticatedAdminModulesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/customers/': {
+      id: '/_authenticated/admin/customers/'
+      path: '/customers'
+      fullPath: '/admin/customers'
+      preLoaderRoute: typeof AuthenticatedAdminCustomersIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/categories/': {
+      id: '/_authenticated/admin/categories/'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/access-management/': {
+      id: '/_authenticated/admin/access-management/'
+      path: '/access-management'
+      fullPath: '/admin/access-management'
+      preLoaderRoute: typeof AuthenticatedAdminAccessManagementIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/stories/$storyId/edit': {
       id: '/_authenticated/stories/$storyId/edit'
@@ -757,8 +1203,160 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStoriesStoryIdEditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/items/$itemId/edit': {
+      id: '/_authenticated/items/$itemId/edit'
+      path: '/items/$itemId/edit'
+      fullPath: '/items/$itemId/edit'
+      preLoaderRoute: typeof AuthenticatedItemsItemIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/zones/new': {
+      id: '/_authenticated/admin/zones/new'
+      path: '/zones/new'
+      fullPath: '/admin/zones/new'
+      preLoaderRoute: typeof AuthenticatedAdminZonesNewRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/stores/new': {
+      id: '/_authenticated/admin/stores/new'
+      path: '/stores/new'
+      fullPath: '/admin/stores/new'
+      preLoaderRoute: typeof AuthenticatedAdminStoresNewRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/modules/new': {
+      id: '/_authenticated/admin/modules/new'
+      path: '/modules/new'
+      fullPath: '/admin/modules/new'
+      preLoaderRoute: typeof AuthenticatedAdminModulesNewRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/customers/$userId': {
+      id: '/_authenticated/admin/customers/$userId'
+      path: '/customers/$userId'
+      fullPath: '/admin/customers/$userId'
+      preLoaderRoute: typeof AuthenticatedAdminCustomersUserIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/categories/new': {
+      id: '/_authenticated/admin/categories/new'
+      path: '/categories/new'
+      fullPath: '/admin/categories/new'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriesNewRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/orders/$orderId/': {
+      id: '/_authenticated/admin/orders/$orderId/'
+      path: '/orders/$orderId'
+      fullPath: '/admin/orders/$orderId'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersOrderIdIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/zones/$zoneId/modules': {
+      id: '/_authenticated/admin/zones/$zoneId/modules'
+      path: '/zones/$zoneId/modules'
+      fullPath: '/admin/zones/$zoneId/modules'
+      preLoaderRoute: typeof AuthenticatedAdminZonesZoneIdModulesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/zones/$zoneId/edit': {
+      id: '/_authenticated/admin/zones/$zoneId/edit'
+      path: '/zones/$zoneId/edit'
+      fullPath: '/admin/zones/$zoneId/edit'
+      preLoaderRoute: typeof AuthenticatedAdminZonesZoneIdEditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/stores/$storeId/edit': {
+      id: '/_authenticated/admin/stores/$storeId/edit'
+      path: '/stores/$storeId/edit'
+      fullPath: '/admin/stores/$storeId/edit'
+      preLoaderRoute: typeof AuthenticatedAdminStoresStoreIdEditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/modules/$moduleId/edit': {
+      id: '/_authenticated/admin/modules/$moduleId/edit'
+      path: '/modules/$moduleId/edit'
+      fullPath: '/admin/modules/$moduleId/edit'
+      preLoaderRoute: typeof AuthenticatedAdminModulesModuleIdEditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/categories/$categoryId/edit': {
+      id: '/_authenticated/admin/categories/$categoryId/edit'
+      path: '/categories/$categoryId/edit'
+      fullPath: '/admin/categories/$categoryId/edit'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriesCategoryIdEditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/access-management/$userId/edit': {
+      id: '/_authenticated/admin/access-management/$userId/edit'
+      path: '/access-management/$userId/edit'
+      fullPath: '/admin/access-management/$userId/edit'
+      preLoaderRoute: typeof AuthenticatedAdminAccessManagementUserIdEditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
+
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminCategoriesNewRoute: typeof AuthenticatedAdminCategoriesNewRoute
+  AuthenticatedAdminCustomersUserIdRoute: typeof AuthenticatedAdminCustomersUserIdRoute
+  AuthenticatedAdminModulesNewRoute: typeof AuthenticatedAdminModulesNewRoute
+  AuthenticatedAdminStoresNewRoute: typeof AuthenticatedAdminStoresNewRoute
+  AuthenticatedAdminZonesNewRoute: typeof AuthenticatedAdminZonesNewRoute
+  AuthenticatedAdminAccessManagementIndexRoute: typeof AuthenticatedAdminAccessManagementIndexRoute
+  AuthenticatedAdminCategoriesIndexRoute: typeof AuthenticatedAdminCategoriesIndexRoute
+  AuthenticatedAdminCustomersIndexRoute: typeof AuthenticatedAdminCustomersIndexRoute
+  AuthenticatedAdminModulesIndexRoute: typeof AuthenticatedAdminModulesIndexRoute
+  AuthenticatedAdminOrdersIndexRoute: typeof AuthenticatedAdminOrdersIndexRoute
+  AuthenticatedAdminStoresIndexRoute: typeof AuthenticatedAdminStoresIndexRoute
+  AuthenticatedAdminZonesIndexRoute: typeof AuthenticatedAdminZonesIndexRoute
+  AuthenticatedAdminAccessManagementUserIdEditRoute: typeof AuthenticatedAdminAccessManagementUserIdEditRoute
+  AuthenticatedAdminCategoriesCategoryIdEditRoute: typeof AuthenticatedAdminCategoriesCategoryIdEditRoute
+  AuthenticatedAdminModulesModuleIdEditRoute: typeof AuthenticatedAdminModulesModuleIdEditRoute
+  AuthenticatedAdminStoresStoreIdEditRoute: typeof AuthenticatedAdminStoresStoreIdEditRoute
+  AuthenticatedAdminZonesZoneIdEditRoute: typeof AuthenticatedAdminZonesZoneIdEditRoute
+  AuthenticatedAdminZonesZoneIdModulesRoute: typeof AuthenticatedAdminZonesZoneIdModulesRoute
+  AuthenticatedAdminOrdersOrderIdIndexRoute: typeof AuthenticatedAdminOrdersOrderIdIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminCategoriesNewRoute: AuthenticatedAdminCategoriesNewRoute,
+    AuthenticatedAdminCustomersUserIdRoute:
+      AuthenticatedAdminCustomersUserIdRoute,
+    AuthenticatedAdminModulesNewRoute: AuthenticatedAdminModulesNewRoute,
+    AuthenticatedAdminStoresNewRoute: AuthenticatedAdminStoresNewRoute,
+    AuthenticatedAdminZonesNewRoute: AuthenticatedAdminZonesNewRoute,
+    AuthenticatedAdminAccessManagementIndexRoute:
+      AuthenticatedAdminAccessManagementIndexRoute,
+    AuthenticatedAdminCategoriesIndexRoute:
+      AuthenticatedAdminCategoriesIndexRoute,
+    AuthenticatedAdminCustomersIndexRoute:
+      AuthenticatedAdminCustomersIndexRoute,
+    AuthenticatedAdminModulesIndexRoute: AuthenticatedAdminModulesIndexRoute,
+    AuthenticatedAdminOrdersIndexRoute: AuthenticatedAdminOrdersIndexRoute,
+    AuthenticatedAdminStoresIndexRoute: AuthenticatedAdminStoresIndexRoute,
+    AuthenticatedAdminZonesIndexRoute: AuthenticatedAdminZonesIndexRoute,
+    AuthenticatedAdminAccessManagementUserIdEditRoute:
+      AuthenticatedAdminAccessManagementUserIdEditRoute,
+    AuthenticatedAdminCategoriesCategoryIdEditRoute:
+      AuthenticatedAdminCategoriesCategoryIdEditRoute,
+    AuthenticatedAdminModulesModuleIdEditRoute:
+      AuthenticatedAdminModulesModuleIdEditRoute,
+    AuthenticatedAdminStoresStoreIdEditRoute:
+      AuthenticatedAdminStoresStoreIdEditRoute,
+    AuthenticatedAdminZonesZoneIdEditRoute:
+      AuthenticatedAdminZonesZoneIdEditRoute,
+    AuthenticatedAdminZonesZoneIdModulesRoute:
+      AuthenticatedAdminZonesZoneIdModulesRoute,
+    AuthenticatedAdminOrdersOrderIdIndexRoute:
+      AuthenticatedAdminOrdersOrderIdIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
 
 interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
@@ -783,14 +1381,32 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
+interface AuthenticatedVendorRouteRouteChildren {
+  AuthenticatedVendorOrdersIndexRoute: typeof AuthenticatedVendorOrdersIndexRoute
+}
+
+const AuthenticatedVendorRouteRouteChildren: AuthenticatedVendorRouteRouteChildren =
+  {
+    AuthenticatedVendorOrdersIndexRoute: AuthenticatedVendorOrdersIndexRoute,
+  }
+
+const AuthenticatedVendorRouteRouteWithChildren =
+  AuthenticatedVendorRouteRoute._addFileChildren(
+    AuthenticatedVendorRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedVendorRouteRoute: typeof AuthenticatedVendorRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedCashbackCashbackIdRoute: typeof AuthenticatedCashbackCashbackIdRoute
   AuthenticatedCashbackOrderIdRoute: typeof AuthenticatedCashbackOrderIdRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedItemsNewRoute: typeof AuthenticatedItemsNewRoute
   AuthenticatedLoansLoanIdRoute: typeof AuthenticatedLoansLoanIdRoute
   AuthenticatedStoriesNewRoute: typeof AuthenticatedStoriesNewRoute
+  AuthenticatedUsersUserIdRoute: typeof AuthenticatedUsersUserIdRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedCashbackIndexRoute: typeof AuthenticatedCashbackIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
@@ -798,23 +1414,30 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEmprestimosIndexRoute: typeof AuthenticatedEmprestimosIndexRoute
   AuthenticatedFeesIndexRoute: typeof AuthenticatedFeesIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedItemsIndexRoute: typeof AuthenticatedItemsIndexRoute
   AuthenticatedLoansIndexRoute: typeof AuthenticatedLoansIndexRoute
   AuthenticatedPayableAccountsIndexRoute: typeof AuthenticatedPayableAccountsIndexRoute
   AuthenticatedStoriesIndexRoute: typeof AuthenticatedStoriesIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedItemsItemIdEditRoute: typeof AuthenticatedItemsItemIdEditRoute
   AuthenticatedStoriesStoryIdEditRoute: typeof AuthenticatedStoriesStoryIdEditRoute
+  AuthenticatedItemsItemIdIndexRoute: typeof AuthenticatedItemsItemIdIndexRoute
   AuthenticatedStoriesStoryIdIndexRoute: typeof AuthenticatedStoriesStoryIdIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedVendorRouteRoute: AuthenticatedVendorRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedCashbackCashbackIdRoute: AuthenticatedCashbackCashbackIdRoute,
   AuthenticatedCashbackOrderIdRoute: AuthenticatedCashbackOrderIdRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedItemsNewRoute: AuthenticatedItemsNewRoute,
   AuthenticatedLoansLoanIdRoute: AuthenticatedLoansLoanIdRoute,
   AuthenticatedStoriesNewRoute: AuthenticatedStoriesNewRoute,
+  AuthenticatedUsersUserIdRoute: AuthenticatedUsersUserIdRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedCashbackIndexRoute: AuthenticatedCashbackIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
@@ -822,13 +1445,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEmprestimosIndexRoute: AuthenticatedEmprestimosIndexRoute,
   AuthenticatedFeesIndexRoute: AuthenticatedFeesIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
+  AuthenticatedItemsIndexRoute: AuthenticatedItemsIndexRoute,
   AuthenticatedLoansIndexRoute: AuthenticatedLoansIndexRoute,
   AuthenticatedPayableAccountsIndexRoute:
     AuthenticatedPayableAccountsIndexRoute,
   AuthenticatedStoriesIndexRoute: AuthenticatedStoriesIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedItemsItemIdEditRoute: AuthenticatedItemsItemIdEditRoute,
   AuthenticatedStoriesStoryIdEditRoute: AuthenticatedStoriesStoryIdEditRoute,
+  AuthenticatedItemsItemIdIndexRoute: AuthenticatedItemsItemIdIndexRoute,
   AuthenticatedStoriesStoryIdIndexRoute: AuthenticatedStoriesStoryIdIndexRoute,
 }
 
