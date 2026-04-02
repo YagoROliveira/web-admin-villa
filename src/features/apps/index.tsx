@@ -24,9 +24,9 @@ const route = getRouteApi('/_authenticated/apps/')
 type AppType = 'all' | 'connected' | 'notConnected'
 
 const appText = new Map<AppType, string>([
-  ['all', 'All Apps'],
-  ['connected', 'Connected'],
-  ['notConnected', 'Not Connected'],
+  ['all', 'Todos'],
+  ['connected', 'Conectados'],
+  ['notConnected', 'Não conectados'],
 ])
 
 export function Apps() {
@@ -97,16 +97,16 @@ export function Apps() {
       <Main fixed>
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
-            App Integrations
+            Integrações
           </h1>
           <p className='text-muted-foreground'>
-            Here&apos;s a list of your apps for the integration!
+            Gerencie as integrações e aplicativos conectados ao Villa Market.
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
           <div className='flex flex-col gap-4 sm:my-4 sm:flex-row'>
             <Input
-              placeholder='Filter apps...'
+              placeholder='Filtrar aplicativos...'
               className='h-9 w-40 lg:w-[250px]'
               value={searchTerm}
               onChange={handleSearch}
@@ -116,9 +116,9 @@ export function Apps() {
                 <SelectValue>{appText.get(appType)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Apps</SelectItem>
-                <SelectItem value='connected'>Connected</SelectItem>
-                <SelectItem value='notConnected'>Not Connected</SelectItem>
+                <SelectItem value='all'>Todos</SelectItem>
+                <SelectItem value='connected'>Conectados</SelectItem>
+                <SelectItem value='notConnected'>Não conectados</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -133,13 +133,13 @@ export function Apps() {
               <SelectItem value='asc'>
                 <div className='flex items-center gap-4'>
                   <ArrowUpAZ size={16} />
-                  <span>Ascending</span>
+                  <span>A-Z</span>
                 </div>
               </SelectItem>
               <SelectItem value='desc'>
                 <div className='flex items-center gap-4'>
                   <ArrowDownAZ size={16} />
-                  <span>Descending</span>
+                  <span>Z-A</span>
                 </div>
               </SelectItem>
             </SelectContent>

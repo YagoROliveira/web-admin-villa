@@ -26,6 +26,8 @@ import {
   Calculator,
   Gift,
   Receipt,
+  Tag,
+  UserCheck,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -62,7 +64,7 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
         },
         {
-          title: 'Tasks',
+          title: 'Tarefas',
           url: '/tasks',
           icon: ListTodo,
         },
@@ -103,7 +105,17 @@ export const sidebarData: SidebarData = {
           icon: MessagesSquare,
         },
         {
-          title: 'Users',
+          title: 'Classificados',
+          url: '/classifieds',
+          icon: Tag,
+        },
+        {
+          title: 'Clientes',
+          url: '/admin/customers',
+          icon: UserCheck,
+        },
+        {
+          title: 'Usuários',
           url: '/users',
           icon: Users,
         },

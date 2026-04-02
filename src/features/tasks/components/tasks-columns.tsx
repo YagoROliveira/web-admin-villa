@@ -19,7 +19,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
               : false
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label='Select all'
+        aria-label='Selecionar todos'
         className='translate-y-[2px]'
       />
     ),
@@ -27,7 +27,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='Select row'
+        aria-label='Selecionar linha'
         className='translate-y-[2px]'
       />
     ),
@@ -37,7 +37,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Task' />
+      <DataTableColumnHeader column={column} title='Tarefa' />
     ),
     cell: ({ row }) => <div className='w-[80px]'>{row.getValue('id')}</div>,
     enableSorting: false,
@@ -46,7 +46,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'title',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Title' />
+      <DataTableColumnHeader column={column} title='Título' />
     ),
     cell: ({ row }) => {
       const label = labels.find((label) => label.value === row.original.label)
@@ -91,7 +91,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'priority',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Priority' />
+      <DataTableColumnHeader column={column} title='Prioridade' />
     ),
     cell: ({ row }) => {
       const priority = priorities.find(

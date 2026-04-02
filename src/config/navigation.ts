@@ -88,7 +88,7 @@ export const NAVIGATION_CONFIG: NavGroupConfig[] = [
         always: true,
       },
       {
-        title: 'Tasks',
+        title: 'Tarefas',
         url: '/tasks',
         icon: ListTodo,
         always: true,

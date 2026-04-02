@@ -32,10 +32,10 @@ type TaskMutateDrawerProps = {
 }
 
 const formSchema = z.object({
-  title: z.string().min(1, 'Title is required.'),
-  status: z.string().min(1, 'Please select a status.'),
-  label: z.string().min(1, 'Please select a label.'),
-  priority: z.string().min(1, 'Please choose a priority.'),
+  title: z.string().min(1, 'Título é obrigatório.'),
+  status: z.string().min(1, 'Selecione um status.'),
+  label: z.string().min(1, 'Selecione uma etiqueta.'),
+  priority: z.string().min(1, 'Escolha uma prioridade.'),
 })
 type TaskForm = z.infer<typeof formSchema>
 
@@ -73,12 +73,12 @@ export function TasksMutateDrawer({
     >
       <SheetContent className='flex flex-col'>
         <SheetHeader className='text-start'>
-          <SheetTitle>{isUpdate ? 'Update' : 'Create'} Task</SheetTitle>
+          <SheetTitle>{isUpdate ? 'Editar' : 'Criar'} Tarefa</SheetTitle>
           <SheetDescription>
             {isUpdate
-              ? 'Update the task by providing necessary info.'
-              : 'Add a new task by providing necessary info.'}
-            Click save when you&apos;re done.
+              ? 'Atualize as informações da tarefa.'
+              : 'Preencha as informações para criar uma nova tarefa.'}
+            {' '}Clique em salvar quando terminar.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -92,9 +92,9 @@ export function TasksMutateDrawer({
               name='title'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>Título</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder='Enter a title' />
+                    <Input {...field} placeholder='Digite um título' />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -109,13 +109,13 @@ export function TasksMutateDrawer({
                   <SelectDropdown
                     defaultValue={field.value}
                     onValueChange={field.onChange}
-                    placeholder='Select dropdown'
+                    placeholder='Selecione o status'
                     items={[
-                      { label: 'In Progress', value: 'in progress' },
+                      { label: 'Em andamento', value: 'in progress' },
                       { label: 'Backlog', value: 'backlog' },
-                      { label: 'Todo', value: 'todo' },
-                      { label: 'Canceled', value: 'canceled' },
-                      { label: 'Done', value: 'done' },
+                      { label: 'A fazer', value: 'todo' },
+                      { label: 'Cancelado', value: 'canceled' },
+                      { label: 'Concluído', value: 'done' },
                     ]}
                   />
                   <FormMessage />
@@ -127,7 +127,7 @@ export function TasksMutateDrawer({
               name='label'
               render={({ field }) => (
                 <FormItem className='relative'>
-                  <FormLabel>Label</FormLabel>
+                  <FormLabel>Etiqueta</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -139,14 +139,14 @@ export function TasksMutateDrawer({
                           <RadioGroupItem value='documentation' />
                         </FormControl>
                         <FormLabel className='font-normal'>
-                          Documentation
+                          Documentação
                         </FormLabel>
                       </FormItem>
                       <FormItem className='flex items-center'>
                         <FormControl>
                           <RadioGroupItem value='feature' />
                         </FormControl>
-                        <FormLabel className='font-normal'>Feature</FormLabel>
+                        <FormLabel className='font-normal'>Funcionalidade</FormLabel>
                       </FormItem>
                       <FormItem className='flex items-center'>
                         <FormControl>
@@ -165,7 +165,7 @@ export function TasksMutateDrawer({
               name='priority'
               render={({ field }) => (
                 <FormItem className='relative'>
-                  <FormLabel>Priority</FormLabel>
+                  <FormLabel>Prioridade</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -176,19 +176,19 @@ export function TasksMutateDrawer({
                         <FormControl>
                           <RadioGroupItem value='high' />
                         </FormControl>
-                        <FormLabel className='font-normal'>High</FormLabel>
+                        <FormLabel className='font-normal'>Alta</FormLabel>
                       </FormItem>
                       <FormItem className='flex items-center'>
                         <FormControl>
                           <RadioGroupItem value='medium' />
                         </FormControl>
-                        <FormLabel className='font-normal'>Medium</FormLabel>
+                        <FormLabel className='font-normal'>Média</FormLabel>
                       </FormItem>
                       <FormItem className='flex items-center'>
                         <FormControl>
                           <RadioGroupItem value='low' />
                         </FormControl>
-                        <FormLabel className='font-normal'>Low</FormLabel>
+                        <FormLabel className='font-normal'>Baixa</FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
@@ -200,10 +200,10 @@ export function TasksMutateDrawer({
         </Form>
         <SheetFooter className='gap-2'>
           <SheetClose asChild>
-            <Button variant='outline'>Close</Button>
+            <Button variant='outline'>Fechar</Button>
           </SheetClose>
           <Button form='tasks-form' type='submit'>
-            Save changes
+            Salvar
           </Button>
         </SheetFooter>
       </SheetContent>

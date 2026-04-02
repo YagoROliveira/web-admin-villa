@@ -1,13 +1,12 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-// Base URL da API
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://prod.villamarket.app:8443/wallet-api'
-  : 'http://localhost:9001/wallet-api';
+// Base URL da API — usa a mesma variável de ambiente do villamarket-api
+const API_BASE_URL =
+  import.meta.env.VITE_VILLAMARKET_API_URL || 'http://localhost:5001'
 
 // Instância do axios
 const api = axios.create({
-  baseURL: 'http://localhost:9001/wallet-api',
+  baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

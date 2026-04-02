@@ -26,7 +26,6 @@ const customersSearchSchema = z.object({
 })
 
 export const Route = createFileRoute('/_authenticated/admin/customers/')({
-  beforeLoad: requirePermission('admin.customers.view'),
   validateSearch: customersSearchSchema,
   component: Customers,
 })

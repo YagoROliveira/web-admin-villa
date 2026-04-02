@@ -17,11 +17,11 @@ export const labels = [
   },
   {
     value: 'feature',
-    label: 'Feature',
+    label: 'Funcionalidade',
   },
   {
     value: 'documentation',
-    label: 'Documentation',
+    label: 'Documentação',
   },
 ]
 
@@ -32,22 +32,22 @@ export const statuses = [
     icon: HelpCircle,
   },
   {
-    label: 'Todo',
+    label: 'A fazer',
     value: 'todo' as const,
     icon: Circle,
   },
   {
-    label: 'In Progress',
+    label: 'Em andamento',
     value: 'in progress' as const,
     icon: Timer,
   },
   {
-    label: 'Done',
+    label: 'Concluído',
     value: 'done' as const,
     icon: CheckCircle,
   },
   {
-    label: 'Canceled',
+    label: 'Cancelado',
     value: 'canceled' as const,
     icon: CircleOff,
   },
@@ -55,22 +55,22 @@ export const statuses = [
 
 export const priorities = [
   {
-    label: 'Low',
+    label: 'Baixa',
     value: 'low' as const,
     icon: ArrowDown,
   },
   {
-    label: 'Medium',
+    label: 'Média',
     value: 'medium' as const,
     icon: ArrowRight,
   },
   {
-    label: 'High',
+    label: 'Alta',
     value: 'high' as const,
     icon: ArrowUp,
   },
   {
-    label: 'Critical',
+    label: 'Crítica',
     value: 'critical' as const,
     icon: AlertCircle,
   },

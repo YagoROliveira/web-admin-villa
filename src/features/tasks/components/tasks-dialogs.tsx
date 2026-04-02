@@ -55,15 +55,15 @@ export function TasksDialogs() {
               )
             }}
             className='max-w-md'
-            title={`Delete this task: ${currentRow.id} ?`}
+            title={`Excluir esta tarefa: ${currentRow.id}?`}
             desc={
               <>
-                You are about to delete a task with the ID{' '}
+                Você está prestes a excluir a tarefa com o ID{' '}
                 <strong>{currentRow.id}</strong>. <br />
-                This action cannot be undone.
+                Esta ação não pode ser desfeita.
               </>
             }
-            confirmText='Delete'
+            confirmText='Excluir'
           />
         </>
       )}

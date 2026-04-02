@@ -12,9 +12,14 @@ import {
   TrendingUp,
   Upload,
   Wallet,
+  FileImage,
+  ExternalLink,
+  Loader2,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 import {
   Table,
   TableBody,
@@ -105,6 +110,124 @@ interface LoanDetailsResponse {
   }>
 }
 
+// ─── Helpers ───
+
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string
+  value: React.ReactNode
+}) {
+  return (
+    <div className='flex items-start justify-between gap-4 border-b py-2.5 text-sm last:border-0'>
+      <span className='shrink-0 text-muted-foreground'>{label}</span>
+      <span className='break-all text-right font-medium'>
+        {value || <span className='font-normal italic text-muted-foreground/50'>—</span>}
+      </span>
+    </div>
+  )
+}
+
+function DocRow({
+  doc,
+  formatDateTime,
+}: {
+  doc: {
+    id: string
+    documentType: string
+    documentUrl: string
+    status: string
+    createdAt: string
+  }
+  formatDateTime: (d: string) => string
+}) {
+  const [imgFailed, setImgFailed] = useState(false)
+  const [preview, setPreview] = useState(false)
+
+  return (
+    <>
+      <TableRow
+        className='cursor-pointer select-none hover:bg-muted/50'
+        onClick={() => setPreview((p) => !p)}
+      >
+        {/* Miniatura */}
+        <TableCell className='w-14 py-2'>
+          <div className='group relative size-10 overflow-hidden rounded border bg-muted'>
+            {!imgFailed ? (
+              <img
+                src={doc.documentUrl}
+                alt={doc.documentType}
+                className='size-full object-cover'
+                onError={() => setImgFailed(true)}
+              />
+            ) : (
+              <FileImage className='m-auto size-5 text-muted-foreground' />
+            )}
+          </div>
+        </TableCell>
+
+        {/* Tipo */}
+        <TableCell className='text-sm font-medium'>{doc.documentType || '—'}</TableCell>
+
+        {/* Status */}
+        <TableCell>
+          <Badge variant='outline' className='text-xs'>{doc.status}</Badge>
+        </TableCell>
+
+        {/* Data */}
+        <TableCell className='text-sm text-muted-foreground'>
+          {formatDateTime(doc.createdAt)}
+        </TableCell>
+
+        {/* Ações */}
+        <TableCell className='text-right'>
+          <div className='flex items-center justify-end gap-1.5' onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant='ghost'
+              size='sm'
+              className='h-7 px-2 text-xs'
+              onClick={() => window.open(doc.documentUrl, '_blank')}
+            >
+              <ExternalLink size={12} /> Abrir
+            </Button>
+            <Button
+              variant='ghost'
+              size='sm'
+              className='h-7 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-50'
+              onClick={() => {}}
+            >
+              Aprovar
+            </Button>
+            <Button
+              variant='ghost'
+              size='sm'
+              className='h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50'
+              onClick={() => {}}
+            >
+              Reprovar
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+
+      {/* Linha de prévia expandível */}
+      {preview && (
+        <TableRow>
+          <TableCell colSpan={5} className='bg-muted/30 pb-4 pt-2'>
+            <img
+              src={doc.documentUrl}
+              alt={doc.documentType}
+              className='max-h-72 rounded-md object-contain'
+              onError={() => setImgFailed(true)}
+            />
+          </TableCell>
+        </TableRow>
+      )}
+    </>
+  )
+}
+
 export function LoanDetails() {
   const { loanId } = useParams({ from: '/_authenticated/loans/$loanId' })
   const [loanData, setLoanData] = useState<LoanDetailsResponse | null>(null)
@@ -119,6 +242,13 @@ export function LoanDetails() {
     // Aqui você implementaria a lógica para enviar a alteração para a API
     // Por exemplo: updateLoanStatus(loanId, data.status, data.reason)
   }
+
+  // Função para formatar moeda
+  const formatCurrency = (value: string | number) =>
+    Number(value || 0).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    })
 
   // Função para formatar status do empréstimo
   const formatLoanStatus = (status: string) => {
@@ -257,107 +387,62 @@ export function LoanDetails() {
   useEffect(() => {
     if (!loanId) return
 
+    const controller = new AbortController()
+
     setIsLoading(true)
     setError(null)
 
-    console.log('Buscando dados do empréstimo:', loanId)
-
-    // Vamos tentar primeiro o endpoint que funcionou na listagem
     const url = buildApiUrl(API_CONFIG.ENDPOINTS.LOANS.GET_ANALYSIS_DATA, {
       requestId: loanId,
     })
-    fetch(url)
+
+    fetch(url, { signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) {
           const errorText = await res.text()
-          throw new Error(
-            `Erro ${res.status}: ${res.statusText} - ${errorText}`
-          )
+          throw new Error(`Erro ${res.status}: ${res.statusText} - ${errorText}`)
         }
-
         const data = await res.json()
-        console.log('Data received:', data)
-
-        // A API pode retornar um array ou um objeto direto
         let loanDetail
-
         if (Array.isArray(data)) {
-          // Se for array, procurar pelo ID
           loanDetail = data.find((loan: any) => loan.id === loanId)
         } else if (data && typeof data === 'object') {
-          // Se for objeto direto, usar os dados como estão
           loanDetail = data
         } else {
           throw new Error('Formato de dados inválido')
         }
-
-        if (!loanDetail) {
-          throw new Error('Empréstimo não encontrado')
-        }
-
-        console.log('Loan detail:', loanDetail)
-
-        // Adaptar os dados para o formato esperado
-        const adaptedData = {
-          loanRequested: {
-            id: loanDetail.id || loanId,
-            userName: loanDetail.userName,
-            phone: loanDetail.phone || '',
-            email: loanDetail.email || '',
-            amountRequested: loanDetail.amountRequested,
-            document: loanDetail.document || '',
-            paymentMethod: loanDetail.paymentMethod || '',
-            cidade: loanDetail.cidade || '',
-            estado: loanDetail.estado || '',
-            cep: loanDetail.cep || '',
-            endereco: loanDetail.endereco || '',
-            approvalStatus: loanDetail.approvalStatus,
-            loanStatus: loanDetail.loanStatus || loanDetail.approvalStatus,
-            analysisNotes: loanDetail.analysisNotes || '',
-            step: loanDetail.step || '',
-            valueApproved:
-              loanDetail.valueApproved || loanDetail.amountRequested,
-            installmentAmount: loanDetail.installmentAmount || '0',
-            numberOfInstallments: loanDetail.numberOfInstallments || '1',
-            dueDate: loanDetail.dueDate,
-            bank: loanDetail.bank || '',
-            bank_agency: loanDetail.bank_agency || '',
-            bank_account: loanDetail.bank_account || '',
-            pix_key: loanDetail.pix_key || '',
-            createdAt: loanDetail.createdAt,
-            updatedAt: loanDetail.updatedAt,
-            hireloan: loanDetail.hireloan,
-            loanDocuments: loanDetail.loanDocuments || [],
-            installments: loanDetail.installments || [],
-          },
-          orders: loanDetail.orders || [],
-        }
-
-        console.log('Adapted data:', adaptedData)
-
+        if (!loanDetail) throw new Error('Empréstimo não encontrado')
         setLoanData(loanDetail)
         setIsLoading(false)
       })
       .catch((err) => {
-        console.error('Fetch error:', err)
+        if (err.name === 'AbortError') return
         setError(err.message || 'Erro desconhecido')
         setIsLoading(false)
       })
+
+    return () => controller.abort()
   }, [loanId])
+
+  const pageHeader = (
+    <Header fixed>
+      <Search />
+      <div className='ms-auto flex items-center space-x-4'>
+        <ThemeSwitch />
+        <ConfigDrawer />
+        <ProfileDropdown />
+      </div>
+    </Header>
+  )
 
   if (isLoading) {
     return (
       <>
-        <Header fixed>
-          <Search />
-          <div className='ms-auto flex items-center space-x-4'>
-            <ThemeSwitch />
-            <ConfigDrawer />
-            <ProfileDropdown />
-          </div>
-        </Header>
+        {pageHeader}
         <Main>
-          <div>Carregando...</div>
+          <div className='flex h-64 items-center justify-center'>
+            <Loader2 className='size-8 animate-spin text-muted-foreground' />
+          </div>
         </Main>
       </>
     )
@@ -366,16 +451,12 @@ export function LoanDetails() {
   if (error) {
     return (
       <>
-        <Header fixed>
-          <Search />
-          <div className='ms-auto flex items-center space-x-4'>
-            <ThemeSwitch />
-            <ConfigDrawer />
-            <ProfileDropdown />
-          </div>
-        </Header>
+        {pageHeader}
         <Main>
-          <div className='text-red-500'>Erro: {error}</div>
+          <div className='rounded-lg border border-destructive/30 bg-destructive/10 p-6 text-destructive'>
+            <p className='font-medium'>Erro ao carregar empréstimo</p>
+            <p className='mt-1 text-sm opacity-80'>{error}</p>
+          </div>
         </Main>
       </>
     )
@@ -384,16 +465,11 @@ export function LoanDetails() {
   if (!loanData) {
     return (
       <>
-        <Header fixed>
-          <Search />
-          <div className='ms-auto flex items-center space-x-4'>
-            <ThemeSwitch />
-            <ConfigDrawer />
-            <ProfileDropdown />
-          </div>
-        </Header>
+        {pageHeader}
         <Main>
-          <div>Empréstimo não encontrado</div>
+          <div className='rounded-lg border p-6 text-center text-muted-foreground'>
+            Empréstimo não encontrado.
+          </div>
         </Main>
       </>
     )
@@ -401,158 +477,140 @@ export function LoanDetails() {
 
   return (
     <>
-      <Header fixed>
-        <Search />
-        <div className='ms-auto flex items-center space-x-4'>
-          <ThemeSwitch />
-          <ConfigDrawer />
-          <ProfileDropdown />
-        </div>
-      </Header>
+      {pageHeader}
       <Main>
-        <div className='mb-2 flex flex-wrap items-center justify-between space-y-2 gap-x-4'>
-          <div>
-            <h2 className='text-2xl font-bold tracking-tight'>
-              Detalhes do Empréstimo
-            </h2>
-            <p className='text-muted-foreground'>
-              Solicitação de{' '}
-              {loanData.loanRequested.userName?.toUpperCase() ||
-                'Nome não informado'}
-            </p>
+        {/* Cabeçalho */}
+        <div className='mb-6'>
+          <div className='mb-4 flex flex-wrap items-start justify-between gap-4'>
+            <div>
+              <h2 className='text-2xl font-bold tracking-tight'>
+                Detalhes do Empréstimo
+              </h2>
+              <p className='text-muted-foreground'>
+                Solicitação de{' '}
+                <span className='font-medium text-foreground'>
+                  {loanData.loanRequested.userName?.toUpperCase() || '—'}
+                </span>
+              </p>
+            </div>
+
+            {/* Ações secundárias (sempre visíveis) */}
+            <div className='flex flex-wrap items-center gap-2'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setIsViabilityDialogOpen(true)}
+              >
+                <TrendingUp size={15} />
+                Análise de Viabilidade
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => {}}
+              >
+                <FileText size={15} />
+                Solicitar Dados
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setIsStatusDialogOpen(true)}
+              >
+                <Edit size={15} />
+                Alterar Status
+              </Button>
+              <LoanNotificationDialog
+                loanRequestId={loanData.loanRequested.id}
+                userName={loanData.loanRequested.userName || 'Usuário'}
+                overdueAmount={
+                  loanData.loanRequested.installments
+                    ?.filter((i) => i.dueDate && new Date(i.dueDate) < new Date() && !i.paymentDate)
+                    .reduce((s, i) => s + parseFloat(i.amount || '0'), 0) || 0
+                }
+                overdueDays={
+                  loanData.loanRequested.installments
+                    ?.filter((i) => i.dueDate && new Date(i.dueDate) < new Date() && !i.paymentDate)
+                    .map((i) => Math.ceil(Math.abs(Date.now() - new Date(i.dueDate).getTime()) / 86400000))
+                    .reduce((max, d) => Math.max(max, d), 0) || undefined
+                }
+              />
+            </div>
           </div>
-          <div className='flex flex-wrap gap-2'>
-            <Button
-              variant='outline'
-              className='space-x-1'
-              onClick={() => setIsViabilityDialogOpen(true)}
-            >
-              <span>Análise de Viabilidade</span> <TrendingUp size={18} />
-            </Button>
-            <Button
-              variant='outline'
-              className='space-x-1'
-              onClick={() => {
-                /* implementar ação de solicitar dados */
-              }}
-            >
-              <span>Solicitar Dados</span> <FileText size={18} />
-            </Button>
 
-            {/* Botões de Aprovação/Recusa - só aparecem se o status permitir */}
-            {loanData.loanRequested.approvalStatus?.toLowerCase() ===
-              'pending' && (
-                <>
-                  <LoanApprovalDialog
-                    loanId={loanData.loanRequested.id}
-                    amountRequested={loanData.loanRequested.amountRequested}
-                    userName={
-                      loanData.loanRequested.userName || 'Nome não informado'
-                    }
-                    userId={loanData.loanRequested.id}
-                  >
-                    <Button className='space-x-1 bg-green-600 hover:bg-green-700'>
-                      <CheckCircle size={18} />
-                      <span>Aprovar</span>
-                    </Button>
-                  </LoanApprovalDialog>
+          {/* Ações primárias contextuais */}
+          {(() => {
+            const status = loanData.loanRequested.approvalStatus?.toLowerCase()
+            const loanStatus = loanData.loanRequested.loanStatus?.toLowerCase()
+            const primaryActions = []
 
-                  <LoanRejectionDialog
-                    loanId={loanData.loanRequested.id}
-                    amountRequested={loanData.loanRequested.amountRequested}
-                    userName={
-                      loanData.loanRequested.userName || 'Nome não informado'
-                    }
-                  >
-                    <Button variant='destructive' className='space-x-1'>
-                      <XCircle size={18} />
-                      <span>Rejeitar</span>
-                    </Button>
-                  </LoanRejectionDialog>
-                </>
-              )}
-
-            {/* Botão de Desembolso - aparece para empréstimos aprovados que ainda não foram desembolsados */}
-            {loanData.loanRequested.approvalStatus?.toLowerCase() ===
-              'approved' && (
-                <LoanDisbursementDialog
+            if (status === 'pending') {
+              primaryActions.push(
+                <LoanApprovalDialog
+                  key='approve'
                   loanId={loanData.loanRequested.id}
-                  userName={
-                    loanData.loanRequested.userName || 'Nome não informado'
-                  }
+                  amountRequested={loanData.loanRequested.amountRequested}
+                  userName={loanData.loanRequested.userName || ''}
+                  userId={loanData.loanRequested.id}
+                >
+                  <Button className='bg-green-600 hover:bg-green-700'>
+                    <CheckCircle size={16} /> Aprovar
+                  </Button>
+                </LoanApprovalDialog>,
+                <LoanRejectionDialog
+                  key='reject'
+                  loanId={loanData.loanRequested.id}
+                  amountRequested={loanData.loanRequested.amountRequested}
+                  userName={loanData.loanRequested.userName || ''}
+                >
+                  <Button variant='destructive'>
+                    <XCircle size={16} /> Rejeitar
+                  </Button>
+                </LoanRejectionDialog>
+              )
+            }
+
+            if (status === 'approved') {
+              primaryActions.push(
+                <LoanDisbursementDialog
+                  key='disburse'
+                  loanId={loanData.loanRequested.id}
+                  userName={loanData.loanRequested.userName || ''}
                   valueApproved={loanData.loanRequested.valueApproved}
                   onSuccess={() => window.location.reload()}
                 >
-                  <Button className='space-x-1 bg-green-600 hover:bg-green-700'>
-                    <Wallet size={18} />
-                    <span>Marcar como Desembolsado</span>
+                  <Button className='bg-green-600 hover:bg-green-700'>
+                    <Wallet size={16} /> Marcar como Desembolsado
                   </Button>
                 </LoanDisbursementDialog>
-              )}
+              )
+            }
 
-            {/* Botão de Upload de Comprovante - aparece para empréstimos desembolsados */}
-            {['disbursed', 'active', 'in_progress'].includes(
-              loanData.loanRequested.loanStatus?.toLowerCase()
-            ) && (
+            if (['disbursed', 'active', 'in_progress'].includes(loanStatus ?? '')) {
+              primaryActions.push(
                 <LoanPaymentProofDialog
+                  key='proof'
                   loanId={loanData.loanRequested.id}
-                  userName={
-                    loanData.loanRequested.userName || 'Nome não informado'
-                  }
+                  userName={loanData.loanRequested.userName || ''}
                   amountPaid={loanData.loanRequested.valueApproved}
                   onSuccess={() => window.location.reload()}
                 >
-                  <Button
-                    variant='outline'
-                    className='space-x-1 border-blue-600 text-blue-600 hover:bg-blue-50'
-                  >
-                    <Upload size={18} />
-                    <span>Enviar Comprovante</span>
+                  <Button variant='outline'>
+                    <Upload size={16} /> Enviar Comprovante
                   </Button>
                 </LoanPaymentProofDialog>
-              )}
+              )
+            }
 
-            <Button
-              variant='outline'
-              className='space-x-1'
-              onClick={() => setIsStatusDialogOpen(true)}
-            >
-              <span>Alterar Status</span> <Edit size={18} />
-            </Button>
+            if (primaryActions.length === 0) return null
 
-            {/* Botão de Notificação Manual */}
-            <LoanNotificationDialog
-              loanRequestId={loanData.loanRequested.id}
-              userName={loanData.loanRequested.userName || 'Usuário'}
-              overdueAmount={
-                loanData.loanRequested.installments
-                  ?.filter(
-                    (inst) =>
-                      inst.dueDate &&
-                      new Date(inst.dueDate) < new Date() &&
-                      !inst.paymentDate
-                  )
-                  .reduce((sum, inst) => sum + parseFloat(inst.amount || '0'), 0) || 0
-              }
-              overdueDays={
-                loanData.loanRequested.installments
-                  ?.filter(
-                    (inst) =>
-                      inst.dueDate &&
-                      new Date(inst.dueDate) < new Date() &&
-                      !inst.paymentDate
-                  )
-                  .map((inst) => {
-                    const dueDate = new Date(inst.dueDate)
-                    const today = new Date()
-                    const diffTime = Math.abs(today.getTime() - dueDate.getTime())
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-                    return diffDays
-                  })
-                  .reduce((max, days) => Math.max(max, days), 0) || undefined
-              }
-            />
-          </div>
+            return (
+              <div className='flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 px-4 py-3'>
+                <span className='text-sm font-medium text-muted-foreground'>Ações:</span>
+                {primaryActions}
+              </div>
+            )
+          })()}
         </div>
         {/* Indicador de Status do Empréstimo */}
         <LoanStatusIndicator
@@ -561,346 +619,277 @@ export function LoanDetails() {
           analysisNotes={loanData.loanRequested.analysisNotes}
           className='mb-6'
         />
-        <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
           {/* Dados do Solicitante */}
-          <div className='bg-card rounded-lg border p-6'>
-            <h3 className='mb-4 text-lg font-semibold'>Dados do Solicitante</h3>
-            <div className='space-y-2'>
-              <p>
-                <strong>Nome:</strong>{' '}
-                {loanData.loanRequested.userName?.toUpperCase() ||
-                  'Nome não informado'}
-              </p>
-              <p>
-                <strong>Email:</strong>{' '}
-                {loanData.loanRequested.email || 'Email não informado'}
-              </p>
-              <p>
-                <strong>Telefone:</strong>{' '}
-                {loanData.loanRequested.phone || 'Telefone não informado'}
-              </p>
-              <p>
-                <strong>Documento:</strong>{' '}
-                {loanData.loanRequested.document || 'Documento não informado'}
-              </p>
-              <p>
-                <strong>Endereço:</strong>{' '}
-                {loanData.loanRequested.endereco || 'Endereço não informado'}
-              </p>
-              <p>
-                <strong>Cidade:</strong>{' '}
-                {loanData.loanRequested.cidade || 'Cidade não informada'}
-              </p>
-              <p>
-                <strong>Estado:</strong>{' '}
-                {loanData.loanRequested.estado || 'Estado não informado'}
-              </p>
-              <p>
-                <strong>CEP:</strong>{' '}
-                {loanData.loanRequested.cep || 'CEP não informado'}
-              </p>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className='pb-2'>
+              <CardTitle className='text-base'>Dados do Solicitante</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InfoRow
+                label='Nome'
+                value={loanData.loanRequested.userName?.toUpperCase()}
+              />
+              <InfoRow
+                label='Email'
+                value={loanData.loanRequested.email}
+              />
+              <InfoRow
+                label='Telefone'
+                value={loanData.loanRequested.phone}
+              />
+              <InfoRow
+                label='Documento'
+                value={loanData.loanRequested.document}
+              />
+              <InfoRow
+                label='Endereço'
+                value={loanData.loanRequested.endereco}
+              />
+              <InfoRow
+                label='Cidade / UF'
+                value={
+                  [loanData.loanRequested.cidade, loanData.loanRequested.estado]
+                    .filter(Boolean)
+                    .join(' / ') || null
+                }
+              />
+              <InfoRow
+                label='CEP'
+                value={loanData.loanRequested.cep}
+              />
+            </CardContent>
+          </Card>
 
           {/* Dados do Empréstimo */}
-          <div className='bg-card rounded-lg border p-6'>
-            <h3 className='mb-4 text-lg font-semibold'>Dados do Empréstimo</h3>
-            <div className='space-y-2'>
-              <p>
-                <strong>Valor Solicitado:</strong>{' '}
-                {Number(
-                  loanData.loanRequested.amountRequested || 0
-                ).toLocaleString('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                })}
-              </p>
-              <p>
-                <strong>Valor Aprovado:</strong>{' '}
-                {Number(
-                  loanData.loanRequested.valueApproved || 0
-                ).toLocaleString('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                })}
-              </p>
-              <div className='flex items-center gap-2'>
-                <strong>Status:</strong>
-                {(() => {
-                  const statusInfo = formatLoanStatus(
-                    loanData.loanRequested.approvalStatus
-                  )
+          <Card>
+            <CardHeader className='pb-2'>
+              <CardTitle className='text-base'>Dados do Empréstimo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InfoRow
+                label='Valor Solicitado'
+                value={formatCurrency(loanData.loanRequested.amountRequested)}
+              />
+              <InfoRow
+                label='Valor Aprovado'
+                value={formatCurrency(loanData.loanRequested.valueApproved)}
+              />
+              <InfoRow
+                label='Status'
+                value={(() => {
+                  const s = formatLoanStatus(loanData.loanRequested.approvalStatus)
                   return (
-                    <div className='flex items-center gap-2'>
-                      <statusInfo.icon className='size-4' />
-                      <Badge className={statusInfo.color}>
-                        {statusInfo.label}
-                      </Badge>
+                    <div className='flex items-center gap-1.5'>
+                      <s.icon className='size-3.5' />
+                      <Badge className={s.color}>{s.label}</Badge>
                     </div>
                   )
                 })()}
-              </div>
-              <p>
-                <strong>Parcelas:</strong>{' '}
-                {loanData.loanRequested.numberOfInstallments || 'Não definido'}
-              </p>
-              <p>
-                <strong>Valor da Parcela:</strong>{' '}
-                {Number(
-                  loanData.loanRequested.installmentAmount || 0
-                ).toLocaleString('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                })}
-              </p>
-              <p>
-                <strong>Método de Pagamento:</strong>{' '}
-                {loanData.loanRequested.paymentMethod || 'Não informado'}
-              </p>
-            </div>
-          </div>
+              />
+              <InfoRow
+                label='Parcelas'
+                value={loanData.loanRequested.numberOfInstallments}
+              />
+              <InfoRow
+                label='Valor da Parcela'
+                value={formatCurrency(loanData.loanRequested.installmentAmount)}
+              />
+              <InfoRow
+                label='Forma de Pagamento'
+                value={loanData.loanRequested.paymentMethod}
+              />
+              <InfoRow
+                label='Criado em'
+                value={formatDateTime(loanData.loanRequested.createdAt)}
+              />
+            </CardContent>
+          </Card>
 
           {/* Dados Bancários */}
-          <div className='bg-card rounded-lg border p-6'>
-            <h3 className='mb-4 text-lg font-semibold'>Dados Bancários</h3>
-            <div className='space-y-2'>
-              <p>
-                <strong>Banco:</strong>{' '}
-                {loanData.loanRequested.bank || 'Banco não informado'}
-              </p>
-              <p>
-                <strong>Agência:</strong>{' '}
-                {loanData.loanRequested.bank_agency || 'Agência não informada'}
-              </p>
-              <p>
-                <strong>Conta:</strong>{' '}
-                {loanData.loanRequested.bank_account || 'Conta não informada'}
-              </p>
-              <p>
-                <strong>Chave PIX:</strong>{' '}
-                {loanData.loanRequested.pix_key || 'Chave PIX não informada'}
-              </p>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className='pb-2'>
+              <CardTitle className='text-base'>Dados Bancários</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InfoRow
+                label='Banco'
+                value={loanData.loanRequested.bank}
+              />
+              <InfoRow
+                label='Agência'
+                value={loanData.loanRequested.bank_agency}
+              />
+              <InfoRow
+                label='Conta'
+                value={loanData.loanRequested.bank_account}
+              />
+              <InfoRow
+                label='Chave PIX'
+                value={loanData.loanRequested.pix_key}
+              />
+            </CardContent>
+          </Card>
         </div>
         {/* Documentos */}
         {loanData.loanRequested.loanDocuments &&
           loanData.loanRequested.loanDocuments.length > 0 && (
             <div className='mt-8'>
-              <h3 className='mb-4 text-lg font-semibold'>Documentos</h3>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
-                {loanData.loanRequested.loanDocuments.map((doc) => (
-                  <div key={doc.id} className='bg-card rounded-lg border p-4'>
-                    <div className='mb-3'>
-                      <img
-                        src={doc.documentUrl}
-                        alt={`Documento ${doc.documentType}`}
-                        className='h-32 w-full cursor-pointer rounded object-cover transition-opacity hover:opacity-80'
-                        onClick={() => window.open(doc.documentUrl, '_blank')}
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none'
-                          const nextEl = e.currentTarget
-                            .nextElementSibling as HTMLElement
-                          if (nextEl) nextEl.style.display = 'flex'
-                        }}
+              <h3 className='mb-4 text-lg font-semibold'>
+                Documentos{' '}
+                <span className='ml-1 text-sm font-normal text-muted-foreground'>
+                  ({Array.from(new Map(loanData.loanRequested.loanDocuments.map((d) => [d.id, d])).values()).length})
+                </span>
+              </h3>
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className='w-14'>Prévia</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead className='text-right'>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Array.from(
+                      new Map(
+                        loanData.loanRequested.loanDocuments.map((d) => [d.id, d])
+                      ).values()
+                    ).map((doc) => (
+                      <DocRow
+                        key={doc.id}
+                        doc={doc}
+                        formatDateTime={formatDateTime}
                       />
-                      <div
-                        className='hidden h-32 w-full cursor-pointer items-center justify-center rounded bg-gray-100 transition-colors hover:bg-gray-200'
-                        onClick={() => window.open(doc.documentUrl, '_blank')}
-                      >
-                        <div className='text-center'>
-                          <svg
-                            className='mx-auto mb-2 h-8 w-8 text-gray-400'
-                            fill='none'
-                            stroke='currentColor'
-                            viewBox='0 0 24 24'
-                          >
-                            <path
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              strokeWidth={2}
-                              d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                            />
-                          </svg>
-                          <span className='text-sm text-gray-600'>
-                            Ver Documento
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className='space-y-1'>
-                      <p>
-                        <strong>Tipo:</strong> {doc.documentType}
-                      </p>
-                      <p>
-                        <strong>Status:</strong> {doc.status}
-                      </p>
-                      <p>
-                        <strong>Data:</strong> {formatDateTime(doc.createdAt)}
-                      </p>
-                    </div>
-                    <div className='mt-3 flex gap-2'>
-                      <button
-                        className='flex-1 rounded bg-green-500 px-3 py-1 text-xs text-white transition-colors hover:bg-green-600'
-                        onClick={() => {
-                          /* implementar ação de aprovar */
-                        }}
-                      >
-                        Aprovar
-                      </button>
-                      <button
-                        className='flex-1 rounded bg-red-500 px-3 py-1 text-xs text-white transition-colors hover:bg-red-600'
-                        onClick={() => {
-                          /* implementar ação de reprovar */
-                        }}
-                      >
-                        Reprovar
-                      </button>
-                      <button
-                        className='flex-1 rounded bg-blue-500 px-3 py-1 text-xs text-white transition-colors hover:bg-blue-600'
-                        onClick={() => {
-                          /* implementar ação de solicitar novo documento */
-                        }}
-                      >
-                        Solicitar Novo
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
             </div>
-          )}{' '}
+          )}
         {/* Parcelas */}
         {loanData.loanRequested.installments &&
           loanData.loanRequested.installments.length > 0 && (
             <div className='mt-8'>
               <h3 className='mb-4 text-lg font-semibold'>Parcelas</h3>
-              <div className='overflow-hidden rounded-md border'>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Parcela</TableHead>
-                      <TableHead>Valor Original</TableHead>
-                      <TableHead>Valor Atual</TableHead>
-                      <TableHead>Vencimento</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Data Pagamento</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loanData.loanRequested.installments.map((installment) => {
-                      const paymentStatus = installment.paymentDate
-                        ? 'paid'
-                        : installment.daysLate && installment.daysLate > 0
-                          ? 'overdue'
-                          : 'pending'
-                      const statusInfo = formatPaymentStatus(paymentStatus)
+              <Card>
+                <div className='overflow-hidden rounded-lg'>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className='w-20'>Nº</TableHead>
+                        <TableHead>Valor Original</TableHead>
+                        <TableHead>Valor Atual</TableHead>
+                        <TableHead>Vencimento</TableHead>
+                        <TableHead>Pagamento</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {loanData.loanRequested.installments.map((installment) => {
+                        const paymentStatus = installment.paymentDate
+                          ? 'paid'
+                          : installment.daysLate && installment.daysLate > 0
+                            ? 'overdue'
+                            : 'pending'
+                        const statusInfo = formatPaymentStatus(paymentStatus)
 
-                      return (
-                        <TableRow key={installment.id}>
-                          <TableCell>{installment.installment}</TableCell>
-                          <TableCell>
-                            {Number(installment.originAmount).toLocaleString(
-                              'pt-BR',
-                              { style: 'currency', currency: 'BRL' }
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {Number(installment.amount).toLocaleString(
-                              'pt-BR',
-                              { style: 'currency', currency: 'BRL' }
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {formatDateTime(installment.dueDate)}
-                          </TableCell>
-                          <TableCell>
-                            <div className='flex items-center gap-2'>
-                              <statusInfo.icon className='size-4' />
-                              <Badge className={statusInfo.color}>
-                                {statusInfo.label}
-                              </Badge>
-                              {installment.daysLate &&
-                                installment.daysLate > 0 && (
-                                  <span className='text-sm text-red-600'>
-                                    ({installment.daysLate} dias)
+                        return (
+                          <TableRow key={installment.id}>
+                            <TableCell className='font-medium'>
+                              {installment.installment}
+                            </TableCell>
+                            <TableCell>
+                              {formatCurrency(installment.originAmount)}
+                            </TableCell>
+                            <TableCell>
+                              {formatCurrency(installment.amount)}
+                            </TableCell>
+                            <TableCell>
+                              {formatDateTime(installment.dueDate)}
+                            </TableCell>
+                            <TableCell>
+                              {installment.paymentDate
+                                ? formatDateTime(installment.paymentDate)
+                                : <span className='text-muted-foreground'>—</span>}
+                            </TableCell>
+                            <TableCell>
+                              <div className='flex items-center gap-1.5'>
+                                <statusInfo.icon className='size-3.5' />
+                                <Badge className={statusInfo.color}>
+                                  {statusInfo.label}
+                                </Badge>
+                                {installment.daysLate && installment.daysLate > 0 && (
+                                  <span className='text-xs text-red-600'>
+                                    ({installment.daysLate}d)
                                   </span>
                                 )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {installment.paymentDate
-                              ? formatDateTime(installment.paymentDate)
-                              : '-'}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </Card>
             </div>
           )}
         {/* Histórico de Pedidos */}
         {loanData.orders && loanData.orders.length > 0 && (
           <div className='mt-8'>
             <h3 className='mb-4 text-lg font-semibold'>Histórico de Pedidos</h3>
-            <div className='overflow-hidden rounded-md border'>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Status Pagamento</TableHead>
-                    <TableHead>Status Pedido</TableHead>
-                    <TableHead>Método Pagamento</TableHead>
-                    <TableHead>Data Criação</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loanData.orders.map((order) => {
-                    const paymentStatusInfo = formatPaymentStatus(
-                      order.payment_status
-                    )
-                    const orderStatusInfo = formatOrderStatus(
-                      order.order_status
-                    )
+            <Card>
+              <div className='overflow-hidden rounded-lg'>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className='w-28'>ID</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Pgto</TableHead>
+                      <TableHead>Pedido</TableHead>
+                      <TableHead>Método</TableHead>
+                      <TableHead>Data</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loanData.orders.map((order) => {
+                      const paymentStatusInfo = formatPaymentStatus(order.payment_status)
+                      const orderStatusInfo = formatOrderStatus(order.order_status)
 
-                    return (
-                      <TableRow key={order.id}>
-                        <TableCell>{order.id}</TableCell>
-                        <TableCell>
-                          {Number(order.order_amount).toLocaleString('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL',
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          <div className='flex items-center gap-2'>
-                            <paymentStatusInfo.icon className='size-4' />
-                            <Badge className={paymentStatusInfo.color}>
-                              {paymentStatusInfo.label}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className='flex items-center gap-2'>
-                            <orderStatusInfo.icon className='size-4' />
-                            <Badge className={orderStatusInfo.color}>
-                              {orderStatusInfo.label}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell>{order.payment_method}</TableCell>
-                        <TableCell>
-                          {formatDateTime(order.created_at)}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+                      return (
+                        <TableRow key={order.id}>
+                          <TableCell className='font-mono text-xs text-muted-foreground'>
+                            {String(order.id).slice(0, 8)}…
+                          </TableCell>
+                          <TableCell>{formatCurrency(order.order_amount)}</TableCell>
+                          <TableCell>
+                            <div className='flex items-center gap-1.5'>
+                              <paymentStatusInfo.icon className='size-3.5' />
+                              <Badge className={paymentStatusInfo.color}>
+                                {paymentStatusInfo.label}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className='flex items-center gap-1.5'>
+                              <orderStatusInfo.icon className='size-3.5' />
+                              <Badge className={orderStatusInfo.color}>
+                                {orderStatusInfo.label}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell>{order.payment_method}</TableCell>
+                          <TableCell>{formatDateTime(order.created_at)}</TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </Card>
           </div>
         )}
       </Main>

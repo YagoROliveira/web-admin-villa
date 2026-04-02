@@ -26,11 +26,11 @@ const formSchema = z.object({
   file: z
     .instanceof(FileList)
     .refine((files) => files.length > 0, {
-      message: 'Please upload a file',
+      message: 'Selecione um arquivo',
     })
     .refine(
       (files) => ['text/csv'].includes(files?.[0]?.type),
-      'Please upload csv format.'
+      'Envie um arquivo no formato CSV.'
     ),
 })
 
@@ -74,9 +74,9 @@ export function TasksImportDialog({
     >
       <DialogContent className='gap-2 sm:max-w-sm'>
         <DialogHeader className='text-start'>
-          <DialogTitle>Import Tasks</DialogTitle>
+          <DialogTitle>Importar Tarefas</DialogTitle>
           <DialogDescription>
-            Import tasks quickly from a CSV file.
+            Importe tarefas rapidamente a partir de um arquivo CSV.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -86,7 +86,7 @@ export function TasksImportDialog({
               name='file'
               render={() => (
                 <FormItem className='my-2'>
-                  <FormLabel>File</FormLabel>
+                  <FormLabel>Arquivo</FormLabel>
                   <FormControl>
                     <Input type='file' {...fileRef} className='h-8 py-0' />
                   </FormControl>
@@ -98,10 +98,10 @@ export function TasksImportDialog({
         </Form>
         <DialogFooter className='gap-2'>
           <DialogClose asChild>
-            <Button variant='outline'>Close</Button>
+            <Button variant='outline'>Fechar</Button>
           </DialogClose>
           <Button type='submit' form='task-import-form'>
-            Import
+            Importar
           </Button>
         </DialogFooter>
       </DialogContent>
