@@ -35,7 +35,6 @@ import {
 import { useAuthStore } from '@/stores/auth-store'
 import {
   itemFormSchema,
-  type Item,
   type ItemFormValues,
 } from '../data/schema'
 import {
@@ -96,7 +95,9 @@ export function ItemFormPage({ itemId }: ItemFormPageProps) {
       discount: null,
       tax: 0,
       stock: 0,
+      stockType: 'unlimited',
       maxCartQty: undefined,
+      isActive: true,
       isVeg: false,
       isHalal: false,
       isOrganic: false,
@@ -105,6 +106,12 @@ export function ItemFormPage({ itemId }: ItemFormPageProps) {
       availableFrom: '',
       availableTo: '',
       tags: [],
+      addonIds: [],
+      variations: undefined,
+      allergyIds: [],
+      attributes: [],
+      isPrescriptionRequired: false,
+      isBasic: false,
     },
   })
 
@@ -124,6 +131,7 @@ export function ItemFormPage({ itemId }: ItemFormPageProps) {
         tax: existingItem.tax != null ? Number(existingItem.tax) : 0,
         stock: existingItem.stock ?? 0,
         maxCartQty: existingItem.maxCartQty ?? undefined,
+        isActive: existingItem.isActive,
         isVeg: existingItem.isVeg ?? false,
         isHalal: existingItem.isHalal ?? false,
         isOrganic: existingItem.isOrganic ?? false,
@@ -132,6 +140,8 @@ export function ItemFormPage({ itemId }: ItemFormPageProps) {
         availableFrom: existingItem.availableFrom ?? '',
         availableTo: existingItem.availableTo ?? '',
         tags: existingItem.tags?.map((t) => t.tag) ?? [],
+        addonIds: existingItem.addOnIds ?? [],
+        variations: existingItem.variations ?? undefined,
       })
     }
   }, [existingItem, isUpdate, form])
@@ -173,6 +183,15 @@ export function ItemFormPage({ itemId }: ItemFormPageProps) {
         ...moduleOptions,
       ]
       : moduleOptions
+
+  // Determine module type from the selected module option (uses moduleOptionsWithCurrent which is now defined)
+  const selectedModuleId = form.watch('moduleId')
+  const selectedModule = moduleOptionsWithCurrent.find((o) => o.value === selectedModuleId)
+  const moduleType: string = ((selectedModule as any)?.description ?? '').toLowerCase()
+  const isFood = moduleType.includes('food') || moduleType.includes('restaur')
+  const isGrocery = moduleType.includes('grocery') || moduleType.includes('shop') || moduleType.includes('supermarket')
+  const isPharmacy = moduleType.includes('pharmacy') || moduleType.includes('pharma')
+  const isEcommerce = moduleType.includes('ecommerce') || moduleType.includes('e-commerce')
 
   const handleSubmit = (data: ItemFormValues) => {
     // Clean empty optional fields
@@ -629,6 +648,7 @@ export function ItemFormPage({ itemId }: ItemFormPageProps) {
             <CardContent>
               <div className='grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3'>
                 {([
+                  { name: 'isActive' as const, label: 'Ativo' },
                   { name: 'isVeg' as const, label: 'Vegetariano' },
                   { name: 'isHalal' as const, label: 'Halal' },
                   { name: 'isOrganic' as const, label: 'Orgânico' },
@@ -655,6 +675,113 @@ export function ItemFormPage({ itemId }: ItemFormPageProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* ─── Estoque (Grocery / Ecommerce) ─── */}
+          {(isGrocery || isEcommerce) && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Controle de Estoque</CardTitle>
+                <CardDescription>
+                  Configurações de estoque para produtos físicos.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                <FormField
+                  control={form.control}
+                  name='stockType'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Estoque</FormLabel>
+                      <FormControl>
+                        <select
+                          {...field}
+                          value={field.value ?? 'unlimited'}
+                          className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+                        >
+                          <option value='unlimited'>Ilimitado</option>
+                          <option value='fixed'>Fixo (controlar estoque)</option>
+                        </select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {form.watch('stockType') === 'fixed' && (
+                  <div className='grid grid-cols-2 gap-4'>
+                    <FormField
+                      control={form.control}
+                      name='stock'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Estoque Atual</FormLabel>
+                          <FormControl>
+                            <Input {...field} type='number' min='0' />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='minimumStockWarning'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Aviso estoque mínimo</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type='number'
+                              min='0'
+                              value={field.value ?? ''}
+                              placeholder='Ex: 5'
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ─── Farmácia ─── */}
+          {isPharmacy && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Informações Farmacêuticas</CardTitle>
+                <CardDescription>
+                  Dados específicos para produtos de farmácia.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className='space-y-4'>
+                <div className='grid grid-cols-2 gap-4'>
+                  {([
+                    { name: 'isBasic' as const, label: 'Produto básico' },
+                    { name: 'isPrescriptionRequired' as const, label: 'Requer prescrição' },
+                  ]).map(({ name, label }) => (
+                    <FormField
+                      key={name}
+                      control={form.control}
+                      name={name}
+                      render={({ field }) => (
+                        <FormItem className='flex items-center gap-3'>
+                          <FormControl>
+                            <Switch
+                              checked={field.value ?? false}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel className='!mt-0'>{label}</FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* ─── Tags ─── */}
           <Card>

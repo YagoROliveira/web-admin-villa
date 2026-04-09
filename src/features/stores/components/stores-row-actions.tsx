@@ -1,7 +1,7 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import type { Row } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
-import { Pencil, Trash2, Power, CheckCircle, Star } from 'lucide-react'
+import { Eye, Pencil, Trash2, Power, CheckCircle, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -46,6 +46,20 @@ export function StoresRowActions({ row }: StoresRowActionsProps) {
         <DropdownMenuItem
           onClick={() =>
             navigate({
+              to: '/admin/stores/$storeId',
+              params: { storeId: store.id },
+            })
+          }
+        >
+          <Eye className='mr-2 h-4 w-4' />
+          Ver Detalhes
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={() =>
+            navigate({
               to: '/admin/stores/$storeId/edit',
               params: { storeId: store.id },
             })
@@ -58,7 +72,7 @@ export function StoresRowActions({ row }: StoresRowActionsProps) {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onClick={() => toggleActive.mutate(store.id)}
+          onClick={() => toggleActive.mutate({ id: store.id, value: !store.isActive })}
           disabled={toggleActive.isPending}
         >
           <Power className='mr-2 h-4 w-4' />
@@ -66,7 +80,7 @@ export function StoresRowActions({ row }: StoresRowActionsProps) {
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          onClick={() => toggleApproved.mutate(store.id)}
+          onClick={() => toggleApproved.mutate({ id: store.id, value: !store.isApproved })}
           disabled={toggleApproved.isPending}
         >
           <CheckCircle className='mr-2 h-4 w-4' />
@@ -74,7 +88,7 @@ export function StoresRowActions({ row }: StoresRowActionsProps) {
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          onClick={() => toggleFeatured.mutate(store.id)}
+          onClick={() => toggleFeatured.mutate({ id: store.id, value: !store.isFeatured })}
           disabled={toggleFeatured.isPending}
         >
           <Star className='mr-2 h-4 w-4' />

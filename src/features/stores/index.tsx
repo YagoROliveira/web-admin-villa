@@ -5,6 +5,14 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useStores, useStoreStats } from './hooks/use-stores'
 import { StoresProvider } from './components/stores-provider'
 import { StoresTable } from './components/stores-table'
@@ -16,12 +24,13 @@ export function Stores() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize] = useState(25)
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
 
   const {
     data: storesData,
     isLoading,
     isFetching,
-  } = useStores(currentPage, pageSize, searchQuery)
+  } = useStores(currentPage, pageSize, searchQuery, statusFilter)
 
   const { data: stats, isLoading: statsLoading } = useStoreStats()
 
@@ -51,8 +60,8 @@ export function Stores() {
         {/* Stats cards */}
         <StoresStatsCards stats={stats} isLoading={statsLoading} />
 
-        {/* Search */}
-        <div className='my-4 flex items-center gap-4'>
+        {/* Filters */}
+        <div className='my-4 flex flex-wrap items-center gap-3'>
           <Input
             placeholder='Buscar lojas...'
             value={searchQuery}
@@ -60,23 +69,40 @@ export function Stores() {
               setSearchQuery(e.target.value)
               setCurrentPage(1)
             }}
-            className='max-w-sm'
+            className='max-w-xs'
           />
+          <Select
+            value={statusFilter || 'all'}
+            onValueChange={(v) => { setStatusFilter(v === 'all' ? '' : v); setCurrentPage(1) }}
+          >
+            <SelectTrigger className='w-40'>
+              <SelectValue placeholder='Status' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>Todos</SelectItem>
+              <SelectItem value='active'>Ativas</SelectItem>
+              <SelectItem value='inactive'>Inativas</SelectItem>
+              <SelectItem value='pending'>Pendentes</SelectItem>
+            </SelectContent>
+          </Select>
+          {(searchQuery || statusFilter) && (
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={() => { setSearchQuery(''); setStatusFilter(''); setCurrentPage(1) }}
+            >
+              Limpar filtros
+            </Button>
+          )}
           {isFetching && (
             <span className='text-muted-foreground text-sm'>Carregando...</span>
           )}
         </div>
 
         {/* Table */}
-        {isLoading ? (
-          <div className='flex items-center justify-center py-12'>
-            <span className='text-muted-foreground'>Carregando lojas...</span>
-          </div>
-        ) : (
-          <div className='-mx-4 flex-1 overflow-auto px-4 py-1'>
-            <StoresTable data={stores} />
-          </div>
-        )}
+        <div className='-mx-4 flex-1 overflow-auto px-4 py-1'>
+          <StoresTable data={stores} isLoading={isLoading} />
+        </div>
 
         {/* Pagination info */}
         {storesData && (
@@ -85,20 +111,22 @@ export function Stores() {
               Página {storesData.page} de {storesData.totalPages} ({storesData.total} lojas)
             </span>
             <div className='flex gap-2'>
-              <button
-                className='rounded border px-3 py-1 text-sm disabled:opacity-50'
+              <Button
+                variant='outline'
+                size='sm'
                 disabled={currentPage <= 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
               >
                 Anterior
-              </button>
-              <button
-                className='rounded border px-3 py-1 text-sm disabled:opacity-50'
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
                 disabled={currentPage >= storesData.totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
               >
                 Próxima
-              </button>
+              </Button>
             </div>
           </div>
         )}

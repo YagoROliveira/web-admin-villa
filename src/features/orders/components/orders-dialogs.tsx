@@ -35,16 +35,16 @@ import {
 
 // ─── Status transitions allowed (simplified for frontend) ────────────
 const STATUS_TRANSITIONS: Record<string, string[]> = {
-  PENDING: ['CONFIRMED', 'CANCELED'],
-  CONFIRMED: ['PROCESSING', 'CANCELED'],
-  PROCESSING: ['HANDOVER', 'CANCELED'],
-  HANDOVER: ['PICKED_UP', 'CANCELED'],
-  PICKED_UP: ['DELIVERED', 'CANCELED'],
-  DELIVERED: [],
-  CANCELED: [],
-  FAILED: [],
-  REFUND_REQUESTED: ['REFUNDED'],
-  REFUNDED: [],
+  pending: ['accepted', 'canceled'],
+  accepted: ['processing', 'canceled'],
+  processing: ['handover', 'canceled'],
+  handover: ['picked_up', 'canceled'],
+  picked_up: ['delivered', 'canceled'],
+  delivered: [],
+  canceled: [],
+  failed: [],
+  requested: ['refunded'],
+  refunded: [],
 }
 
 // ─── Change Status Dialog ────────────────────────────────────────────
@@ -57,7 +57,7 @@ export function ChangeStatusDialog() {
 
   const isOpen = dialogOpen === 'status' && !!selectedOrder
   const allowedStatuses = selectedOrder
-    ? STATUS_TRANSITIONS[selectedOrder.status] ?? []
+    ? STATUS_TRANSITIONS[selectedOrder.order_status] ?? []
     : []
 
   function handleClose() {
@@ -69,7 +69,7 @@ export function ChangeStatusDialog() {
   function handleConfirm() {
     if (!selectedOrder || !newStatus) return
     updateStatus.mutate(
-      { orderId: selectedOrder.id, status: newStatus },
+      { orderId: String(selectedOrder.id), orderStatus: newStatus },
       { onSuccess: handleClose }
     )
   }
@@ -80,13 +80,13 @@ export function ChangeStatusDialog() {
         <DialogHeader>
           <DialogTitle>Alterar Status do Pedido</DialogTitle>
           <DialogDescription>
-            Pedido #{selectedOrder?.trackingId?.substring(0, 8).toUpperCase()}
+            Pedido #{selectedOrder?.id}
             {' — Status atual: '}
             <Badge
-              className={`${ORDER_STATUS_LABELS[selectedOrder?.status ?? '']?.color ?? ''} border-0`}
+              className={`${ORDER_STATUS_LABELS[selectedOrder?.order_status ?? '']?.color ?? ''} border-0`}
             >
-              {ORDER_STATUS_LABELS[selectedOrder?.status ?? '']?.label ??
-                selectedOrder?.status}
+              {ORDER_STATUS_LABELS[selectedOrder?.order_status ?? '']?.label ??
+                selectedOrder?.order_status}
             </Badge>
           </DialogDescription>
         </DialogHeader>
@@ -153,7 +153,7 @@ export function CancelOrderDialog() {
   function handleConfirm() {
     if (!selectedOrder) return
     cancelOrder.mutate(
-      { orderId: selectedOrder.id, reason },
+      { orderId: String(selectedOrder.id), reason },
       { onSuccess: handleClose }
     )
   }
@@ -165,7 +165,7 @@ export function CancelOrderDialog() {
           <DialogTitle>Cancelar Pedido</DialogTitle>
           <DialogDescription>
             Tem certeza que deseja cancelar o pedido{' '}
-            <strong>#{selectedOrder?.trackingId?.substring(0, 8).toUpperCase()}</strong>?
+            <strong>#{selectedOrder?.id}</strong>?
             Esta ação não pode ser desfeita.
           </DialogDescription>
         </DialogHeader>
@@ -219,7 +219,7 @@ export function AssignDeliveryManDialog() {
   function handleConfirm() {
     if (!selectedOrder || !deliveryManId) return
     assignDM.mutate(
-      { orderId: selectedOrder.id, deliveryManId },
+      { orderId: String(selectedOrder.id), deliveryManId },
       { onSuccess: handleClose }
     )
   }
@@ -230,11 +230,11 @@ export function AssignDeliveryManDialog() {
         <DialogHeader>
           <DialogTitle>Atribuir Entregador</DialogTitle>
           <DialogDescription>
-            Pedido #{selectedOrder?.trackingId?.substring(0, 8).toUpperCase()}
-            {selectedOrder?.deliveryMan && (
+            Pedido #{selectedOrder?.id}
+            {selectedOrder?.delivery_man_id && (
               <>
-                {' — Entregador atual: '}
-                <strong>{selectedOrder.deliveryMan.name}</strong>
+                {' — Entregador atual: #'}
+                <strong>{selectedOrder.delivery_man_id}</strong>
               </>
             )}
           </DialogDescription>
@@ -286,12 +286,12 @@ export function OrderDetailDialog() {
 
   if (!selectedOrder) return null
 
-  const statusInfo = ORDER_STATUS_LABELS[selectedOrder.status] ?? {
-    label: selectedOrder.status,
+  const statusInfo = ORDER_STATUS_LABELS[selectedOrder.order_status] ?? {
+    label: selectedOrder.order_status,
     color: 'bg-gray-100 text-gray-800',
   }
-  const paymentInfo = PAYMENT_STATUS_LABELS[selectedOrder.paymentStatus] ?? {
-    label: selectedOrder.paymentStatus,
+  const paymentInfo = PAYMENT_STATUS_LABELS[selectedOrder.payment_status] ?? {
+    label: selectedOrder.payment_status,
     color: 'bg-gray-100 text-gray-800',
   }
 
@@ -305,11 +305,11 @@ export function OrderDetailDialog() {
       <DialogContent className='max-h-[80vh] overflow-y-auto sm:max-w-[600px]'>
         <DialogHeader>
           <DialogTitle>
-            Pedido #{selectedOrder.trackingId?.substring(0, 8).toUpperCase()}
+            Pedido #{selectedOrder.id.substring(0, 8).toUpperCase()}
           </DialogTitle>
           <DialogDescription>
             Criado em{' '}
-            {new Date(selectedOrder.createdAt).toLocaleString('pt-BR')}
+            {new Date(selectedOrder.created_at).toLocaleString('pt-BR')}
           </DialogDescription>
         </DialogHeader>
 
@@ -323,11 +323,11 @@ export function OrderDetailDialog() {
               {paymentInfo.label}
             </Badge>
             <Badge variant='outline'>
-              {ORDER_TYPE_LABELS[selectedOrder.orderType] ?? selectedOrder.orderType}
+              {ORDER_TYPE_LABELS[selectedOrder.order_type] ?? selectedOrder.order_type}
             </Badge>
             <Badge variant='outline'>
-              {PAYMENT_METHOD_LABELS[selectedOrder.paymentMethod] ??
-                selectedOrder.paymentMethod}
+              {PAYMENT_METHOD_LABELS[selectedOrder.payment_method] ??
+                selectedOrder.payment_method}
             </Badge>
           </div>
 
@@ -347,90 +347,83 @@ export function OrderDetailDialog() {
             <div>
               <Label className='text-muted-foreground text-xs'>Cliente</Label>
               <p className='text-sm font-medium'>
-                {selectedOrder.user?.name ?? 'Convidado'}
+                {selectedOrder.customer_name ?? selectedOrder.customer?.f_name ?? 'Convidado'}
               </p>
-              {selectedOrder.user?.phone && (
+              {selectedOrder.customer_phone && (
                 <p className='text-muted-foreground text-xs'>
-                  {selectedOrder.user.phone}
+                  {selectedOrder.customer_phone}
                 </p>
               )}
             </div>
           </div>
 
           {/* Delivery Man */}
-          {selectedOrder.deliveryMan && (
+          {selectedOrder.delivery_man_id && (
             <div>
               <Label className='text-muted-foreground text-xs'>
                 Entregador
               </Label>
               <p className='text-sm font-medium'>
-                {selectedOrder.deliveryMan.name}
+                ID: {selectedOrder.delivery_man_id}
               </p>
-              {selectedOrder.deliveryMan.phone && (
-                <p className='text-muted-foreground text-xs'>
-                  {selectedOrder.deliveryMan.phone}
-                </p>
-              )}
             </div>
           )}
 
           {/* Amounts */}
-          {selectedOrder.amounts && (
-            <div className='rounded-lg border p-3'>
-              <Label className='text-muted-foreground mb-2 block text-xs'>
-                Valores
-              </Label>
-              <div className='grid grid-cols-2 gap-1 text-sm'>
-                <span>Subtotal:</span>
-                <span className='text-right'>
-                  {formatCurrency(selectedOrder.amounts.subtotal)}
-                </span>
-                <span>Taxa de entrega:</span>
-                <span className='text-right'>
-                  {formatCurrency(selectedOrder.amounts.deliveryFee)}
-                </span>
-                {selectedOrder.amounts.discount > 0 && (
-                  <>
-                    <span>Desconto:</span>
-                    <span className='text-right text-red-600'>
-                      -{formatCurrency(selectedOrder.amounts.discount)}
-                    </span>
-                  </>
-                )}
-                {selectedOrder.amounts.tax > 0 && (
-                  <>
-                    <span>Impostos:</span>
-                    <span className='text-right'>
-                      {formatCurrency(selectedOrder.amounts.tax)}
-                    </span>
-                  </>
-                )}
-                <span className='font-bold'>Total:</span>
-                <span className='text-right font-bold'>
-                  {formatCurrency(selectedOrder.amounts.total)}
-                </span>
-              </div>
+          <div className='rounded-lg border p-3'>
+            <Label className='text-muted-foreground mb-2 block text-xs'>
+              Valores
+            </Label>
+            <div className='grid grid-cols-2 gap-1 text-sm'>
+              <span>Subtotal:</span>
+              <span className='text-right'>
+                {formatCurrency(selectedOrder.amount_after_discount ?? selectedOrder.order_amount)}
+              </span>
+              <span>Taxa de entrega:</span>
+              <span className='text-right'>
+                {formatCurrency(selectedOrder.delivery_charge)}
+              </span>
+              {(selectedOrder.coupon_discount_amount ?? 0) > 0 && (
+                <>
+                  <span>Desconto:</span>
+                  <span className='text-right text-red-600'>
+                    -{formatCurrency(selectedOrder.coupon_discount_amount)}
+                  </span>
+                </>
+              )}
+              {(selectedOrder.total_tax_amount ?? 0) > 0 && (
+                <>
+                  <span>Impostos:</span>
+                  <span className='text-right'>
+                    {formatCurrency(selectedOrder.total_tax_amount)}
+                  </span>
+                </>
+              )}
+              <span className='font-bold'>Total:</span>
+              <span className='text-right font-bold'>
+                {formatCurrency(selectedOrder.order_amount)}
+              </span>
             </div>
-          )}
+          </div>
 
           {/* Note */}
-          {selectedOrder.note && (
+          {selectedOrder.order_note && (
             <div>
               <Label className='text-muted-foreground text-xs'>
                 Observação
               </Label>
-              <p className='text-sm'>{selectedOrder.note}</p>
+              <p className='text-sm'>{selectedOrder.order_note}</p>
             </div>
           )}
 
           {/* Cancel reason */}
-          {selectedOrder.cancelReason && (
+          {selectedOrder.cancellation_reason && (
             <div>
               <Label className='text-muted-foreground text-xs'>
                 Motivo do cancelamento
               </Label>
               <p className='text-destructive text-sm'>
-                {selectedOrder.cancelReason}
+                {selectedOrder.cancellation_reason}
               </p>
             </div>
           )}

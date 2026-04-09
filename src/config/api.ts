@@ -107,16 +107,12 @@ export const VM_API = {
 
     // ─── Orders ───
     ORDERS: {
-      LIST: '/v1/orders',
-      GET: (id: string) => `/v1/orders/${id}`,
-      MY: '/v1/orders/my',
-      BY_STORE: (storeId: string) => `/v1/orders/store/${storeId}`,
-      STATS: '/v1/orders/stats',
-      UPDATE_STATUS: (id: string) => `/v1/orders/${id}/status`,
-      UPDATE_AMOUNTS: (id: string) => `/v1/orders/${id}/amounts`,
-      UPDATE_NOTE: (id: string) => `/v1/orders/${id}/note`,
-      ASSIGN_DM: (id: string) => `/v1/orders/${id}/assign`,
-      CANCEL: (id: string) => `/v1/orders/${id}/cancel`,
+      LIST: '/admin/stores/orders-with-costs',
+      GET: (id: string) => `/order/details/${id}`,
+      BY_STORE: (storeId: string) => `/admin/stores/orders-with-costs?store_id=${storeId}`,
+      UPDATE_PAYMENT_STATUS: '/order/payment-status',
+      ADD_DELIVERY_MAN: (orderId: string, dmId: string) => `/order/add-delivery-man/${orderId}/${dmId}`,
+      EXPORT: (fileType: string, status: string, type: string) => `/order/export-orders/${fileType}/${status}/${type}`,
     },
 
     // ─── Payments ───

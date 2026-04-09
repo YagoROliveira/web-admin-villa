@@ -1,6 +1,8 @@
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { useItemsContext } from './items-provider'
 import { useDeleteItem } from '../hooks/use-items'
+import { ItemsImportDialog } from './items-import-dialog'
+import { ItemsStockDialog } from './items-stock-dialog'
 
 export function ItemsDialogs() {
   const { open, setOpen, currentRow, setCurrentRow } = useItemsContext()
@@ -8,7 +10,7 @@ export function ItemsDialogs() {
 
   return (
     <>
-      {/* Delete confirmation only — create/edit are now full pages */}
+      {/* Delete confirmation */}
       {currentRow && (
         <ConfirmDialog
           key='item-delete'
@@ -35,6 +37,13 @@ export function ItemsDialogs() {
           confirmText='Excluir'
         />
       )}
+
+      {/* Import dialog */}
+      <ItemsImportDialog />
+
+      {/* Stock management dialog */}
+      <ItemsStockDialog />
     </>
   )
 }
+

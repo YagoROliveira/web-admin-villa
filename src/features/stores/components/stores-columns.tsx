@@ -1,5 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { useNavigate } from '@tanstack/react-router'
+import { Eye } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
 import type { Store } from '../data/schema'
@@ -66,44 +69,24 @@ export const storesColumns: ColumnDef<Store>[] = [
     },
   },
   {
-    accessorKey: 'module',
+    accessorKey: 'phone',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Módulo' />
+      <DataTableColumnHeader column={column} title='Telefone' />
     ),
     cell: ({ row }) => {
-      const mod = row.original.module
-      return mod ? (
-        <Badge variant='outline'>{mod.name}</Badge>
-      ) : (
-        <span className='text-muted-foreground'>-</span>
-      )
+      const phone = row.original.phone
+      return phone ? <span>{phone}</span> : <span className='text-muted-foreground'>-</span>
     },
     enableSorting: false,
   },
   {
-    accessorKey: 'zone',
+    accessorKey: 'commissionRate',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Zona' />
+      <DataTableColumnHeader column={column} title='Comissão' />
     ),
     cell: ({ row }) => {
-      const zone = row.original.zone
-      return zone ? (
-        <span>{zone.displayName || zone.name}</span>
-      ) : (
-        <span className='text-muted-foreground'>-</span>
-      )
-    },
-    enableSorting: false,
-  },
-  {
-    accessorKey: 'vendor',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Lojista' />
-    ),
-    cell: ({ row }) => {
-      const vendor = row.original.vendor
-      if (!vendor) return <span className='text-muted-foreground'>-</span>
-      return <span>{vendor.name || vendor.email || '-'}</span>
+      const rate = row.original.commissionRate
+      return rate != null ? <span>{rate}%</span> : <span className='text-muted-foreground'>-</span>
     },
     enableSorting: false,
   },
@@ -154,6 +137,22 @@ export const storesColumns: ColumnDef<Store>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => <StoresRowActions row={row} />,
+    cell: ({ row }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const navigate = useNavigate()
+      return (
+        <div className='flex items-center gap-1' data-no-navigate>
+          <Button
+            variant='ghost'
+            size='sm'
+            className='h-8 w-8 p-0'
+            onClick={() => navigate({ to: '/admin/stores/$storeId', params: { storeId: row.original.id } })}
+          >
+            <Eye className='h-4 w-4' />
+          </Button>
+          <StoresRowActions row={row} />
+        </div>
+      )
+    },
   },
 ]

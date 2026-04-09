@@ -66,6 +66,7 @@ import { Route as AuthenticatedAdminStoresNewRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminModulesNewRouteImport } from './routes/_authenticated/admin/modules/new'
 import { Route as AuthenticatedAdminCustomersUserIdRouteImport } from './routes/_authenticated/admin/customers/$userId'
 import { Route as AuthenticatedAdminCategoriesNewRouteImport } from './routes/_authenticated/admin/categories/new'
+import { Route as AuthenticatedAdminStoresStoreIdIndexRouteImport } from './routes/_authenticated/admin/stores/$storeId/index'
 import { Route as AuthenticatedAdminOrdersOrderIdIndexRouteImport } from './routes/_authenticated/admin/orders/$orderId/index'
 import { Route as AuthenticatedAdminZonesZoneIdModulesRouteImport } from './routes/_authenticated/admin/zones/$zoneId/modules'
 import { Route as AuthenticatedAdminZonesZoneIdEditRouteImport } from './routes/_authenticated/admin/zones/$zoneId/edit'
@@ -393,6 +394,12 @@ const AuthenticatedAdminCategoriesNewRoute =
     path: '/categories/new',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminStoresStoreIdIndexRoute =
+  AuthenticatedAdminStoresStoreIdIndexRouteImport.update({
+    id: '/stores/$storeId/',
+    path: '/stores/$storeId/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminOrdersOrderIdIndexRoute =
   AuthenticatedAdminOrdersOrderIdIndexRouteImport.update({
     id: '/orders/$orderId/',
@@ -500,6 +507,7 @@ export interface FileRoutesByFullPath {
   '/admin/zones/$zoneId/edit': typeof AuthenticatedAdminZonesZoneIdEditRoute
   '/admin/zones/$zoneId/modules': typeof AuthenticatedAdminZonesZoneIdModulesRoute
   '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdIndexRoute
+  '/admin/stores/$storeId': typeof AuthenticatedAdminStoresStoreIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -564,6 +572,7 @@ export interface FileRoutesByTo {
   '/admin/zones/$zoneId/edit': typeof AuthenticatedAdminZonesZoneIdEditRoute
   '/admin/zones/$zoneId/modules': typeof AuthenticatedAdminZonesZoneIdModulesRoute
   '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdIndexRoute
+  '/admin/stores/$storeId': typeof AuthenticatedAdminStoresStoreIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -631,6 +640,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/zones/$zoneId/edit': typeof AuthenticatedAdminZonesZoneIdEditRoute
   '/_authenticated/admin/zones/$zoneId/modules': typeof AuthenticatedAdminZonesZoneIdModulesRoute
   '/_authenticated/admin/orders/$orderId/': typeof AuthenticatedAdminOrdersOrderIdIndexRoute
+  '/_authenticated/admin/stores/$storeId/': typeof AuthenticatedAdminStoresStoreIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -698,6 +708,7 @@ export interface FileRouteTypes {
     | '/admin/zones/$zoneId/edit'
     | '/admin/zones/$zoneId/modules'
     | '/admin/orders/$orderId'
+    | '/admin/stores/$storeId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/admin'
@@ -762,6 +773,7 @@ export interface FileRouteTypes {
     | '/admin/zones/$zoneId/edit'
     | '/admin/zones/$zoneId/modules'
     | '/admin/orders/$orderId'
+    | '/admin/stores/$storeId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -828,6 +840,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/zones/$zoneId/edit'
     | '/_authenticated/admin/zones/$zoneId/modules'
     | '/_authenticated/admin/orders/$orderId/'
+    | '/_authenticated/admin/stores/$storeId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1245,6 +1258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCategoriesNewRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/stores/$storeId/': {
+      id: '/_authenticated/admin/stores/$storeId/'
+      path: '/stores/$storeId'
+      fullPath: '/admin/stores/$storeId'
+      preLoaderRoute: typeof AuthenticatedAdminStoresStoreIdIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/orders/$orderId/': {
       id: '/_authenticated/admin/orders/$orderId/'
       path: '/orders/$orderId'
@@ -1317,6 +1337,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminZonesZoneIdEditRoute: typeof AuthenticatedAdminZonesZoneIdEditRoute
   AuthenticatedAdminZonesZoneIdModulesRoute: typeof AuthenticatedAdminZonesZoneIdModulesRoute
   AuthenticatedAdminOrdersOrderIdIndexRoute: typeof AuthenticatedAdminOrdersOrderIdIndexRoute
+  AuthenticatedAdminStoresStoreIdIndexRoute: typeof AuthenticatedAdminStoresStoreIdIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
@@ -1351,6 +1372,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
       AuthenticatedAdminZonesZoneIdModulesRoute,
     AuthenticatedAdminOrdersOrderIdIndexRoute:
       AuthenticatedAdminOrdersOrderIdIndexRoute,
+    AuthenticatedAdminStoresStoreIdIndexRoute:
+      AuthenticatedAdminStoresStoreIdIndexRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =

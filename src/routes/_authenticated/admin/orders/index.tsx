@@ -1,8 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Orders } from '@/features/orders'
-import { requirePermission } from '@/lib/route-guards'
 
 export const Route = createFileRoute('/_authenticated/admin/orders/')({
-  beforeLoad: requirePermission('orders.view'),
-  component: () => <Orders />,
+  validateSearch: (search: Record<string, unknown>) => ({
+    status: typeof search.status === 'string' ? search.status : 'all',
+  }),
+  component: OrdersRoute,
 })
+
+function OrdersRoute() {
+  const { status } = Route.useSearch()
+  return <Orders statusFilter={status} />
+}

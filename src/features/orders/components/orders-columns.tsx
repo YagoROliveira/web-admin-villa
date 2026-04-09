@@ -14,10 +14,11 @@ import { OrdersRowActions } from './orders-row-actions'
 
 function formatCurrency(value: number | undefined | null) {
   if (value == null) return '-'
-  return `R$ ${value.toFixed(2)}`
+  return `R$ ${Number(value).toFixed(2)}`
 }
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string | undefined | null) {
+  if (!dateStr) return '-'
   return new Date(dateStr).toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
@@ -56,85 +57,82 @@ export const ordersColumns: ColumnDef<Order>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'trackingId',
+    accessorKey: 'id',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Pedido' />
     ),
-    cell: ({ row }) => {
-      const tracking = row.original.trackingId
-      return (
-        <Link
-          to='/admin/orders/$orderId'
-          params={{ orderId: row.original.id }}
-          className='font-mono text-xs text-primary hover:underline'
-        >
-          #{tracking}
-        </Link>
-      )
-    },
+    cell: ({ row }) => (
+      <Link
+        to='/admin/orders/$orderId'
+        params={{ orderId: String(row.original.id) }}
+        className='font-mono text-xs text-primary hover:underline'
+      >
+        #{row.original.id}
+      </Link>
+    ),
   },
   {
-    accessorKey: 'store',
+    accessorKey: 'store_id',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Loja' />
     ),
     cell: ({ row }) => {
-      const store = row.original.store
-      if (!store) return <span className='text-muted-foreground'>-</span>
-      return (
-        <div className='flex items-center gap-2'>
-          {store.logoUrl ? (
-            <img
-              src={store.logoUrl}
-              alt={store.name}
-              className='h-6 w-6 rounded-full object-cover'
-            />
-          ) : (
+      const storeName = row.original.store_name ?? row.original.store?.name
+      if (storeName) {
+        return (
+          <div className='flex items-center gap-2'>
             <div className='bg-muted flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-medium'>
-              {store.name.charAt(0)}
+              {storeName.charAt(0)}
             </div>
-          )}
-          <span className='max-w-[120px] truncate text-sm'>{store.name}</span>
-        </div>
-      )
+            <span className='max-w-[120px] truncate text-sm'>{storeName}</span>
+          </div>
+        )
+      }
+      return <span className='text-muted-foreground text-xs'>Loja #{row.original.store_id}</span>
     },
   },
   {
-    accessorKey: 'user',
+    accessorKey: 'user_id',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Cliente' />
     ),
     cell: ({ row }) => {
-      const user = row.original.user
-      if (!user) return <span className='text-muted-foreground'>Convidado</span>
-      return (
-        <div>
-          <div className='text-sm font-medium'>{user.name || 'Sem nome'}</div>
-          {user.phone && (
-            <div className='text-muted-foreground text-xs'>{user.phone}</div>
-          )}
-        </div>
-      )
+      const customerName =
+        row.original.customer_name ||
+        [row.original.customer?.f_name, row.original.customer?.l_name].filter(Boolean).join(' ') ||
+        null
+      const phone = row.original.customer_phone ?? row.original.customer?.phone
+      if (customerName) {
+        return (
+          <div>
+            <div className='text-sm font-medium'>{customerName}</div>
+            {phone && (
+              <div className='text-muted-foreground text-xs'>{phone}</div>
+            )}
+          </div>
+        )
+      }
+      return <span className='text-muted-foreground text-xs'>#{row.original.user_id}</span>
     },
   },
   {
-    accessorKey: 'orderType',
+    accessorKey: 'order_type',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Tipo' />
     ),
     cell: ({ row }) => {
-      const label = ORDER_TYPE_LABELS[row.original.orderType] ?? row.original.orderType
+      const label = ORDER_TYPE_LABELS[row.original.order_type] ?? row.original.order_type
       return <Badge variant='outline'>{label}</Badge>
     },
   },
   {
-    accessorKey: 'status',
+    accessorKey: 'order_status',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Status' />
     ),
     cell: ({ row }) => {
-      const info = ORDER_STATUS_LABELS[row.original.status] ?? {
-        label: row.original.status,
+      const info = ORDER_STATUS_LABELS[row.original.order_status] ?? {
+        label: row.original.order_status,
         color: 'bg-gray-100 text-gray-800',
       }
       return (
@@ -143,16 +141,16 @@ export const ordersColumns: ColumnDef<Order>[] = [
         </Badge>
       )
     },
-    filterFn: (row, _id, value) => value.includes(row.getValue('status')),
+    filterFn: (row, _id, value) => value.includes(row.getValue('order_status')),
   },
   {
-    accessorKey: 'paymentStatus',
+    accessorKey: 'payment_status',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Pagamento' />
     ),
     cell: ({ row }) => {
-      const info = PAYMENT_STATUS_LABELS[row.original.paymentStatus] ?? {
-        label: row.original.paymentStatus,
+      const info = PAYMENT_STATUS_LABELS[row.original.payment_status] ?? {
+        label: row.original.payment_status,
         color: 'bg-gray-100 text-gray-800',
       }
       return (
@@ -163,53 +161,44 @@ export const ordersColumns: ColumnDef<Order>[] = [
     },
   },
   {
-    accessorKey: 'paymentMethod',
+    accessorKey: 'payment_method',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Método' />
     ),
-    cell: ({ row }) => {
-      return (
-        <span className='text-muted-foreground text-xs'>
-          {PAYMENT_METHOD_LABELS[row.original.paymentMethod] ?? row.original.paymentMethod}
-        </span>
-      )
-    },
+    cell: ({ row }) => (
+      <span className='text-muted-foreground text-xs'>
+        {PAYMENT_METHOD_LABELS[row.original.payment_method] ?? row.original.payment_method}
+      </span>
+    ),
   },
   {
-    id: 'total',
+    accessorKey: 'order_amount',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Total' />
     ),
-    cell: ({ row }) => {
-      const amounts = row.original.amounts
-      return (
-        <span className='font-semibold'>
-          {formatCurrency(amounts?.total)}
-        </span>
-      )
-    },
+    cell: ({ row }) => (
+      <span className='font-semibold'>
+        {formatCurrency(row.original.order_amount)}
+      </span>
+    ),
   },
   {
-    id: 'items',
-    header: 'Itens',
-    cell: ({ row }) => {
-      const count = row.original._count?.items ?? row.original.items?.length ?? '-'
-      return <span className='text-muted-foreground text-xs'>{count}</span>
-    },
-  },
-  {
-    accessorKey: 'createdAt',
+    accessorKey: 'created_at',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Data' />
     ),
     cell: ({ row }) => (
       <span className='text-muted-foreground text-xs'>
-        {formatDate(row.original.createdAt)}
+        {formatDate(row.original.created_at)}
       </span>
     ),
   },
   {
     id: 'actions',
-    cell: ({ row }) => <OrdersRowActions row={row} />,
+    cell: ({ row }) => (
+      <div className='flex items-center justify-end'>
+        <OrdersRowActions row={row} />
+      </div>
+    ),
   },
 ]

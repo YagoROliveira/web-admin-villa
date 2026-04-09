@@ -3,6 +3,7 @@ import { buildVmApiUrl, VM_API, buildApiUrl, API_CONFIG } from '@/config/api'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { DEFAULT_ROLE_PERMISSIONS } from '@/types/auth'
+import { tryPhpLogin } from '@/lib/api'
 import type { AuthUser, UserRole, Permission } from '@/types/auth'
 
 // ─── Request / Response types ───
@@ -116,7 +117,7 @@ export function useLogin() {
   const { auth } = useAuthStore()
 
   return useMutation<
-    { user: AuthUser; accessToken: string; refreshToken: string },
+    { user: AuthUser; accessToken: string; refreshToken: string; _credentials: LoginRequest },
     Error,
     LoginRequest
   >({
@@ -181,12 +182,14 @@ export function useLogin() {
       const accessToken = data.accessToken ?? data.token ?? data.access_token ?? ''
       const refreshToken = data.refreshToken ?? data.refresh_token ?? ''
 
-      return { user, accessToken, refreshToken }
+      return { user, accessToken, refreshToken, _credentials: credentials }
     },
     onSuccess: (result) => {
       auth.setUser(result.user)
       auth.setAccessToken(result.accessToken)
       auth.setRefreshToken(result.refreshToken)
+      // Silently try PHP login to obtain a PHP-compatible token for order details
+      tryPhpLogin(result._credentials.email, result._credentials.password).catch(() => {})
       toast.success(`Bem-vindo, ${result.user.name}!`)
     },
     onError: (error: Error) => {

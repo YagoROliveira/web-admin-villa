@@ -11,6 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+import { useNavigate } from '@tanstack/react-router'
 import {
   Table,
   TableBody,
@@ -29,6 +30,7 @@ interface OrdersTableProps {
 }
 
 export function OrdersTable({ data, isLoading }: OrdersTableProps) {
+  const navigate = useNavigate()
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -92,6 +94,13 @@ export function OrdersTable({ data, isLoading }: OrdersTableProps) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  className='cursor-pointer'
+                  onClick={(e) => {
+                    // Ignore clicks on checkbox, buttons, links, or dropdown elements
+                    const target = e.target as HTMLElement
+                    if (target.closest('input[type="checkbox"], button, a, [role="menuitem"], [data-radix-popper-content-wrapper]')) return
+                    navigate({ to: '/admin/orders/$orderId', params: { orderId: String(row.original.id) } })
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

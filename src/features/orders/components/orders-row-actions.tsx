@@ -22,8 +22,8 @@ export function OrdersRowActions({ row }: OrdersRowActionsProps) {
   const navigate = useNavigate()
   const { setSelectedOrder, setDialogOpen } = useOrdersContext()
 
-  const isCancelable = !['DELIVERED', 'CANCELED', 'FAILED', 'REFUNDED'].includes(
-    order.status
+  const isCancelable = !['delivered', 'canceled', 'failed', 'refunded'].includes(
+    order.order_status
   )
 
   return (
@@ -42,7 +42,7 @@ export function OrdersRowActions({ row }: OrdersRowActionsProps) {
           onClick={() => {
             navigate({
               to: '/admin/orders/$orderId',
-              params: { orderId: order.id },
+              params: { orderId: String(order.id) },
             })
           }}
         >

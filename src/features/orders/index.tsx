@@ -4,57 +4,38 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { useOrders, useStoreOrders, useOrderStats } from './hooks/use-orders'
+import { usePhpOrders } from './hooks/use-orders'
 import { OrdersProvider } from './components/orders-provider'
 import { OrdersTable } from './components/orders-table'
 import { OrdersDialogs } from './components/orders-dialogs'
-import { OrdersStatsCards } from './components/orders-stats-cards'
-import { ORDER_STATUS_LABELS } from './data/schema'
+
 
 interface OrdersProps {
-  /** When provided, filters orders by this store (vendor mode). */
+  statusFilter?: string
   storeId?: string
 }
 
-export function Orders({ storeId }: OrdersProps) {
+export function Orders({ statusFilter = 'all' }: OrdersProps) {
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize] = useState(25)
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('ALL')
+  const activeStatus = statusFilter || 'all'
 
-  const isVendor = !!storeId
-
-  // Use the appropriate query based on role
-  const adminQuery = useOrders(
+  const { data: ordersData, isLoading, isFetching } = usePhpOrders(
+    activeStatus,
     currentPage,
-    pageSize,
-    searchQuery,
-    !isVendor
-      ? { status: statusFilter !== 'ALL' ? statusFilter : undefined }
-      : undefined,
-    !isVendor // Only enable when NOT vendor
-  )
-  const vendorQuery = useStoreOrders(
-    storeId ?? '',
-    currentPage,
-    pageSize,
     searchQuery
   )
 
-  const ordersQuery = isVendor ? vendorQuery : adminQuery
-  const { data: ordersData, isLoading, isFetching } = ordersQuery
+  const orders = ordersData?.orders ?? []
+  const totalOrders = ordersData?.total ?? 0
+  const totalPages = ordersData?.lastPage ?? 1
 
-  const { data: stats, isLoading: statsLoading } = useOrderStats(storeId)
-
-  const orders = ordersData?.items ?? []
+  function handleSearch(value: string) {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
 
   return (
     <OrdersProvider>
@@ -67,56 +48,25 @@ export function Orders({ storeId }: OrdersProps) {
       </Header>
 
       <Main>
-        <div className='mb-2 flex flex-wrap items-center justify-between space-y-2 gap-x-4'>
+        <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>Pedidos</h2>
-            <p className='text-muted-foreground'>
-              {isVendor
-                ? 'Gerencie os pedidos da sua loja.'
-                : 'Gerencie todos os pedidos da plataforma.'}
+            <p className='text-muted-foreground text-sm'>
+              {totalOrders > 0 ? `${totalOrders} pedidos encontrados` : 'Gerencie todos os pedidos da plataforma.'}
             </p>
           </div>
         </div>
 
-        {/* Stats cards */}
-        <OrdersStatsCards stats={stats} isLoading={statsLoading} />
-
-        {/* Filters */}
-        <div className='my-4 flex flex-wrap items-center gap-4'>
+        {/* Search bar */}
+        <div className='mb-4 flex flex-wrap items-center gap-3'>
           <Input
-            placeholder='Buscar pedidos...'
+            placeholder='Buscar por ID, status, referência...'
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              setCurrentPage(1)
-            }}
+            onChange={(e) => handleSearch(e.target.value)}
             className='max-w-sm'
           />
-
-          {!isVendor && (
-            <Select
-              value={statusFilter}
-              onValueChange={(val) => {
-                setStatusFilter(val)
-                setCurrentPage(1)
-              }}
-            >
-              <SelectTrigger className='w-[200px]'>
-                <SelectValue placeholder='Filtrar por status' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='ALL'>Todos os status</SelectItem>
-                {Object.entries(ORDER_STATUS_LABELS).map(([key, info]) => (
-                  <SelectItem key={key} value={key}>
-                    {info.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
           {isFetching && (
-            <span className='text-muted-foreground text-sm'>Carregando...</span>
+            <span className='text-muted-foreground text-xs'>Carregando...</span>
           )}
         </div>
 
@@ -126,27 +76,65 @@ export function Orders({ storeId }: OrdersProps) {
         </div>
 
         {/* Pagination */}
-        {ordersData && (
+        {totalPages > 1 && (
           <div className='mt-4 flex items-center justify-between'>
             <span className='text-muted-foreground text-sm'>
-              Página {ordersData.page} de {ordersData.totalPages} (
-              {ordersData.total} pedidos)
+              Página {currentPage} de {totalPages} ({totalOrders} pedidos)
             </span>
-            <div className='flex gap-2'>
-              <button
-                className='rounded border px-3 py-1 text-sm disabled:opacity-50'
+            <div className='flex items-center gap-1'>
+              <Button
+                variant='outline'
+                size='sm'
                 disabled={currentPage <= 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
               >
                 Anterior
-              </button>
-              <button
-                className='rounded border px-3 py-1 text-sm disabled:opacity-50'
-                disabled={currentPage >= ordersData.totalPages}
+              </Button>
+              {/* Page number pills — show at most 5 pages */}
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                let page: number
+                if (totalPages <= 5) {
+                  page = i + 1
+                } else if (currentPage <= 3) {
+                  page = i + 1
+                } else if (currentPage >= totalPages - 2) {
+                  page = totalPages - 4 + i
+                } else {
+                  page = currentPage - 2 + i
+                }
+                return (
+                  <Button
+                    key={page}
+                    variant={page === currentPage ? 'default' : 'outline'}
+                    size='sm'
+                    className='w-8 px-0'
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </Button>
+                )
+              })}
+              {totalPages > 5 && currentPage < totalPages - 2 && (
+                <span className='text-muted-foreground px-1 text-sm'>...</span>
+              )}
+              {totalPages > 5 && currentPage < totalPages - 2 && (
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='w-8 px-0'
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  {totalPages}
+                </Button>
+              )}
+              <Button
+                variant='outline'
+                size='sm'
+                disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
               >
                 Próxima
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -156,3 +144,5 @@ export function Orders({ storeId }: OrdersProps) {
     </OrdersProvider>
   )
 }
+
+
